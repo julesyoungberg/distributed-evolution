@@ -1,0 +1,25 @@
+---
+version: '3'
+
+services:
+    master:
+        build:
+            context: .
+            dockerfile: ./master/Dockerfile
+        command: go run master/master.go
+        environment: 
+            PORT: 3000
+        expose:
+            - "3000"
+    worker:
+        build:
+            context: .
+            dockerfile: ./worker/Dockerfile
+        command: go run worker/worker.go
+        environment: 
+            MASTER_PORT: 3000
+
+networks:
+    default:
+        external:
+            name: distributed-ga

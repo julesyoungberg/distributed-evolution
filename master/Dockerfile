@@ -7,4 +7,6 @@ COPY ./ /app
 # RUN mkdir /shared
 # VOLUME /shared
 
-ENTRYPOINT go run master.go
+EXPOSE 3000
+
+CMD ["go" "run" "master.go"]
