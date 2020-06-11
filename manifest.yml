@@ -3,29 +3,35 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: distributed-evolution
+  name: distributed-ga
   labels:
-    app: distributed-evolution
+    app: distributed-ga
 
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: master
+      app: distributed-ga
   strategy: {}
 
   template:
     metadata:
-      name: master
+      name: distributed-ga
       labels:
-        app: master
+        app: distributed-ga
     spec:
       containers:
       - name: master
-        image: de-master # TODO push to docker registry
+        image: dga-master # TODO push to docker registry
         imagePullPolicy: Never
         resources: {}
         ports:
           - containerPort: 3000
+      - name: worker
+        image: dga-worker # TODO push to docker registry
+        imagePullPolicy: Never
+        resources: {}
+        ports:
+          - containerPort: 3001
 
 status: {}

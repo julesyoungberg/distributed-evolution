@@ -1,1 +1,1 @@
-docker build -t de-worker .
+docker build -t dga-worker .

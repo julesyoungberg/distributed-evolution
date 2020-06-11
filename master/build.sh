@@ -1,1 +1,1 @@
-docker build -t de-master .
+docker build -t dga-master .
