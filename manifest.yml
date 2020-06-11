@@ -1,0 +1,31 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: distributed-evolution
+  labels:
+    app: distributed-evolution
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: master
+  strategy: {}
+
+  template:
+    metadata:
+      name: master
+      labels:
+        app: master
+    spec:
+      containers:
+      - name: master
+        image: de-master # TODO push to docker registry
+        imagePullPolicy: Never
+        resources: {}
+        ports:
+          - containerPort: 3000
+
+status: {}
