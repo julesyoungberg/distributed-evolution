@@ -7,22 +7,15 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
+
+	"../api"
 )
-
-// TODO move EchoArgs and EchoReply to shared package
-type EchoArgs struct {
-	Message string
-}
-
-type EchoReply struct {
-	Message string
-}
 
 type Master struct {
 	// master state
 }
 
-func (m *Master) Echo(args *EchoArgs, reply *EchoReply) error {
+func (m *Master) Echo(args *api.EchoArgs, reply *api.EchoReply) error {
 	fmt.Printf("request received: { Message: %v }\n", args.Message)
 	reply.Message = args.Message
 	return nil

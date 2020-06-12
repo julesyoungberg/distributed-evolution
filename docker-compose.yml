@@ -17,7 +17,7 @@ services:
             dockerfile: ./worker/Dockerfile
         command: go run worker/worker.go
         environment: 
-            MASTER_PORT: 3000
+            PORT: 3000
 
 networks:
     default:
