@@ -8,7 +8,7 @@ import (
 	"net/rpc"
 	"os"
 
-	"../api"
+	"github.com/rickyfitts/distributed-evolution/api"
 )
 
 type Master struct {

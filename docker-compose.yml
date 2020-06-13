@@ -5,8 +5,8 @@ services:
     master:
         build:
             context: .
-            dockerfile: ./master/Dockerfile
-        command: go run master/master.go
+            dockerfile: ./master.Dockerfile
+        command: go run master.go
         environment: 
             PORT: 3000
         expose:
@@ -14,8 +14,8 @@ services:
     worker:
         build:
             context: .
-            dockerfile: ./worker/Dockerfile
-        command: go run worker/worker.go
+            dockerfile: ./worker.Dockerfile
+        command: go run worker.go
         environment: 
             PORT: 3000
 

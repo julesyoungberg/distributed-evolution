@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"../api"
+	"github.com/rickyfitts/distributed-evolution/api"
 )
 
 type Worker struct {
