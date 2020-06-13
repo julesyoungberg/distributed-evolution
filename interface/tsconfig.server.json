@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "lib": ["dom", "es2015", "es2016"],
+        "moduleResolution": "node",
+        "noImplicitAny": false,
+        "removeComments": true,
+        "outDir": "./build",
+        "skipLibCheck": true,
+        "sourceMap": false,
+        "strict": false,
+        "typeRoots": ["./node_modules/@types", "./@types"]
+    },
+    "include": ["./src/server/**/*", "./@types/**/*"],
+    "exclude": ["**/*.test.ts"]
+}

@@ -11,7 +11,7 @@ RUN go mod download
 # RUN mkdir /shared
 # VOLUME /shared
 
-EXPOSE 3000
+EXPOSE 9000
 
 WORKDIR /app/master
 

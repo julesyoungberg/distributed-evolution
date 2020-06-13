@@ -8,16 +8,31 @@ services:
             dockerfile: ./master.Dockerfile
         command: go run master.go
         environment: 
-            PORT: 3000
-        expose:
-            - "3000"
+            PORT: 9000
+        ports:
+            - 9000:9000
     worker:
         build:
             context: .
             dockerfile: ./worker.Dockerfile
         command: go run worker.go
         environment: 
+            PORT: 9000
+    interface:
+        build:
+            context: .
+            dockerfile: ./interface.Dockerfile
+        command: npm run start:nodemon
+        environment: 
             PORT: 3000
+            API: "master:9000"
+        ports:
+            - 3000:3000
+        restart: unless-stopped
+        volumes:
+            - ./interface/:/app
+            - /app/node_modules/
+            - /app/.next
 
 networks:
     default:
