@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -14,7 +13,7 @@ type websocketMessage struct {
 	TargetImage string `json:"targetImage"`
 }
 
-func (m *Master) socket(ws *websocket.Conn) {
+func (m *Master) subscribe(ws *websocket.Conn) {
 	for {
 		m := websocketMessage{TargetImage: m.targetImageBase64}
 
@@ -28,11 +27,11 @@ func (m *Master) socket(ws *websocket.Conn) {
 }
 
 func (m *Master) httpServer() {
-	http.Handle("/subscribe", websocket.Handler(m.socket))
+	http.Handle("/subscribe", websocket.Handler(m.subscribe))
 
 	port := os.Getenv("HTTP_PORT")
 
-	fmt.Printf("http listening on port %v\n", port)
+	log.Printf("listening for HTTP on port %v\n", port)
 
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

@@ -3,15 +3,24 @@ package util
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"image"
 	"image/jpeg"
 	"log"
 	"net/http"
 )
 
+// Debugging
+const Debug = 1
+
+func DPrintf(format string, a ...interface{}) (n int, err error) {
+	if Debug > 0 {
+		log.Printf(format, a...)
+	}
+	return
+}
+
 func GetRandomImage() image.Image {
-	fmt.Printf("fetching image...")
+	DPrintf("fetching random image...")
 
 	imageUrl := "https://picsum.photos/900"
 
@@ -30,7 +39,7 @@ func GetRandomImage() image.Image {
 }
 
 func Base64EncodeImage(img image.Image) string {
-	fmt.Printf("encoding image...")
+	DPrintf("encoding image...")
 
 	buf := new(bytes.Buffer)
 

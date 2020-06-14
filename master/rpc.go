@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -9,16 +8,21 @@ import (
 	"os"
 
 	"github.com/rickyfitts/distributed-evolution/api"
+	"github.com/rickyfitts/distributed-evolution/util"
 )
 
 func (m *Master) Echo(args *api.EchoArgs, reply *api.EchoReply) error {
-	fmt.Printf("request received: { Message: %v }\n", args.Message)
+	util.DPrintf("request received: { Message: %v }\n", args.Message)
 	reply.Message = args.Message
 	return nil
 }
 
 func (m *Master) rpcServer() {
-	rpc.Register(m)
+	err := rpc.Register(m)
+	if err != nil {
+		log.Fatal("rpc error: ", err)
+	}
+
 	rpc.HandleHTTP()
 
 	port := os.Getenv("RPC_PORT")
@@ -27,7 +31,10 @@ func (m *Master) rpcServer() {
 		log.Fatal("listener error: ", err)
 	}
 
-	fmt.Printf("rpc listening on port %v\n", port)
+	log.Printf("listening for RPC on port %v\n", port)
 
-	http.Serve(listener, nil)
+	err = http.Serve(listener, nil)
+	if err != nil {
+		log.Fatal("rpc serve error: ", err)
+	}
 }

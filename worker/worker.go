@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"time"
+
+	"github.com/rickyfitts/distributed-evolution/util"
 
 	"github.com/rickyfitts/distributed-evolution/api"
 )
@@ -20,6 +21,6 @@ func main() {
 
 		api.Call("Master.Echo", &args, &reply)
 
-		fmt.Printf("response received: { Message: %v }\n", reply.Message)
+		util.DPrintf("response received: { Message: %v }\n", reply.Message)
 	}
 }

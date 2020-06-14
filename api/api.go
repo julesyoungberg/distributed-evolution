@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/rpc"
 	"os"
+
+	"github.com/rickyfitts/distributed-evolution/util"
 )
 
 type EchoArgs struct {
@@ -19,12 +21,12 @@ type EchoReply struct {
 // usually returns true.
 // returns false if something goes wrong.
 func Call(rpcname string, args interface{}, reply interface{}) bool {
-	println("making a request")
+	util.DPrintf("making a request")
 
 	port := os.Getenv("PORT")
 	c, err := rpc.DialHTTP("tcp", "master:"+port)
 	if err != nil {
-		log.Fatal("dialing:", err)
+		log.Fatal("dialing: ", err)
 	}
 
 	defer c.Close()
