@@ -1,43 +1,16 @@
-import getConfig from 'next/config'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+
+import useWebsocket from '../hooks/useWebsocket'
 
 export default function Home() {
     const [targetImage, setTargetImage] = useState<string | undefined>(undefined)
 
-    useEffect(() => {
-        const { publicRuntimeConfig } = getConfig()
-    
-        const socket = new WebSocket(`ws://${publicRuntimeConfig.apiUrl}/subscribe`)
+    const onMessage = (data: Record<string, any>) => {
+        if (data.targetImage) setTargetImage(data.targetImage)
+    }
 
-        const onOpen = () => {
-            console.log('subscribed to server')
-        }
-
-        const onMessage = (event) => {
-            console.log('message from server ', event.data)
-            
-            let json: Record<string, any> | undefined
-
-            try {
-                json = JSON.parse(event.data)
-            } catch (e) {
-                // silence is golden
-            }
-
-            if (!json) return
-
-            setTargetImage(json.targetImage)
-        }
-
-        socket.addEventListener('open', onOpen)
-        socket.addEventListener('message', onMessage)
-
-        return () => {
-            socket.removeEventListener('open', onOpen)
-            socket.removeEventListener('message', onMessage)
-        }
-    })
+    useWebsocket(onMessage)
 
     return (
         <div className='container'>
@@ -47,9 +20,12 @@ export default function Home() {
             </Head>
 
             <main>
-                <h1>Welcome</h1>
+                <h1>Distributed Evolution</h1>
 
-                {targetImage && <img src={`data:image/jpg;base64, ${targetImage}`} />}
+                <div>
+                    <h2>Target Image</h2>
+                    {targetImage && <img src={`data:image/jpg;base64, ${targetImage}`} />}
+                </div>
             </main>
         </div>
     )
