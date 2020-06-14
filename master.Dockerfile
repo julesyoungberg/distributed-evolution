@@ -8,11 +8,12 @@ COPY ./go.mod ./go.sum ./
 
 RUN go mod download
 
-# RUN mkdir /shared
-# VOLUME /shared
+# expose http port
+EXPOSE 9000 
 
-EXPOSE 9000
+# expose rpc port
+EXPOSE 8080
 
 WORKDIR /app/master
 
-CMD ["go" "run" "master.go"]
+CMD ["go" "run" "."]

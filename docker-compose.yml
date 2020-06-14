@@ -6,18 +6,20 @@ services:
         build:
             context: .
             dockerfile: ./master.Dockerfile
-        command: go run master.go
+        command: go run .
         environment: 
-            PORT: 9000
+            HTTP_PORT: 9000
+            RPC_PORT: 8080
         ports:
             - 9000:9000
+            - 8080
     worker:
         build:
             context: .
             dockerfile: ./worker.Dockerfile
-        command: go run worker.go
+        command: go run .
         environment: 
-            PORT: 9000
+            PORT: 8080
     interface:
         build:
             context: .
@@ -25,7 +27,7 @@ services:
         command: npm run start:nodemon
         environment: 
             PORT: 3000
-            API: "master:9000"
+            API_URL: localhost:9000
         ports:
             - 3000:3000
         restart: unless-stopped

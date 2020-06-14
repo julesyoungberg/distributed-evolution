@@ -1,4 +1,8 @@
 module.exports = {
+    publicRuntimeConfig: {
+        apiUrl: process.env.API_URL,
+        environment: process.env.NODE_ENV,
+    },
     webpackDevMiddleware: config => {
         config.watchOptions = {
             poll: 1000,
