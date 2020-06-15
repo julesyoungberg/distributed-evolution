@@ -1,11 +1,9 @@
 package main
 
 import (
-	"encoding/base64"
 	"fmt"
 	"image"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/MaxHalford/eaopt"
@@ -27,16 +25,26 @@ type Worker struct {
 	targetImage  Image
 }
 
+func createGA() *eaopt.GA {
+	gaConfig := eaopt.NewDefaultGAConfig()
+
+	gaConfig.NPops = 1
+	gaConfig.NGenerations = 1
+
+	ga, err := gaConfig.NewGA()
+	if err != nil {
+		log.Fatal("error creating ga: ", err)
+	}
+
+	return ga
+}
+
 func (w *Worker) runTask(task api.Task) {
 	util.DPrintf("assigned task %v\n", task.ID)
 
 	w.currentTask = task
 
-	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(task.TargetImage))
-	img, _, err := image.Decode(reader)
-	if err != nil {
-		log.Fatal("error decoding task target image ", err)
-	}
+	img := util.DecodeImage(task.TargetImage)
 
 	bounds := img.Bounds()
 	w.targetImage = Image{
@@ -47,7 +55,7 @@ func (w *Worker) runTask(task api.Task) {
 
 	Factory := createTriangleFactory(w)
 
-	err = w.ga.Minimize(Factory)
+	err := w.ga.Minimize(Factory)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -67,7 +75,7 @@ func main() {
 	time.Sleep(10 * time.Second)
 
 	for {
-		task := getTask()
+		task := api.GetTask()
 
 		// if generation is zero this is an empty response, if so just wait for more work
 		if task.Generation != 0 {

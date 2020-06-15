@@ -7,6 +7,7 @@ import (
 	"image/jpeg"
 	"log"
 	"net/http"
+	"strings"
 )
 
 // Debugging
@@ -38,7 +39,7 @@ func GetRandomImage() image.Image {
 	return img
 }
 
-func Base64EncodeImage(img image.Image) string {
+func EncodeImage(img image.Image) string {
 	buf := new(bytes.Buffer)
 
 	err := jpeg.Encode(buf, img, nil)
@@ -47,4 +48,14 @@ func Base64EncodeImage(img image.Image) string {
 	}
 
 	return base64.StdEncoding.EncodeToString(buf.Bytes())
+}
+
+func DecodeImage(data string) image.Image {
+	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
+	img, _, err := image.Decode(reader)
+	if err != nil {
+		log.Fatal("error decoding task target image ", err)
+	}
+
+	return img
 }

@@ -42,7 +42,7 @@ func (m *Master) generateTasks() {
 				Generation:  1,
 				ID:          (y * cols) + x,
 				Location:    rect,
-				TargetImage: util.Base64EncodeImage(rgbImg.SubImage(rect)),
+				TargetImage: util.EncodeImage(rgbImg.SubImage(rect)),
 			}
 
 			m.taskQueue = append(m.taskQueue, task)
@@ -54,7 +54,7 @@ func main() {
 	m := new(Master)
 
 	m.targetImage = util.GetRandomImage()
-	m.targetImageBase64 = util.Base64EncodeImage(m.targetImage)
+	m.targetImageBase64 = util.EncodeImage(m.targetImage)
 	m.generateTasks()
 
 	m.generateTasks()

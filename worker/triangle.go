@@ -7,11 +7,6 @@ import (
 	"github.com/MaxHalford/eaopt"
 )
 
-type Vector struct {
-	x float64
-	y float64
-}
-
 type Triangle struct {
 	context  *Worker
 	Color    color.RGBA
