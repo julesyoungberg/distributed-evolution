@@ -20,10 +20,10 @@ services:
         command: go run .
         environment: 
             PORT: 8080
-    interface:
+    ui:
         build:
             context: .
-            dockerfile: ./interface.Dockerfile
+            dockerfile: ./ui.Dockerfile
         command: npm run start:nodemon
         environment: 
             API_URL: localhost:9000
@@ -33,7 +33,7 @@ services:
             - 3000:3000
         restart: unless-stopped
         volumes:
-            - ./interface/:/app
+            - ./ui/:/app
             - /app/node_modules/
             - /app/.next
 

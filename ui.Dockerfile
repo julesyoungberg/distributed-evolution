@@ -2,11 +2,11 @@ FROM node:alpine AS builder
 
 WORKDIR /app
 
-COPY ./interface/package*.json ./
+COPY ./ui/package*.json ./
 
 RUN npm ci
 
-COPY ./interface .
+COPY ./ui .
 
 EXPOSE 3000
 
