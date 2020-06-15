@@ -15,9 +15,9 @@ type websocketMessage struct {
 
 func (m *Master) subscribe(ws *websocket.Conn) {
 	for {
-		m := websocketMessage{TargetImage: m.targetImageBase64}
+		msg := websocketMessage{TargetImage: m.targetImageBase64}
 
-		if err := websocket.JSON.Send(ws, m); err != nil {
+		if err := websocket.JSON.Send(ws, msg); err != nil {
 			log.Println(err)
 			break
 		}

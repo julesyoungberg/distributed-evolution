@@ -6,14 +6,23 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
+	"time"
 
 	"github.com/rickyfitts/distributed-evolution/api"
 	"github.com/rickyfitts/distributed-evolution/util"
 )
 
-func (m *Master) Echo(args *api.EchoArgs, reply *api.EchoReply) error {
-	util.DPrintf("request received: { Message: %v }\n", args.Message)
-	reply.Message = args.Message
+func (m *Master) GetTask(args *api.EmptyMessage, reply *api.Task) error {
+	if len(m.taskQueue) > 0 {
+		task := m.taskQueue[0]
+		task.Started = time.Now()
+		*reply = task
+
+		m.inProgressTasks = append(m.inProgressTasks, task)
+		m.taskQueue = m.taskQueue[1:]
+		util.DPrintf("assigning task %v\n", task.ID)
+	}
+
 	return nil
 }
 

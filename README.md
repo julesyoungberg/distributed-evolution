@@ -8,5 +8,6 @@ TODO:
 5. download random image (lorem ipsum?) in master and send to interface - DONE
 6. slice image up into jobs
 7. send jobs to workers
-8. combine result in master
-9. iterate
+8. excute genetic algorithm for each job
+9. combine result in master
+10. iterate

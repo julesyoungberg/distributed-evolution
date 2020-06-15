@@ -39,8 +39,6 @@ func GetRandomImage() image.Image {
 }
 
 func Base64EncodeImage(img image.Image) string {
-	DPrintf("encoding image...")
-
 	buf := new(bytes.Buffer)
 
 	err := jpeg.Encode(buf, img, nil)

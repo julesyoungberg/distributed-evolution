@@ -3,24 +3,33 @@ package main
 import (
 	"time"
 
-	"github.com/rickyfitts/distributed-evolution/util"
-
 	"github.com/rickyfitts/distributed-evolution/api"
+	"github.com/rickyfitts/distributed-evolution/util"
 )
 
 type Worker struct {
 	// worker state
 }
 
+func (w *Worker) runTask(task api.Task) {
+	util.DPrintf("assigned task %v\n", task.ID)
+	time.Sleep(10 * time.Second)
+}
+
 func main() {
+	var w Worker
+
+	// wait for master to initialize
+	time.Sleep(10 * time.Second)
+
 	for {
-		time.Sleep(10 * time.Second)
+		task := getTask()
 
-		args := api.EchoArgs{Message: "Hello World!"}
-		var reply api.EchoReply
+		// if generation is zero this is an empty response, if so just wait for more work
+		if task.Generation != 0 {
+			w.runTask(task)
+		}
 
-		api.Call("Master.Echo", &args, &reply)
-
-		util.DPrintf("response received: { Message: %v }\n", reply.Message)
+		time.Sleep(time.Second)
 	}
 }
