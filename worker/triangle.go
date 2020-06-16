@@ -8,7 +8,7 @@ import (
 )
 
 type Triangle struct {
-	context  *Worker
+	Context  *Worker
 	Color    color.RGBA
 	Vertices [][]float64
 }
@@ -17,6 +17,7 @@ type Triangle struct {
 func createTriangleFactory(ctx *Worker) func(rng *rand.Rand) eaopt.Genome {
 	upper := Vector{float64(ctx.targetImage.width), float64(ctx.targetImage.height)}
 
+	// creates a random triangle, used to generate the initial population
 	return func(rng *rand.Rand) eaopt.Genome {
 		clr := color.RGBA{
 			uint8(rng.Intn(255)),
@@ -32,31 +33,41 @@ func createTriangleFactory(ctx *Worker) func(rng *rand.Rand) eaopt.Genome {
 		}
 
 		return Triangle{
-			context:  ctx,
+			Context:  ctx,
 			Color:    clr,
 			Vertices: vrt,
 		}
 	}
 }
 
-func (t *Triangle) Contains(pt Vector) bool {
+// checks if a point is contained in the triangle
+func (t *Triangle) contains(pt Vector) bool {
 	v1 := t.Vertices[0]
 	v2 := t.Vertices[1]
 	v3 := t.Vertices[2]
-	return PointInTriangle(pt, Vector{v1[0], v1[1]}, Vector{v2[0], v2[1]}, Vector{v3[0], v3[1]})
+	return pointInTriangle(pt, Vector{v1[0], v1[1]}, Vector{v2[0], v2[1]}, Vector{v3[0], v3[1]})
 }
 
-// determine how well the triangle matches with the containing pixels of the target image
+// clamps the triangles position by the width and height of the target image
+func (t *Triangle) clampPosition() {
+	for _, v := range t.Vertices {
+		v[0] = clampFloat64(v[0], 0.0, float64(t.Context.targetImage.width))
+		v[1] = clampFloat64(v[0], 0.0, float64(t.Context.targetImage.height))
+	}
+}
+
+// determine how well the triangle matches with the corresponding pixels of the target image
 func (t Triangle) Evaluate() (float64, error) {
 	totalInside := 0
 	var fitness float64 = 0.0
 
-	for y := 0; y < t.context.targetImage.height; y++ {
-		for x := 0; x < t.context.targetImage.width; x++ {
-			if t.Contains(Vector{float64(x), float64(y)}) {
+	for y := 0; y < t.Context.targetImage.height; y++ {
+		for x := 0; x < t.Context.targetImage.width; x++ {
+			// if the pixel is within the triangle, check how well the color matches
+			if t.contains(Vector{float64(x), float64(y)}) {
 				totalInside++
 
-				r, g, b, _ := t.context.targetImage.image.At(x, y).RGBA()
+				r, g, b, _ := t.Context.targetImage.image.At(x, y).RGBA()
 
 				dr := uint32(t.Color.R) / r
 				dg := uint32(t.Color.G) / g
@@ -77,7 +88,7 @@ func (t Triangle) Mutate(rng *rand.Rand) {
 	c := []uint8{t.Color.R, t.Color.G, t.Color.B}
 
 	for i, x := range c {
-		if rng.Float64() < t.context.mutationRate {
+		if rng.Float64() < t.Context.mutationRate {
 			c[i] = uint8(rng.NormFloat64() * float64(x))
 		}
 	}
@@ -89,6 +100,8 @@ func (t Triangle) Mutate(rng *rand.Rand) {
 	for _, p := range t.Vertices {
 		eaopt.MutNormalFloat64(p, 0.8, rng)
 	}
+
+	t.clampPosition()
 }
 
 // mix genes with another triangle
@@ -111,12 +124,15 @@ func (t Triangle) Crossover(g eaopt.Genome, rng *rand.Rand) {
 	for i := range t.Vertices {
 		eaopt.CrossUniformFloat64(t.Vertices[i], o.Vertices[i], rng)
 	}
+
+	t.clampPosition()
+	o.clampPosition()
 }
 
 // copy all the data without pointers
 // TODO figure out how deep this actually needs to be
 func (t Triangle) Clone() eaopt.Genome {
-	clone := Triangle{context: t.context}
+	clone := Triangle{Context: t.Context}
 	clone.Color = color.RGBA{t.Color.R, t.Color.G, t.Color.B, t.Color.A}
 
 	for _, p := range t.Vertices {

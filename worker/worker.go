@@ -26,12 +26,7 @@ type Worker struct {
 }
 
 func createGA() *eaopt.GA {
-	gaConfig := eaopt.NewDefaultGAConfig()
-
-	gaConfig.NPops = 1
-	gaConfig.NGenerations = 1
-
-	ga, err := gaConfig.NewGA()
+	ga, err := eaopt.NewDefaultGAConfig().NewGA()
 	if err != nil {
 		log.Fatal("error creating ga: ", err)
 	}
@@ -39,18 +34,26 @@ func createGA() *eaopt.GA {
 	return ga
 }
 
+// TODO figure out how we can set an initial population to start from
+// maybe make another version of createTriangleFactory that accepts a seed population
 func (w *Worker) runTask(task api.Task) {
 	util.DPrintf("assigned task %v\n", task.ID)
 
-	w.currentTask = task
-
 	img := util.DecodeImage(task.TargetImage)
+	width, height := util.GetImageDimensions(img)
 
-	bounds := img.Bounds()
+	w.currentTask = task
 	w.targetImage = Image{
 		image:  img,
-		width:  bounds.Dx(),
-		height: bounds.Dy(),
+		width:  width,
+		height: height,
+	}
+
+	w.ga.NGenerations = 1000
+
+	w.ga.Callback = func(ga *eaopt.GA) {
+		// TODO send current population to the master
+		fmt.Printf("Best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
 	}
 
 	Factory := createTriangleFactory(w)
@@ -65,10 +68,6 @@ func main() {
 	w := Worker{
 		ga:           createGA(),
 		mutationRate: 0.8,
-	}
-
-	w.ga.Callback = func(ga *eaopt.GA) {
-		fmt.Printf("Best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
 	}
 
 	// wait for master to initialize

@@ -59,3 +59,8 @@ func DecodeImage(data string) image.Image {
 
 	return img
 }
+
+func GetImageDimensions(img image.Image) (int, int) {
+	bounds := img.Bounds()
+	return bounds.Dx(), bounds.Dy()
+}
