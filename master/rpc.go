@@ -28,7 +28,11 @@ func (m *Master) Update(task, reply *api.Task) error {
 	m.Tasks[task.ID] = *task
 	m.mu.Unlock()
 
-	m.UpdateGenerations(*task)
+	genN := m.UpdateGenerations(*task)
+
+	m.DrawToGeneration(genN, *task)
+
+	m.UpdateUI(genN)
 
 	return nil
 }

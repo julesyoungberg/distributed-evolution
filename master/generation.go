@@ -1,6 +1,8 @@
 package master
 
 import (
+	"log"
+
 	"github.com/fogleman/gg"
 
 	"github.com/rickyfitts/distributed-evolution/api"
@@ -16,7 +18,7 @@ type Generation struct {
 
 type Generations = map[uint]Generation
 
-func (m *Master) UpdateGenerations(task api.Task) {
+func (m *Master) UpdateGenerations(task api.Task) uint {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -55,6 +57,19 @@ func (m *Master) UpdateGenerations(task api.Task) {
 		}
 	}
 
+	return genN
+}
+
+func (m *Master) DrawToGeneration(genN uint, task api.Task) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	generation, ok := m.Generations[genN]
+	if !ok {
+		// wtf
+		log.Fatalf("error getting generation %v", genN)
+	}
+
 	// get offset from task
 	offsetX := float64(task.Location[0])
 	offsetY := float64(task.Location[1])
@@ -78,9 +93,5 @@ func (m *Master) UpdateGenerations(task api.Task) {
 			dc.Fill()
 		}
 		// TODO implement more shapes
-	}
-
-	if generation.Done {
-		m.updateUI(generation)
 	}
 }

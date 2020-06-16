@@ -5,26 +5,54 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/rickyfitts/distributed-evolution/util"
+
 	"golang.org/x/net/websocket"
 )
 
 type websocketMessage struct {
-	TargetImage string `json:"targetImage"`
+	CurrentGeneration uint   `json:"currentGeneration"`
+	Output            string `json:"output"`
+	TargetImage       string `json:"targetImage"`
 }
 
 // TODO handle multiple connections
 func (m *Master) subscribe(ws *websocket.Conn) {
+	m.ws = ws
+
 	msg := websocketMessage{TargetImage: m.TargetImageBase64}
 
 	if err := websocket.JSON.Send(ws, msg); err != nil {
 		log.Println(err)
 	}
-
-	m.ws = ws
 }
 
-func (m *Master) updateUI(generation Generation) {
-	// TODO
+func (m *Master) UpdateUI(genN uint) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	generation, ok := m.Generations[genN]
+	if !ok {
+		log.Fatalf("error getting generation %v", genN)
+	}
+
+	// TODO move this?
+	if !generation.Done {
+		return
+	}
+
+	// get resulting image
+	img := generation.Output.Image()
+
+	// send encoded image and current generation
+	msg := websocketMessage{
+		CurrentGeneration: genN,
+		Output:            util.EncodeImage(img),
+	}
+
+	if err := websocket.JSON.Send(m.ws, msg); err != nil {
+		log.Println(err)
+	}
 }
 
 // TODO take target image from http
