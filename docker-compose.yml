@@ -6,7 +6,7 @@ services:
         build:
             context: .
             dockerfile: ./master.Dockerfile
-        command: go run .
+        command: go run main/master/master.go
         environment: 
             HTTP_PORT: 9000
             NUM_WORKERS: 1
@@ -18,7 +18,7 @@ services:
         build:
             context: .
             dockerfile: ./worker.Dockerfile
-        command: go run .
+        command: go run main/worker/worker.go
         environment: 
             PORT: 8080
     ui:

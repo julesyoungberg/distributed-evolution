@@ -14,6 +14,4 @@ EXPOSE 9000
 # expose rpc port
 EXPOSE 8080
 
-WORKDIR /app/master
-
-CMD ["go" "run" "."]
+CMD ["go" "run" "main/master/master.go"]

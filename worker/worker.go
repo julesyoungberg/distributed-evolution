@@ -1,4 +1,4 @@
-package main
+package worker
 
 import (
 	"fmt"
@@ -36,7 +36,7 @@ func createGA() *eaopt.GA {
 
 // TODO figure out how we can set an initial population to start from
 // maybe make another version of createTriangleFactory that accepts a seed population
-func (w *Worker) runTask(task api.Task) {
+func (w *Worker) RunTask(task api.Task) {
 	util.DPrintf("assigned task %v\n", task.ID)
 
 	img := util.DecodeImage(task.TargetImage)
@@ -64,7 +64,7 @@ func (w *Worker) runTask(task api.Task) {
 	}
 }
 
-func main() {
+func Run() {
 	w := Worker{
 		ga:           createGA(),
 		mutationRate: 0.8,
@@ -78,7 +78,7 @@ func main() {
 
 		// if generation is zero this is an empty response, if so just wait for more work
 		if task.Generation != 0 {
-			w.runTask(task)
+			w.RunTask(task)
 		}
 
 		time.Sleep(time.Second)

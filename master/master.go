@@ -1,4 +1,4 @@
-package main
+package master
 
 import (
 	"image"
@@ -56,7 +56,7 @@ func (m *Master) generateTasks() {
 	}
 }
 
-func main() {
+func Run() {
 	m := new(Master)
 
 	m.targetImage = util.GetRandomImage()

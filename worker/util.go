@@ -1,4 +1,4 @@
-package main
+package worker
 
 type Vector struct {
 	X float64

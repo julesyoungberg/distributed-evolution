@@ -8,6 +8,4 @@ COPY ./go.mod ./go.sum ./
 
 RUN go mod download
 
-WORKDIR /app/worker
-
-CMD ["go" "run" "."]
+CMD ["go" "run" "main/worker/worker.go"]
