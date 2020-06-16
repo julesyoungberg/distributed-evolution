@@ -11,23 +11,32 @@ import (
 )
 
 type Task struct {
-	Generation  int
+	Generation  uint
 	ID          int
 	Location    []int
-	Population  eaopt.Population
+	Population  eaopt.Individuals
 	Status      string
 	TargetImage string
 	Type        string
 }
 
 func GetTask() Task {
+	util.DPrintf("requesting task...")
+
+	var args Task
 	var reply Task
-	Call("Master.GetTask", nil, &reply)
+
+	Call("Master.GetTask", &args, &reply)
+
 	return reply
 }
 
 func Update(args Task) {
-	Call("Master.Update", &args, nil)
+	util.DPrintf("sending progress...")
+
+	var reply Task
+
+	Call("Master.Update", &args, &reply)
 }
 
 // send an RPC request to the master, wait for the response.

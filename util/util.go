@@ -21,8 +21,6 @@ func DPrintf(format string, a ...interface{}) (n int, err error) {
 }
 
 func GetRandomImage() image.Image {
-	DPrintf("fetching random image...")
-
 	imageUrl := "https://picsum.photos/900"
 
 	response, err := http.Get(imageUrl)

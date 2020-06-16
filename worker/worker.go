@@ -40,9 +40,11 @@ func createGA() *eaopt.GA {
 func (w *Worker) RunTask(task api.Task) {
 	util.DPrintf("assigned task %v\n", task.ID)
 
+	util.DPrintf("decoding image...")
 	img := util.DecodeImage(task.TargetImage)
 	width, height := util.GetImageDimensions(img)
 
+	util.DPrintf("saving task data...")
 	w.CurrentTask = task
 	w.TargetImage = Image{
 		Image:  img,
@@ -50,17 +52,23 @@ func (w *Worker) RunTask(task api.Task) {
 		Height: height,
 	}
 
+	util.DPrintf("preparing ga...")
+
 	w.ga.NGenerations = 1000
+	w.ga.PopSize = 100
 
 	w.ga.Callback = func(ga *eaopt.GA) {
-		fmt.Printf("Best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
+		fmt.Printf("best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
 
-		task.Population = ga.Populations[0]
+		task.Generation = ga.Generations
+		task.Population = ga.Populations[0].Individuals
 
 		api.Update(task)
 	}
 
 	Factory := createTriangleFactory(w)
+
+	util.DPrintf("evolving...")
 
 	err := w.ga.Minimize(Factory)
 	if err != nil {
@@ -73,9 +81,10 @@ func Run() {
 	w.ga = createGA()
 
 	// wait for master to initialize
-	time.Sleep(10 * time.Second)
+	time.Sleep(20 * time.Second)
 
 	for {
+		// TODO handle errors by waiting and trying again
 		task := api.GetTask()
 
 		// if generation is zero this is an empty response, if so just wait for more work

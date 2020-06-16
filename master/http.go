@@ -27,7 +27,7 @@ func (m *Master) subscribe(ws *websocket.Conn) {
 	}
 }
 
-func (m *Master) UpdateUI(genN uint) {
+func (m *Master) updateUI(genN uint) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -57,7 +57,7 @@ func (m *Master) UpdateUI(genN uint) {
 
 // TODO take target image from http
 // allow multiple jobs at the same time, take number of workers from request too??
-func (m *Master) HttpServer() {
+func (m *Master) httpServer() {
 	http.Handle("/subscribe", websocket.Handler(m.subscribe))
 
 	port := os.Getenv("HTTP_PORT")

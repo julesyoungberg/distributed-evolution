@@ -78,7 +78,9 @@ func (t Triangle) Evaluate() (float64, error) {
 		}
 	}
 
-	fitness /= float64(totalInside)
+	if totalInside > 0 {
+		fitness /= float64(totalInside)
+	}
 
 	return fitness, nil
 }

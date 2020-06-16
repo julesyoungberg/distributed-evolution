@@ -12,6 +12,8 @@ import (
 )
 
 func (m *Master) GetTask(args, reply *api.Task) error {
+	util.DPrintf("task requested")
+
 	for _, task := range m.Tasks {
 		if task.Status == "unstarted" {
 			task.Status = "active"
@@ -28,16 +30,16 @@ func (m *Master) Update(task, reply *api.Task) error {
 	m.Tasks[task.ID] = *task
 	m.mu.Unlock()
 
-	genN := m.UpdateGenerations(*task)
+	genN := m.updateGenerations(*task)
 
-	m.DrawToGeneration(genN, *task)
+	m.drawToGeneration(genN, *task)
 
-	m.UpdateUI(genN)
+	m.updateUI(genN)
 
 	return nil
 }
 
-func (m *Master) RpcServer() {
+func (m *Master) rpcServer() {
 	err := rpc.Register(m)
 	if err != nil {
 		log.Fatal("rpc error: ", err)

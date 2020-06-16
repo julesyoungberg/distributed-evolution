@@ -18,11 +18,11 @@ type Generation struct {
 
 type Generations = map[uint]Generation
 
-func (m *Master) UpdateGenerations(task api.Task) uint {
+func (m *Master) updateGenerations(task api.Task) uint {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	genN := task.Population.Generations
+	genN := task.Generation
 
 	generation, ok := m.Generations[genN]
 
@@ -60,7 +60,7 @@ func (m *Master) UpdateGenerations(task api.Task) uint {
 	return genN
 }
 
-func (m *Master) DrawToGeneration(genN uint, task api.Task) {
+func (m *Master) drawToGeneration(genN uint, task api.Task) {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -77,7 +77,7 @@ func (m *Master) DrawToGeneration(genN uint, task api.Task) {
 	dc := generation.Output
 
 	// draw each member of the population
-	for _, member := range task.Population.Individuals {
+	for _, member := range task.Population {
 		// check the type of task
 		if task.Type == "triangles" {
 			t := member.Genome.(worker.Triangle)
