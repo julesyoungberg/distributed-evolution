@@ -10,7 +10,6 @@ import (
 type Triangle struct {
 	Context  *Worker
 	Color    color.RGBA
-	Type     string
 	Vertices [][]float64
 }
 
@@ -36,7 +35,6 @@ func createTriangleFactory(ctx *Worker) func(rng *rand.Rand) eaopt.Genome {
 		return Triangle{
 			Context:  ctx,
 			Color:    clr,
-			Type:     "triangle",
 			Vertices: vrt,
 		}
 	}
@@ -134,7 +132,7 @@ func (t Triangle) Crossover(g eaopt.Genome, rng *rand.Rand) {
 // copy all the data without pointers
 // TODO figure out how deep this actually needs to be
 func (t Triangle) Clone() eaopt.Genome {
-	clone := Triangle{Context: t.Context, Type: "triangle"}
+	clone := Triangle{Context: t.Context}
 	clone.Color = color.RGBA{t.Color.R, t.Color.G, t.Color.B, t.Color.A}
 
 	for _, p := range t.Vertices {

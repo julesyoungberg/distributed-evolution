@@ -4,6 +4,7 @@ import (
 	"github.com/fogleman/gg"
 
 	"github.com/rickyfitts/distributed-evolution/api"
+	"github.com/rickyfitts/distributed-evolution/worker"
 )
 
 type Generation struct {
@@ -43,7 +44,7 @@ func (m *Master) UpdateGenerations(task api.Task) {
 		m.Generations[genN] = generation
 
 		if len(m.Generations) > 3 {
-			// find and delte the oldest
+			// find and delete the oldest
 			var oldest *Generation
 			for _, g := range m.Generations {
 				if oldest == nil || oldest.Generation > g.Generation {
@@ -54,11 +55,32 @@ func (m *Master) UpdateGenerations(task api.Task) {
 		}
 	}
 
-	// TODO draw to output, then update the ui
-	// draw algorithm
-	// for each member of the task's population
-	//  - cast to a new generic type which implements core drawing functionality
-	//  - make sure to offset by the task's Location
-	// how to draw a rectangle: (use similar approach for triangle)
-	// https://github.com/fogleman/gg/blob/4dc34561c649343936bb2d29e23959bd6d98ab12/context.go#L583
+	// get offset from task
+	offsetX := float64(task.Location[0])
+	offsetY := float64(task.Location[1])
+
+	dc := generation.Output
+
+	// draw each member of the population
+	for _, member := range task.Population.Individuals {
+		// check the type of task
+		if task.Type == "triangles" {
+			t := member.Genome.(worker.Triangle)
+
+			// draw triangle
+			dc.NewSubPath()
+			dc.MoveTo(t.Vertices[0][0]+offsetX, t.Vertices[0][1]+offsetY)
+			dc.LineTo(t.Vertices[1][0]+offsetX, t.Vertices[1][1]+offsetY)
+			dc.LineTo(t.Vertices[2][0]+offsetX, t.Vertices[2][1]+offsetY)
+			dc.ClosePath()
+
+			dc.SetColor(t.Color)
+			dc.Fill()
+		}
+		// TODO implement more shapes
+	}
+
+	if generation.Done {
+		m.updateUI(generation)
+	}
 }

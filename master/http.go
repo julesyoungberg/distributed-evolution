@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"golang.org/x/net/websocket"
 )
@@ -13,19 +12,23 @@ type websocketMessage struct {
 	TargetImage string `json:"targetImage"`
 }
 
+// TODO handle multiple connections
 func (m *Master) subscribe(ws *websocket.Conn) {
-	for {
-		msg := websocketMessage{TargetImage: m.TargetImageBase64}
+	msg := websocketMessage{TargetImage: m.TargetImageBase64}
 
-		if err := websocket.JSON.Send(ws, msg); err != nil {
-			log.Println(err)
-			break
-		}
-
-		time.Sleep(10 * time.Second)
+	if err := websocket.JSON.Send(ws, msg); err != nil {
+		log.Println(err)
 	}
+
+	m.ws = ws
 }
 
+func (m *Master) updateUI(generation Generation) {
+	// TODO
+}
+
+// TODO take target image from http
+// allow multiple jobs at the same time, take number of workers from request too??
 func (m *Master) HttpServer() {
 	http.Handle("/subscribe", websocket.Handler(m.subscribe))
 

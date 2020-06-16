@@ -17,6 +17,7 @@ type Task struct {
 	Population  eaopt.Population
 	Status      string
 	TargetImage string
+	Type        string
 }
 
 func GetTask() Task {

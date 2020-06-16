@@ -10,8 +10,10 @@ import (
 
 	"github.com/rickyfitts/distributed-evolution/api"
 	"github.com/rickyfitts/distributed-evolution/util"
+	"golang.org/x/net/websocket"
 )
 
+// TODO handle multiple jobs
 type Master struct {
 	Generations       Generations
 	NumWorkers        int
@@ -20,6 +22,7 @@ type Master struct {
 	Tasks             []api.Task
 
 	mu sync.Mutex
+	ws *websocket.Conn
 }
 
 // populates the task queue with tasks, where each is a slice of the target image
@@ -49,6 +52,7 @@ func (m *Master) GenerateTasks() {
 				Location:    []int{x0, y0},
 				Status:      "unstarted",
 				TargetImage: util.EncodeImage(rgbImg.SubImage(rect)),
+				Type:        "triangles",
 			}
 
 			m.Tasks = append(m.Tasks, task)
