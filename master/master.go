@@ -6,33 +6,32 @@ import (
 	"math"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/rickyfitts/distributed-evolution/api"
 	"github.com/rickyfitts/distributed-evolution/util"
 )
 
 type Master struct {
-	targetImage       image.Image
-	targetImageBase64 string
-	taskQueue         []api.Task
-	inProgressTasks   []api.Task
+	Generations       Generations
+	NumWorkers        int
+	TargetImage       image.Image
+	TargetImageBase64 string
+	Tasks             []api.Task
+
+	mu sync.Mutex
 }
 
 // populates the task queue with tasks, where each is a slice of the target image
-func (m *Master) generateTasks() {
-	numWorkers, err := strconv.Atoi(os.Getenv("NUM_WORKERS"))
-	if err != nil {
-		log.Fatal("error parsing NUM_WORKERS: ", err)
-	}
+func (m *Master) GenerateTasks() {
+	s := math.Floor(math.Sqrt(float64(m.NumWorkers)))
 
-	s := math.Floor(math.Sqrt(float64(numWorkers)))
-
-	width, height := util.GetImageDimensions(m.targetImage)
+	width, height := util.GetImageDimensions(m.TargetImage)
 
 	cols := int(math.Ceil(float64(width) / s))
 	rows := int(math.Ceil(float64(height) / s))
 
-	rgbImg := m.targetImage.(*image.YCbCr)
+	rgbImg := m.TargetImage.(*image.YCbCr)
 
 	for y := 0; y < rows; y++ {
 		for x := 0; x < cols; x++ {
@@ -47,25 +46,33 @@ func (m *Master) generateTasks() {
 			task := api.Task{
 				Generation:  1,
 				ID:          (y * cols) + x,
-				Location:    rect,
+				Location:    []int{x0, y0},
+				Status:      "unstarted",
 				TargetImage: util.EncodeImage(rgbImg.SubImage(rect)),
 			}
 
-			m.taskQueue = append(m.taskQueue, task)
+			m.Tasks = append(m.Tasks, task)
 		}
 	}
 }
 
 func Run() {
-	m := new(Master)
+	numWorkers, err := strconv.Atoi(os.Getenv("NUM_WORKERS"))
+	if err != nil {
+		log.Fatal("error parsing NUM_WORKERS: ", err)
+	}
 
-	m.targetImage = util.GetRandomImage()
-	m.targetImageBase64 = util.EncodeImage(m.targetImage)
-	m.generateTasks()
+	m := Master{
+		Generations: make(Generations, 3),
+		NumWorkers:  numWorkers,
+	}
 
-	m.generateTasks()
+	m.TargetImage = util.GetRandomImage()
+	m.TargetImageBase64 = util.EncodeImage(m.TargetImage)
 
-	go m.httpServer()
+	m.GenerateTasks()
 
-	m.rpcServer()
+	go m.HttpServer()
+
+	m.RpcServer()
 }

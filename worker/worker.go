@@ -13,16 +13,17 @@ import (
 )
 
 type Image struct {
-	image  image.Image
-	width  int
-	height int
+	Image  image.Image
+	Width  int
+	Height int
 }
 
 type Worker struct {
-	ga           *eaopt.GA
-	mutationRate float64
-	currentTask  api.Task
-	targetImage  Image
+	MutationRate float64
+	CurrentTask  api.Task
+	TargetImage  Image
+
+	ga *eaopt.GA
 }
 
 func createGA() *eaopt.GA {
@@ -42,18 +43,21 @@ func (w *Worker) RunTask(task api.Task) {
 	img := util.DecodeImage(task.TargetImage)
 	width, height := util.GetImageDimensions(img)
 
-	w.currentTask = task
-	w.targetImage = Image{
-		image:  img,
-		width:  width,
-		height: height,
+	w.CurrentTask = task
+	w.TargetImage = Image{
+		Image:  img,
+		Width:  width,
+		Height: height,
 	}
 
 	w.ga.NGenerations = 1000
 
 	w.ga.Callback = func(ga *eaopt.GA) {
-		// TODO send current population to the master
 		fmt.Printf("Best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
+
+		task.Population = ga.Populations[0]
+
+		api.Update(task)
 	}
 
 	Factory := createTriangleFactory(w)
@@ -65,10 +69,8 @@ func (w *Worker) RunTask(task api.Task) {
 }
 
 func Run() {
-	w := Worker{
-		ga:           createGA(),
-		mutationRate: 0.8,
-	}
+	w := Worker{MutationRate: 0.8}
+	w.ga = createGA()
 
 	// wait for master to initialize
 	time.Sleep(10 * time.Second)

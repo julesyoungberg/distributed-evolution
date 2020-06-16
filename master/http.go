@@ -15,7 +15,7 @@ type websocketMessage struct {
 
 func (m *Master) subscribe(ws *websocket.Conn) {
 	for {
-		msg := websocketMessage{TargetImage: m.targetImageBase64}
+		msg := websocketMessage{TargetImage: m.TargetImageBase64}
 
 		if err := websocket.JSON.Send(ws, msg); err != nil {
 			log.Println(err)
@@ -26,7 +26,7 @@ func (m *Master) subscribe(ws *websocket.Conn) {
 	}
 }
 
-func (m *Master) httpServer() {
+func (m *Master) HttpServer() {
 	http.Handle("/subscribe", websocket.Handler(m.subscribe))
 
 	port := os.Getenv("HTTP_PORT")

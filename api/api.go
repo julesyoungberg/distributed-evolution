@@ -2,32 +2,31 @@ package api
 
 import (
 	"fmt"
-	"image"
 	"log"
 	"net/rpc"
 	"os"
-	"time"
 
+	"github.com/MaxHalford/eaopt"
 	"github.com/rickyfitts/distributed-evolution/util"
 )
-
-type EmptyMessage struct{}
 
 type Task struct {
 	Generation  int
 	ID          int
-	Location    image.Rectangle
-	Started     time.Time
+	Location    []int
+	Population  eaopt.Population
+	Status      string
 	TargetImage string
 }
 
 func GetTask() Task {
-	var args EmptyMessage
 	var reply Task
-
-	Call("Master.GetTask", &args, &reply)
-
+	Call("Master.GetTask", nil, &reply)
 	return reply
+}
+
+func Update(args Task) {
+	Call("Master.Update", &args, nil)
 }
 
 // send an RPC request to the master, wait for the response.

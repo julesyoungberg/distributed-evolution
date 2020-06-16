@@ -6,27 +6,34 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
-	"time"
 
 	"github.com/rickyfitts/distributed-evolution/api"
 	"github.com/rickyfitts/distributed-evolution/util"
 )
 
-func (m *Master) GetTask(args *api.EmptyMessage, reply *api.Task) error {
-	if len(m.taskQueue) > 0 {
-		task := m.taskQueue[0]
-		task.Started = time.Now()
-		*reply = task
-
-		m.inProgressTasks = append(m.inProgressTasks, task)
-		m.taskQueue = m.taskQueue[1:]
-		util.DPrintf("assigning task %v\n", task.ID)
+func (m *Master) GetTask(args, reply *api.Task) error {
+	for _, task := range m.Tasks {
+		if task.Status == "unstarted" {
+			task.Status = "active"
+			*reply = task
+			util.DPrintf("assigning task %v\n", task.ID)
+		}
 	}
 
 	return nil
 }
 
-func (m *Master) rpcServer() {
+func (m *Master) Update(task, reply *api.Task) error {
+	m.mu.Lock()
+	m.Tasks[task.ID] = *task
+	m.mu.Unlock()
+
+	m.UpdateGenerations(*task)
+
+	return nil
+}
+
+func (m *Master) RpcServer() {
 	err := rpc.Register(m)
 	if err != nil {
 		log.Fatal("rpc error: ", err)
