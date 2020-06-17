@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/MaxHalford/eaopt"
+	"github.com/rickyfitts/distributed-evolution/util"
 )
 
 type Triangle struct {
@@ -19,6 +20,8 @@ func createTriangleFactory(ctx *Worker) func(rng *rand.Rand) eaopt.Genome {
 
 	// creates a random triangle, used to generate the initial population
 	return func(rng *rand.Rand) eaopt.Genome {
+		util.DPrintf("creating triangle")
+
 		clr := color.RGBA{
 			uint8(rng.Intn(255)),
 			uint8(rng.Intn(255)),
@@ -27,9 +30,9 @@ func createTriangleFactory(ctx *Worker) func(rng *rand.Rand) eaopt.Genome {
 		}
 
 		vrt := [][]float64{
-			[]float64{rng.Float64() * upper.X, rng.Float64() * upper.Y},
-			[]float64{rng.Float64() * upper.X, rng.Float64() * upper.Y},
-			[]float64{rng.Float64() * upper.X, rng.Float64() * upper.Y},
+			{rng.Float64() * upper.X, rng.Float64() * upper.Y},
+			{rng.Float64() * upper.X, rng.Float64() * upper.Y},
+			{rng.Float64() * upper.X, rng.Float64() * upper.Y},
 		}
 
 		return Triangle{
@@ -58,6 +61,8 @@ func (t Triangle) clampPosition() {
 
 // determine how well the triangle matches with the corresponding pixels of the target image
 func (t Triangle) Evaluate() (float64, error) {
+	util.DPrintf("evaluating triangle")
+
 	totalInside := 0
 	var fitness float64 = 0.0
 
@@ -87,6 +92,8 @@ func (t Triangle) Evaluate() (float64, error) {
 
 // mutate the properties of the triangle based on the mutation rate
 func (t Triangle) Mutate(rng *rand.Rand) {
+	util.DPrintf("mutating triangle")
+
 	c := []uint8{t.Color.R, t.Color.G, t.Color.B}
 
 	for i, x := range c {
@@ -108,6 +115,8 @@ func (t Triangle) Mutate(rng *rand.Rand) {
 
 // mix genes with another triangle
 func (t Triangle) Crossover(g eaopt.Genome, rng *rand.Rand) {
+	util.DPrintf("crossover")
+
 	o := g.(Triangle)
 
 	c1 := []float64{float64(t.Color.R), float64(t.Color.G), float64(t.Color.B)}
@@ -134,6 +143,8 @@ func (t Triangle) Crossover(g eaopt.Genome, rng *rand.Rand) {
 // copy all the data without pointers
 // TODO figure out how deep this actually needs to be
 func (t Triangle) Clone() eaopt.Genome {
+	util.DPrintf("cloning triangle")
+
 	clone := Triangle{Context: t.Context}
 	clone.Color = color.RGBA{t.Color.R, t.Color.G, t.Color.B, t.Color.A}
 
