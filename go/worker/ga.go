@@ -22,12 +22,11 @@ func createCallback(task api.Task) func(ga *eaopt.GA) {
 		util.DPrintf("best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
 
 		bestFit := ga.HallOfFame[0]
-		genome := bestFit.Genome.Clone()
+		var genome eaopt.Genome
 
 		if task.Type == "triangles" {
-			t := genome.(Triangles)
-			t.Context = nil
-			genome = t
+			t := bestFit.Genome.(Triangles)
+			genome = t.CloneWithoutContext()
 		}
 
 		bestFit.Genome = genome

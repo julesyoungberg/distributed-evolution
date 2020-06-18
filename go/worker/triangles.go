@@ -16,10 +16,10 @@ type Triangles struct {
 
 // creates a triangles factory with a pointer to the worker object
 func createTrianglesFactory(ctx *Worker) func(rng *rand.Rand) eaopt.Genome {
-	bounds := util.Vector{float64(ctx.TargetImage.Width), float64(ctx.TargetImage.Height)}
+	bounds := util.Vector{X: float64(ctx.TargetImage.Width), Y: float64(ctx.TargetImage.Height)}
 
 	return func(rng *rand.Rand) eaopt.Genome {
-		nTriangles := 100
+		nTriangles := 5
 
 		triangles := Triangles{
 			Context: ctx,
@@ -34,7 +34,7 @@ func createTrianglesFactory(ctx *Worker) func(rng *rand.Rand) eaopt.Genome {
 	}
 }
 
-func (t *Triangles) Draw(dc *gg.Context, offset util.Vector) {
+func (t Triangles) Draw(dc *gg.Context, offset util.Vector) {
 	for _, triangle := range t.Members {
 		triangle.Draw(dc, offset)
 	}
@@ -44,7 +44,7 @@ func (t *Triangles) Draw(dc *gg.Context, offset util.Vector) {
 func (t Triangles) Evaluate() (float64, error) {
 	// draw the triangles
 	dc := gg.NewContext(t.Context.TargetImage.Width, t.Context.TargetImage.Height)
-	t.Draw(dc, util.Vector{0, 0})
+	t.Draw(dc, util.Vector{X: 0, Y: 0})
 	out := dc.Image()
 
 	total := 0
@@ -86,8 +86,7 @@ func (t Triangles) Crossover(g eaopt.Genome, rng *rand.Rand) {
 
 	for i, m := range t.Members {
 		if rng.Float32() < 0.5 {
-			t.Members[i] = o.Members[i]
-			o.Members[i] = m
+			t.Members[i], o.Members[i] = o.Members[i], m
 		}
 	}
 }
@@ -106,7 +105,7 @@ func (t Triangles) Clone() eaopt.Genome {
 	return clone
 }
 
-func (t *Triangles) CloneWithoutContext() eaopt.Genome {
+func (t Triangles) CloneWithoutContext() eaopt.Genome {
 	clone := Triangles{
 		Members: make([]Triangle, len(t.Members)),
 	}
@@ -115,5 +114,59 @@ func (t *Triangles) CloneWithoutContext() eaopt.Genome {
 		clone.Members[i] = m.Clone()
 	}
 
+	return clone
+}
+
+func (t Triangles) At(i int) interface{} {
+	return t.Members[i]
+}
+
+func (t Triangles) Set(i int, v interface{}) {
+	t.Members[i] = v.(Triangle)
+}
+
+func (t Triangles) Len() int {
+	return len(t.Members)
+}
+
+func (t Triangles) Swap(i, j int) {
+	t.Members[i], t.Members[j] = t.Members[j], t.Members[i]
+}
+
+func (t Triangles) Slice(a, b int) eaopt.Slice {
+	return Triangles{
+		Context: t.Context,
+		Members: t.Members[a:b],
+	}
+}
+
+func (t Triangles) Split(k int) (eaopt.Slice, eaopt.Slice) {
+	s1 := Triangles{
+		Context: t.Context,
+		Members: t.Members[:k],
+	}
+
+	s2 := Triangles{
+		Context: t.Context,
+		Members: t.Members[k:],
+	}
+
+	return s1, s2
+}
+
+func (t Triangles) Append(q eaopt.Slice) eaopt.Slice {
+	return Triangles{
+		Context: t.Context,
+		Members: append(t.Members, q.(Triangles).Members...),
+	}
+}
+
+func (t Triangles) Replace(q eaopt.Slice) {
+	copy(t.Members, q.(Triangles).Members)
+}
+
+func (t Triangles) Copy() eaopt.Slice {
+	clone := Triangles{Context: t.Context}
+	copy(clone.Members, t.Members)
 	return clone
 }

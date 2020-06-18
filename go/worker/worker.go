@@ -43,8 +43,10 @@ func (w *Worker) RunTask(task api.Task) {
 
 	util.DPrintf("preparing ga...")
 
-	w.ga.NGenerations = 100
-	w.ga.PopSize = 10
+	w.ga.NPops = 1
+	w.ga.PopSize = 100
+	w.ga.NGenerations = 1
+	w.ga.HofSize = 10
 
 	w.ga.Callback = createCallback(task)
 
@@ -72,6 +74,7 @@ func Run() {
 		// if generation is zero this is an empty response, if so just wait for more work
 		if task.Generation != 0 {
 			w.RunTask(task)
+			break
 		}
 
 		time.Sleep(time.Second)

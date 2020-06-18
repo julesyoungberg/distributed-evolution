@@ -35,7 +35,6 @@ func createTriangle(rng *rand.Rand, bounds util.Vector) Triangle {
 }
 
 func (t *Triangle) Draw(dc *gg.Context, offset util.Vector) {
-	// draw triangle
 	dc.NewSubPath()
 	dc.MoveTo(t.Vertices[0][0]+offset.X, t.Vertices[0][1]+offset.Y)
 	dc.LineTo(t.Vertices[1][0]+offset.X, t.Vertices[1][1]+offset.Y)

@@ -74,13 +74,11 @@ func (m *Master) drawToGeneration(genN uint, task api.Task) {
 		log.Fatalf("error getting generation %v", genN)
 	}
 
-	// get offset from task
-	offsetX := float64(task.Location[0])
-	offsetY := float64(task.Location[1])
+	offset := util.Vector{X: float64(task.Location[0]), Y: float64(task.Location[1])}
 
 	if task.Type == "triangles" {
 		t := task.BestFit.Genome.(worker.Triangles)
-		t.Draw(generation.Output, util.Vector{X: offsetX, Y: offsetY})
+		t.Draw(generation.Output, offset)
 	}
 
 	m.Generations[genN] = generation
