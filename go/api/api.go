@@ -11,10 +11,10 @@ import (
 )
 
 type Task struct {
+	BestFit     eaopt.Individual
 	Generation  uint
 	ID          int
 	Location    []int
-	Population  eaopt.Individuals
 	Status      string
 	TargetImage string
 	Type        string

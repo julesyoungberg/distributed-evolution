@@ -12,6 +12,7 @@ func main() {
 	// TODO fix??
 	gob.Register(image.YCbCr{})
 	gob.Register(worker.Triangle{})
+	gob.Register(worker.Triangles{})
 	gob.Register(color.RGBA{})
 	worker.Run()
 }

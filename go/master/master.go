@@ -19,6 +19,8 @@ type Master struct {
 	NumWorkers        int
 	TargetImage       image.Image
 	TargetImageBase64 string
+	TargetImageHeight int
+	TargetImageWidth  int
 	Tasks             []api.Task
 
 	mu sync.Mutex
@@ -32,6 +34,9 @@ func (m *Master) generateTasks() {
 	s := int(math.Floor(math.Sqrt(float64(m.NumWorkers))))
 
 	width, height := util.GetImageDimensions(m.TargetImage)
+
+	m.TargetImageWidth = width
+	m.TargetImageHeight = height
 
 	colWidth := int(math.Ceil(float64(width) / float64(s)))
 	rowWidth := int(math.Ceil(float64(height) / float64(s)))

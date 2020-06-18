@@ -42,7 +42,7 @@ func (m *Master) updateGenerations(task api.Task) uint {
 			Tasks:      []api.Task{task},
 		}
 
-		generation.Output = gg.NewContext(1000, 1000)
+		generation.Output = gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
 
 		if len(m.Generations) > 3 {
 			delete(m.Generations, genN-3)
@@ -78,25 +78,9 @@ func (m *Master) drawToGeneration(genN uint, task api.Task) {
 	offsetX := float64(task.Location[0])
 	offsetY := float64(task.Location[1])
 
-	dc := generation.Output
-
-	// draw each member of the population
-	for _, member := range task.Population {
-		// check the type of task
-		if task.Type == "triangles" {
-			t := member.Genome.(worker.Triangle)
-
-			// draw triangle
-			dc.NewSubPath()
-			dc.MoveTo(t.Vertices[0][0]+offsetX, t.Vertices[0][1]+offsetY)
-			dc.LineTo(t.Vertices[1][0]+offsetX, t.Vertices[1][1]+offsetY)
-			dc.LineTo(t.Vertices[2][0]+offsetX, t.Vertices[2][1]+offsetY)
-			dc.ClosePath()
-
-			dc.SetColor(t.Color)
-			dc.Fill()
-		}
-		// TODO implement more shapes
+	if task.Type == "triangles" {
+		t := task.BestFit.Genome.(worker.Triangles)
+		t.Draw(generation.Output, util.Vector{X: offsetX, Y: offsetY})
 	}
 
 	m.Generations[genN] = generation

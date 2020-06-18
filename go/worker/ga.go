@@ -21,24 +21,19 @@ func createCallback(task api.Task) func(ga *eaopt.GA) {
 	return func(ga *eaopt.GA) {
 		util.DPrintf("best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
 
-		task.Generation = ga.Generations
-		task.Population = make(eaopt.Individuals, len(ga.Populations[0].Individuals))
+		bestFit := ga.HallOfFame[0]
+		genome := bestFit.Genome.Clone()
 
-		// make a copy of each individual without the context pointer to the worker state
-		for i, indv := range ga.Populations[0].Individuals {
-			copy := indv
-			genome := copy.Genome.Clone()
-
-			if task.Type == "triangles" {
-				t := genome.(Triangle)
-				t.Context = nil
-				genome = t
-			}
-
-			copy.Genome = genome
-
-			task.Population[i] = copy
+		if task.Type == "triangles" {
+			t := genome.(Triangles)
+			t.Context = nil
+			genome = t
 		}
+
+		bestFit.Genome = genome
+
+		task.BestFit = bestFit
+		task.Generation = ga.Generations
 
 		util.DPrintf("updating master")
 

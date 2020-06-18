@@ -48,7 +48,7 @@ func (w *Worker) RunTask(task api.Task) {
 
 	w.ga.Callback = createCallback(task)
 
-	Factory := createTriangleFactory(w)
+	Factory := createTrianglesFactory(w)
 
 	util.DPrintf("evolving...")
 

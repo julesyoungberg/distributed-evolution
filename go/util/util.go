@@ -10,6 +10,11 @@ import (
 	"strings"
 )
 
+type Vector struct {
+	X float64
+	Y float64
+}
+
 // Debugging
 const Debug = 1
 
@@ -18,6 +23,18 @@ func DPrintf(format string, a ...interface{}) (n int, err error) {
 		log.Printf(format, a...)
 	}
 	return
+}
+
+func ClampFloat64(n, min, max float64) float64 {
+	if n < min {
+		return min
+	}
+
+	if n > max {
+		return max
+	}
+
+	return n
 }
 
 func GetRandomImage() image.Image {
