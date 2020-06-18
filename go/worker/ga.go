@@ -9,7 +9,22 @@ import (
 )
 
 func createGA() *eaopt.GA {
-	ga, err := eaopt.NewDefaultGAConfig().NewGA()
+	gaConfig := eaopt.GAConfig{
+		NPops:        1,
+		PopSize:      100,
+		HofSize:      1,
+		NGenerations: 50,
+		Model: eaopt.ModGenerational{
+			Selector: eaopt.SelTournament{
+				NContestants: 3,
+			},
+			MutRate:   0.5,
+			CrossRate: 0.7,
+		},
+		ParallelEval: false,
+	}
+
+	ga, err := gaConfig.NewGA()
 	if err != nil {
 		log.Fatal("error creating ga: ", err)
 	}

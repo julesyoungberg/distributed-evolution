@@ -43,11 +43,6 @@ func (w *Worker) RunTask(task api.Task) {
 
 	util.DPrintf("preparing ga...")
 
-	w.ga.NPops = 1
-	w.ga.PopSize = 100
-	w.ga.NGenerations = 1
-	w.ga.HofSize = 10
-
 	w.ga.Callback = createCallback(task)
 
 	Factory := createTrianglesFactory(w)
