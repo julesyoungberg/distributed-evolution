@@ -21,24 +21,21 @@ type Generation struct {
 type Generations = map[uint]Generation
 
 func (m *Master) updateGenerations(task api.Task) uint {
-	util.DPrintf("updating generations")
-
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
+	util.DPrintf("updating generation %v", task.Generation)
 
 	genN := task.Generation
 
 	generation, ok := m.Generations[genN]
 
 	if ok {
+		util.DPrintf("generation %v exists, appending", genN)
 		// great, the generation already exists, update it
 		generation.Tasks = append(generation.Tasks, task)
-
-		if len(generation.Tasks) == len(m.Tasks) {
-			// this is the last slice for this generation, mark it as done
-			generation.Done = true
-		}
 	} else {
+		util.DPrintf("generation %v does not exist, creating", genN)
 		// this is the first slice of this generation, create it and remove an old one
 		generation = Generation{
 			Generation: genN,
@@ -47,28 +44,29 @@ func (m *Master) updateGenerations(task api.Task) uint {
 
 		generation.Output = gg.NewContext(1000, 1000)
 
-		m.Generations[genN] = generation
-
 		if len(m.Generations) > 3 {
-			// find and delete the oldest
-			var oldest *Generation
-			for _, g := range m.Generations {
-				if oldest == nil || oldest.Generation > g.Generation {
-					oldest = &g
-				}
-			}
-			delete(m.Generations, oldest.Generation)
+			delete(m.Generations, genN-3)
 		}
 	}
+
+	util.DPrintf("generation %v recieved %v out of %v tasks", genN, len(generation.Tasks), len(m.Tasks))
+
+	if len(generation.Tasks) == len(m.Tasks) {
+		util.DPrintf("all tasks complete, marking generation %v as done", genN)
+		// this is the last slice for this generation, mark it as done
+		generation.Done = true
+	}
+
+	m.Generations[genN] = generation
 
 	return genN
 }
 
 func (m *Master) drawToGeneration(genN uint, task api.Task) {
-	util.DPrintf("drawing to generation")
-
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
+	util.DPrintf("drawing to generation %v", genN)
 
 	generation, ok := m.Generations[genN]
 	if !ok {
@@ -100,4 +98,6 @@ func (m *Master) drawToGeneration(genN uint, task api.Task) {
 		}
 		// TODO implement more shapes
 	}
+
+	m.Generations[genN] = generation
 }

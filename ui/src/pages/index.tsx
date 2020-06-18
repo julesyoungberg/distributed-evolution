@@ -9,8 +9,12 @@ import useWebsocket from '../hooks/useWebsocket'
 const Wrapper = styled.div`
     display: flex;
 
-    img {
-        max-width: 100%;
+    div {
+        flex: 1;
+
+        img {
+            max-width: 100%;
+        }
     }
 `
 

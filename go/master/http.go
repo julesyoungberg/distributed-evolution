@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/rickyfitts/distributed-evolution/util"
 
@@ -18,20 +19,40 @@ type websocketMessage struct {
 
 // TODO handle multiple connections
 func (m *Master) subscribe(ws *websocket.Conn) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	util.DPrintf("new websocket connection request")
+
 	m.ws = ws
 
 	msg := websocketMessage{TargetImage: m.TargetImageBase64}
 
+	util.DPrintf("sending data")
+
 	if err := websocket.JSON.Send(ws, msg); err != nil {
 		log.Println(err)
+	}
+
+	for {
+		// keep the connection open
+		m.mu.Unlock()
+		time.Sleep(100 * time.Millisecond)
+		m.mu.Lock()
+		// TODO send keep alive and check if the connection has been closed
 	}
 }
 
 func (m *Master) updateUI(genN uint) {
-	util.DPrintf("updating ui")
-
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
+	util.DPrintf("updating ui with generation %v", genN)
+
+	if m.ws == nil {
+		util.DPrintf("no open ui connections")
+		return
+	}
 
 	generation, ok := m.Generations[genN]
 	if !ok {
@@ -40,8 +61,11 @@ func (m *Master) updateUI(genN uint) {
 
 	// TODO move this?
 	if !generation.Done {
+		util.DPrintf("error, generation not done!")
 		return
 	}
+
+	util.DPrintf("encoding output image for generation %v", genN)
 
 	// get resulting image
 	img := generation.Output.Image()
@@ -51,6 +75,8 @@ func (m *Master) updateUI(genN uint) {
 		CurrentGeneration: genN,
 		Output:            util.EncodeImage(img),
 	}
+
+	util.DPrintf("sending generation %v update to ui", genN)
 
 	if err := websocket.JSON.Send(m.ws, msg); err != nil {
 		log.Println(err)

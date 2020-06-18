@@ -10,7 +10,7 @@ export default function useWebsocket(handleMessage: (data: Record<string, any>) 
         const onOpen = () => console.log('subscribed to server')
 
         const onMessage = (event: { data: string }) => {
-            console.log('message from server: ', event.data)
+            console.log('message from server')
         
             let json: Record<string, any> | undefined
 

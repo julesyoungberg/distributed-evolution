@@ -54,14 +54,30 @@ func (w *Worker) RunTask(task api.Task) {
 
 	util.DPrintf("preparing ga...")
 
-	w.ga.NGenerations = 1000
-	w.ga.PopSize = 100
+	w.ga.NGenerations = 100
+	w.ga.PopSize = 10
 
 	w.ga.Callback = func(ga *eaopt.GA) {
 		util.DPrintf("best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
 
 		task.Generation = ga.Generations
-		task.Population = ga.Populations[0].Individuals
+		task.Population = make(eaopt.Individuals, len(ga.Populations[0].Individuals))
+
+		// make a copy of each individual without the context pointer to the worker state
+		for i, indv := range ga.Populations[0].Individuals {
+			copy := indv
+			genome := copy.Genome.Clone()
+
+			if task.Type == "triangles" {
+				t := genome.(Triangle)
+				t.Context = nil
+				genome = t
+			}
+
+			copy.Genome = genome
+
+			task.Population[i] = copy
+		}
 
 		util.DPrintf("updating master")
 

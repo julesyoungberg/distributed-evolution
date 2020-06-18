@@ -26,7 +26,7 @@ func (m *Master) GetTask(args, reply *api.Task) error {
 }
 
 func (m *Master) Update(task, reply *api.Task) error {
-	util.DPrintf("update received from task %v", task.ID)
+	util.DPrintf("update for generation %v received from task %v", task.Generation, task.ID)
 
 	m.mu.Lock()
 	m.Tasks[task.ID] = *task
