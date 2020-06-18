@@ -28,6 +28,8 @@ func (m *Master) subscribe(ws *websocket.Conn) {
 }
 
 func (m *Master) updateUI(genN uint) {
+	util.DPrintf("updating ui")
+
 	m.mu.Lock()
 	defer m.mu.Unlock()
 

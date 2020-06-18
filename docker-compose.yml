@@ -4,7 +4,7 @@ version: '3'
 services:
     master:
         build:
-            context: .
+            context: ./go
             dockerfile: ./master.Dockerfile
         command: go run main/master/master.go
         environment: 
@@ -16,15 +16,15 @@ services:
             - 8080
     worker:
         build:
-            context: .
+            context: ./go
             dockerfile: ./worker.Dockerfile
         command: go run main/worker/worker.go
         environment: 
             PORT: 8080
     ui:
         build:
-            context: .
-            dockerfile: ./ui.Dockerfile
+            context: ./ui
+            dockerfile: ./Dockerfile
         command: npm run start:nodemon
         environment: 
             API_URL: localhost:9000

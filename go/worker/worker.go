@@ -58,10 +58,12 @@ func (w *Worker) RunTask(task api.Task) {
 	w.ga.PopSize = 100
 
 	w.ga.Callback = func(ga *eaopt.GA) {
-		fmt.Printf("best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
+		util.DPrintf("best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
 
 		task.Generation = ga.Generations
 		task.Population = ga.Populations[0].Individuals
+
+		util.DPrintf("updating master")
 
 		api.Update(task)
 	}
@@ -81,7 +83,7 @@ func Run() {
 	w.ga = createGA()
 
 	// wait for master to initialize
-	time.Sleep(20 * time.Second)
+	time.Sleep(10 * time.Second)
 
 	for {
 		// TODO handle errors by waiting and trying again

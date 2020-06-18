@@ -3,6 +3,8 @@ package master
 import (
 	"log"
 
+	"github.com/rickyfitts/distributed-evolution/util"
+
 	"github.com/fogleman/gg"
 
 	"github.com/rickyfitts/distributed-evolution/api"
@@ -19,6 +21,8 @@ type Generation struct {
 type Generations = map[uint]Generation
 
 func (m *Master) updateGenerations(task api.Task) uint {
+	util.DPrintf("updating generations")
+
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -61,6 +65,8 @@ func (m *Master) updateGenerations(task api.Task) uint {
 }
 
 func (m *Master) drawToGeneration(genN uint, task api.Task) {
+	util.DPrintf("drawing to generation")
+
 	m.mu.Lock()
 	defer m.mu.Unlock()
 

@@ -21,7 +21,7 @@ type Task struct {
 }
 
 func GetTask() Task {
-	util.DPrintf("requesting task...")
+	util.DPrintf("requesting task")
 
 	var args Task
 	var reply Task
@@ -32,7 +32,7 @@ func GetTask() Task {
 }
 
 func Update(args Task) {
-	util.DPrintf("sending progress...")
+	util.DPrintf("sending progress")
 
 	var reply Task
 
