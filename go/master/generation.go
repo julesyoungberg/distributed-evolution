@@ -21,9 +21,6 @@ type Generation struct {
 type Generations = map[uint]Generation
 
 func (m *Master) updateGenerations(task api.Task) uint {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
 	util.DPrintf("updating generation %v", task.Generation)
 
 	genN := task.Generation
@@ -44,9 +41,9 @@ func (m *Master) updateGenerations(task api.Task) uint {
 
 		generation.Output = gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
 
-		if len(m.Generations) > 3 {
-			delete(m.Generations, genN-3)
-		}
+		// if len(m.Generations) > 50 {
+		// 	delete(m.Generations, genN-50)
+		// }
 	}
 
 	util.DPrintf("generation %v recieved %v out of %v tasks", genN, len(generation.Tasks), len(m.Tasks))
@@ -63,9 +60,6 @@ func (m *Master) updateGenerations(task api.Task) uint {
 }
 
 func (m *Master) drawToGeneration(genN uint, task api.Task) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
 	util.DPrintf("drawing to generation %v", genN)
 
 	generation, ok := m.Generations[genN]
@@ -75,6 +69,8 @@ func (m *Master) drawToGeneration(genN uint, task api.Task) {
 	}
 
 	offset := util.Vector{X: float64(task.Location[0]), Y: float64(task.Location[1])}
+
+	util.DPrintf("drawing with offset %v", offset)
 
 	if task.Type == "triangles" {
 		t := task.BestFit.Genome.(worker.Shapes)

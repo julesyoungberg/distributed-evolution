@@ -9,18 +9,18 @@ import (
 	"github.com/rickyfitts/distributed-evolution/util"
 )
 
-func createGA(crossRate, mutationRate float64) *eaopt.GA {
+func (w *Worker) createGA() {
 	gaConfig := eaopt.GAConfig{
 		NPops:        1,
-		PopSize:      100,
+		PopSize:      w.PopSize,
 		HofSize:      1,
-		NGenerations: 1000,
+		NGenerations: w.NGenerations,
 		Model: eaopt.ModGenerational{
 			Selector: eaopt.SelTournament{
-				NContestants: 20,
+				NContestants: w.PoolSize,
 			},
-			MutRate:   mutationRate,
-			CrossRate: crossRate,
+			MutRate:   w.MutationRate,
+			CrossRate: w.CrossRate,
 		},
 		ParallelEval: false,
 	}
@@ -32,7 +32,7 @@ func createGA(crossRate, mutationRate float64) *eaopt.GA {
 
 	ga.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
-	return ga
+	w.ga = ga
 }
 
 func createCallback(task api.Task) func(ga *eaopt.GA) {

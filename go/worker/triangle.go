@@ -21,7 +21,7 @@ func createTriangle(size float64, bounds util.Vector, rng *rand.Rand) Triangle {
 		uint8(rng.Intn(255)),
 		uint8(rng.Intn(255)),
 		uint8(rng.Intn(255)),
-		255,
+		uint8(rng.Intn(255)),
 	}
 
 	offset := func() float64 {

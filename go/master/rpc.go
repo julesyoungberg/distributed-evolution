@@ -14,11 +14,12 @@ import (
 func (m *Master) GetTask(args, reply *api.Task) error {
 	util.DPrintf("task requested")
 
-	for _, task := range m.Tasks {
+	for i, task := range m.Tasks {
 		if task.Status == "unstarted" {
-			task.Status = "active"
-			*reply = task
-			util.DPrintf("assigning task %v\n", task.ID)
+			m.Tasks[i].Status = "active"
+			*reply = m.Tasks[i]
+			util.DPrintf("assigning task %v with location %v\n", task.ID, task.Location)
+			return nil
 		}
 	}
 
@@ -29,8 +30,9 @@ func (m *Master) Update(task, reply *api.Task) error {
 	util.DPrintf("update for generation %v received from task %v", task.Generation, task.ID)
 
 	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	m.Tasks[task.ID] = *task
-	m.mu.Unlock()
 
 	genN := m.updateGenerations(*task)
 

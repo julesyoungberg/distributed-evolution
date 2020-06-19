@@ -45,6 +45,8 @@ func (m *Master) generateTasks() {
 
 	rgbImg := m.TargetImage.(*image.YCbCr)
 
+	m.Tasks = make([]api.Task, m.NumWorkers)
+
 	for y := 0; y < s; y++ {
 		for x := 0; x < s; x++ {
 			x0 := x * colWidth
@@ -55,16 +57,20 @@ func (m *Master) generateTasks() {
 
 			rect := image.Rect(x0, y0, x1, y1)
 
+			index := (y * s) + x
+
 			task := api.Task{
 				Generation:  1,
-				ID:          (y * s) + x,
+				ID:          index,
 				Location:    []int{x0, y0},
 				Status:      "unstarted",
 				TargetImage: util.EncodeImage(rgbImg.SubImage(rect)),
 				Type:        "triangles",
 			}
 
-			m.Tasks = append(m.Tasks, task)
+			util.DPrintf("creating task with location %v", task.Location)
+
+			m.Tasks[index] = task
 		}
 	}
 

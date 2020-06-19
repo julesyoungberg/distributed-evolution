@@ -20,7 +20,6 @@ type websocketMessage struct {
 // TODO handle multiple connections
 func (m *Master) subscribe(ws *websocket.Conn) {
 	m.mu.Lock()
-	defer m.mu.Unlock()
 
 	util.DPrintf("new websocket connection request")
 
@@ -34,19 +33,27 @@ func (m *Master) subscribe(ws *websocket.Conn) {
 		log.Println(err)
 	}
 
+	m.mu.Unlock()
+
 	for {
 		// keep the connection open
-		m.mu.Unlock()
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(time.Second)
+
+		msg = websocketMessage{}
+
 		m.mu.Lock()
-		// TODO send keep alive and check if the connection has been closed
+
+		if err := websocket.JSON.Send(ws, msg); err != nil {
+			log.Println("connection closed: ", err)
+			m.mu.Unlock()
+			return
+		}
+
+		m.mu.Unlock()
 	}
 }
 
 func (m *Master) updateUI(genN uint) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
 	util.DPrintf("updating ui with generation %v", genN)
 
 	if m.ws == nil {
@@ -81,6 +88,8 @@ func (m *Master) updateUI(genN uint) {
 	if err := websocket.JSON.Send(m.ws, msg); err != nil {
 		log.Println(err)
 	}
+
+	delete(m.Generations, genN)
 }
 
 // TODO take target image from http

@@ -20,7 +20,10 @@ type Worker struct {
 	CrossRate    float64
 	CurrentTask  api.Task
 	MutationRate float64
+	NGenerations uint
 	NumShapes    int
+	PoolSize     uint
+	PopSize      uint
 	ShapeSize    float64
 	TargetImage  Image
 
@@ -60,12 +63,16 @@ func (w *Worker) RunTask(task api.Task) {
 
 func Run() {
 	w := Worker{
-		CrossRate:    0.4,
+		CrossRate:    0.2,
 		MutationRate: 0.021,
-		NumShapes:    500,
+		NGenerations: 100000,
+		NumShapes:    100,
+		PoolSize:     20,
+		PopSize:      100,
 		ShapeSize:    500,
 	}
-	w.ga = createGA(w.CrossRate, w.MutationRate)
+
+	w.createGA()
 
 	// wait for master to initialize
 	time.Sleep(10 * time.Second)
