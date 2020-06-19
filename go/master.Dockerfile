@@ -14,4 +14,8 @@ EXPOSE 9000
 # expose rpc port
 EXPOSE 8080
 
-CMD ["go" "run" "main/master/master.go"]
+# CMD ["go" "run" "main/master.go"]
+
+RUN go get github.com/githubnemo/CompileDaemon
+
+ENTRYPOINT CompileDaemon --build="go build commands/run_master.go" --command=./run_master
