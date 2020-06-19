@@ -77,7 +77,7 @@ func (m *Master) drawToGeneration(genN uint, task api.Task) {
 	offset := util.Vector{X: float64(task.Location[0]), Y: float64(task.Location[1])}
 
 	if task.Type == "triangles" {
-		t := task.BestFit.Genome.(worker.Triangles)
+		t := task.BestFit.Genome.(worker.Shapes)
 		t.Draw(generation.Output, offset)
 	}
 

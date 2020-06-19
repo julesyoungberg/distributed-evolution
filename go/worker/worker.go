@@ -17,8 +17,11 @@ type Image struct {
 }
 
 type Worker struct {
-	MutationRate float64
+	CrossRate    float64
 	CurrentTask  api.Task
+	MutationRate float64
+	NumShapes    int
+	ShapeSize    float64
 	TargetImage  Image
 
 	ga *eaopt.GA
@@ -56,8 +59,13 @@ func (w *Worker) RunTask(task api.Task) {
 }
 
 func Run() {
-	w := Worker{MutationRate: 0.8}
-	w.ga = createGA()
+	w := Worker{
+		CrossRate:    0.4,
+		MutationRate: 0.021,
+		NumShapes:    500,
+		ShapeSize:    500,
+	}
+	w.ga = createGA(w.CrossRate, w.MutationRate)
 
 	// wait for master to initialize
 	time.Sleep(10 * time.Second)

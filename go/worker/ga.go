@@ -2,24 +2,25 @@ package worker
 
 import (
 	"log"
+	"os"
 
 	"github.com/MaxHalford/eaopt"
 	"github.com/rickyfitts/distributed-evolution/api"
 	"github.com/rickyfitts/distributed-evolution/util"
 )
 
-func createGA() *eaopt.GA {
+func createGA(crossRate, mutationRate float64) *eaopt.GA {
 	gaConfig := eaopt.GAConfig{
 		NPops:        1,
 		PopSize:      100,
 		HofSize:      1,
-		NGenerations: 50,
+		NGenerations: 1000,
 		Model: eaopt.ModGenerational{
 			Selector: eaopt.SelTournament{
-				NContestants: 3,
+				NContestants: 20,
 			},
-			MutRate:   0.5,
-			CrossRate: 0.7,
+			MutRate:   mutationRate,
+			CrossRate: crossRate,
 		},
 		ParallelEval: false,
 	}
@@ -28,6 +29,8 @@ func createGA() *eaopt.GA {
 	if err != nil {
 		log.Fatal("error creating ga: ", err)
 	}
+
+	ga.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	return ga
 }
@@ -39,10 +42,13 @@ func createCallback(task api.Task) func(ga *eaopt.GA) {
 		bestFit := ga.HallOfFame[0]
 		var genome eaopt.Genome
 
-		if task.Type == "triangles" {
-			t := bestFit.Genome.(Triangles)
-			genome = t.CloneWithoutContext()
-		}
+		t := bestFit.Genome.(Shapes)
+		genome = t.CloneWithoutContext()
+
+		// for _, m := range t.Members {
+		// 	util.DPrintf("vertices: %v", m.Vertices)
+		// 	util.DPrintf("color: %v", m.Color)
+		// }
 
 		bestFit.Genome = genome
 
