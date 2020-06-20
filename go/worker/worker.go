@@ -3,9 +3,11 @@ package worker
 import (
 	"fmt"
 	"image"
+	"log"
 	"time"
 
 	"github.com/MaxHalford/eaopt"
+	"github.com/google/uuid"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
@@ -17,14 +19,10 @@ type Image struct {
 }
 
 type Worker struct {
-	CrossRate    float64
+	ID           uint32
 	CurrentTask  api.Task
-	MutationRate float64
+	Job          api.Job
 	NGenerations uint
-	NumShapes    int
-	PoolSize     uint
-	PopSize      uint
-	ShapeSize    float64
 	TargetImage  Image
 
 	ga *eaopt.GA
@@ -33,7 +31,7 @@ type Worker struct {
 // TODO figure out how we can set an initial population to start from
 // maybe make another version of createTriangleFactory that accepts a seed population
 func (w *Worker) RunTask(task api.Task) {
-	util.DPrintf("assigned task %v\n", task.ID)
+	log.Printf("assigned task %v\n", task.ID)
 
 	util.DPrintf("decoding image...")
 	img := util.DecodeImage(task.TargetImage)
@@ -48,9 +46,17 @@ func (w *Worker) RunTask(task api.Task) {
 	}
 
 	util.DPrintf("preparing ga...")
+	util.DPrintf("setting ID to %v", task.Job.ID)
 
-	w.ga.Callback = createCallback(task)
+	w.Job = task.Job
+	util.DPrintf("ID: %v", w.Job.ID)
 
+	w.createGA()
+
+	task.Job = api.Job{ID: task.Job.ID}
+
+	w.ga.Callback = w.createCallback(task)
+	w.ga.EarlyStop = w.createEarlyStop(task)
 	Factory := createShapesFactory(w, task.Type)
 
 	util.DPrintf("evolving...")
@@ -59,34 +65,37 @@ func (w *Worker) RunTask(task api.Task) {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	log.Printf("finishing task")
 }
 
 func Run() {
 	w := Worker{
-		CrossRate:    0.2,
-		MutationRate: 0.021,
-		NGenerations: 100000,
-		NumShapes:    200,
-		PoolSize:     10,
-		PopSize:      50,
-		ShapeSize:    20,
+		ID:           uuid.New().ID(),
+		NGenerations: 1000000000000, // 1 trillion
+		Job: api.Job{
+			ID:           uuid.New().ID(),
+			CrossRate:    0.2,
+			MutationRate: 0.021,
+			NumShapes:    200,
+			PoolSize:     10,
+			PopSize:      50,
+			ShapeSize:    20,
+		},
 	}
-
-	w.createGA()
-
-	util.DPrintf("waiting for master to start")
 
 	// wait for master to initialize
 	time.Sleep(10 * time.Second)
 
 	for {
-		// TODO handle errors by waiting and trying again
-		task := api.GetTask()
-
+		task, err := api.GetTask(w.ID)
 		// if generation is zero this is an empty response, if so just wait for more work
-		if task.Generation != 0 {
+		if err == nil && task.Generation != 0 {
 			w.RunTask(task)
-			break
+		} else if err != nil {
+			log.Printf("error: %v", err)
+		} else {
+			log.Print("empty task response...")
 		}
 
 		time.Sleep(time.Second)

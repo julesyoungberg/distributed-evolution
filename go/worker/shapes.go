@@ -19,7 +19,7 @@ type Shapes struct {
 	Type    string
 }
 
-func getCreateShapeFunc(shapeType string) func(size float64, bounds util.Vector, rng *rand.Rand) Shape {
+func getCreateShapeFunc(shapeType string) func(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
 	if shapeType == "triangles" {
 		return createTriangle
 	}
@@ -40,12 +40,12 @@ func createShapesFactory(ctx *Worker, shapeType string) func(rng *rand.Rand) eao
 		shapes := Shapes{
 			Bounds:  bounds,
 			Context: ctx,
-			Members: make([]Shape, ctx.NumShapes),
+			Members: make([]Shape, ctx.Job.NumShapes),
 			Type:    shapeType,
 		}
 
-		for i := 0; i < ctx.NumShapes; i++ {
-			shapes.Members[i] = createShape(ctx.ShapeSize, bounds, rng)
+		for i := 0; i < int(ctx.Job.NumShapes); i++ {
+			shapes.Members[i] = createShape(float64(ctx.Job.ShapeSize), bounds, rng)
 		}
 
 		return shapes
@@ -72,8 +72,8 @@ func (s Shapes) Mutate(rng *rand.Rand) {
 	createShape := getCreateShapeFunc(s.Type)
 
 	for i := range s.Members {
-		if rng.Float64() < s.Context.MutationRate {
-			s.Members[i] = createShape(s.Context.ShapeSize, s.Bounds, rng)
+		if rng.Float64() < s.Context.Job.MutationRate {
+			s.Members[i] = createShape(float64(s.Context.Job.ShapeSize), s.Bounds, rng)
 		}
 	}
 }

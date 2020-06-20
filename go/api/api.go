@@ -1,63 +1,81 @@
 package api
 
 import (
-	"fmt"
-	"log"
 	"net/rpc"
 	"os"
+	"time"
 
 	"github.com/MaxHalford/eaopt"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
-type Task struct {
-	BestFit     eaopt.Individual
-	Generation  uint
-	ID          int
-	Location    []int
-	Status      string
-	TargetImage string
-	Type        string
+type Job struct {
+	CrossRate    float64 `json:"crossRate"`
+	ID           uint32  `json:"id"`
+	MutationRate float64 `json:"mutationRate"`
+	NumShapes    uint    `json:"numShapes"`
+	PoolSize     uint    `json:"poolSize"`
+	PopSize      uint    `json:"popSize"`
+	ShapeSize    uint    `json:"shapeSize"`
+	TargetImage  string  `json:"targetImage"`
 }
 
-func GetTask() Task {
+type GetTaskArgs struct {
+	WorkerID uint32
+}
+
+type Task struct {
+	BestFit     eaopt.Individual `json:"bestFit"`
+	Generation  uint             `json:"generation"`
+	ID          int              `json:"id"`
+	Job         Job              `json:"-"`
+	LastUpdate  time.Time        `json:"lastUpdated"`
+	Location    []int            `json:"location"`
+	Status      string           `json:"status"`
+	TargetImage string           `json:"-"`
+	Type        string           `json:"type"`
+	WorkerID    uint32           `json:"workerID"`
+}
+
+func GetTask(workerId uint32) (Task, error) {
 	util.DPrintf("requesting task")
 
-	var args Task
+	args := GetTaskArgs{WorkerID: workerId}
 	var reply Task
 
-	Call("Master.GetTask", &args, &reply)
+	err := Call("Master.GetTask", &args, &reply)
 
-	return reply
+	return reply, err
 }
 
-func Update(args Task) {
+func Update(args Task) (uint32, error) {
 	util.DPrintf("sending progress")
 
 	var reply Task
 
-	Call("Master.Update", &args, &reply)
+	err := Call("Master.Update", &args, &reply)
+
+	return reply.Job.ID, err
 }
 
 // send an RPC request to the master, wait for the response.
 // usually returns true.
 // returns false if something goes wrong.
-func Call(rpcname string, args interface{}, reply interface{}) bool {
+func Call(rpcname string, args interface{}, reply interface{}) error {
 	util.DPrintf("making a request")
 
 	port := os.Getenv("PORT")
 	c, err := rpc.DialHTTP("tcp", "master:"+port)
 	if err != nil {
-		log.Fatal("dialing: ", err)
+		return err
 	}
 
 	defer c.Close()
 
 	err = c.Call(rpcname, args, reply)
-	if err == nil {
-		return true
+	if err != nil {
+		return err
 	}
 
-	fmt.Println(err)
-	return false
+	return nil
 }

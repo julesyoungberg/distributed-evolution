@@ -8,14 +8,16 @@ import { useState, FormEvent } from 'react'
 import { Box, Button, Flex } from 'rebass'
 
 import useAppState from '../../hooks/useAppState'
+import { Theme } from '../../theme'
 
 const { publicRuntimeConfig } = getConfig()
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(Button)<{ disabled: boolean }, Theme>`
     padding: 10px 20px;
     cursor: pointer;
     font-weight: 700;
     text-transform: uppercase;
+    background-color: ${({ disabled, theme }) => (disabled ? theme.colors.lightgray : theme.colors.primary)};
 
     &:focus {
         outline: none;
@@ -73,20 +75,36 @@ export default function Control() {
         img.src = 'https://picsum.photos/900'
 
         img.onload = () => {
-            dispatch({ type: 'update', payload: { targetImage: getBase64Image(img) } })
+            dispatch({ type: 'setTarget', payload: { target: getBase64Image(img) } })
             setLoading(false)
         }
     }
 
-    const onSubmit = (e: FormEvent) => {
+    const onStart = async (e: FormEvent) => {
         e.preventDefault()
-        dispatch({ type: 'clearOutput' })
+        setLoading(true)
 
-        fetch(`${publicRuntimeConfig.apiUrl}/job`, {
+        const body = { ...config, targetImage: state.targetImage }
+        console.log('body', body)
+
+        const response = await fetch(`${publicRuntimeConfig.apiUrl}/job`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...config, targetImage: state.target }),
+            body: JSON.stringify(body),
         })
+
+        console.log('response', response)
+
+        const data = await response.json().catch(() => response.text())
+
+        console.log('data', data)
+
+        dispatch({
+            type: 'start', 
+            payload: { data, statusCode: response.status },
+        })
+
+        setLoading(false)
     }
 
     const fieldProps = (name: string) => ({
@@ -99,18 +117,29 @@ export default function Control() {
                 ...config,
                 [e.target.name!]: e.target.value!,
             })
-        }
+        },
     })
 
+    const disableButtons = loading || ['disconnected', 'error'].includes(state.status)
+
     return (
-        <form onSubmit={onSubmit}>
-            <Flex justifyContent='space-between'>
-                <StyledButton disabled={loading} onClick={getRangomTargetImage}>
-                    Random Target Image
-                </StyledButton>
-                <StyledButton color='secondary' type='submit'>
-                    Start
-                </StyledButton>
+        <form>
+            <Flex css={{ textAlign: 'center' }} justifyContent='space-around'>
+                <Box width={1 / 2}>
+                    <StyledButton disabled={disableButtons} onClick={disableButtons ? undefined : getRangomTargetImage}>
+                        Random Target Image
+                    </StyledButton>
+                </Box>
+                <Box width={1 / 2}>
+                    <StyledButton
+                        disabled={disableButtons}
+                        color='secondary'
+                        onClick={disableButtons ? undefined : onStart}
+                        type='submit'
+                    >
+                        Start
+                    </StyledButton>
+                </Box>
             </Flex>
             <Flex css={{ marginTop: '20px' }} flexWrap='wrap' justifyContent='space-between'>
                 <Field>

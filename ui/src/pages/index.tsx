@@ -48,6 +48,8 @@ export default function Home() {
                         <Status />
 
                         <Control />
+
+                        <pre>{JSON.stringify(state, null, 4)}</pre>
                     </Main>
                 </StateContext.Provider>
             </ThemeProvider>

@@ -6,19 +6,27 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
+	"time"
 
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
-func (m *Master) GetTask(args, reply *api.Task) error {
+func (m *Master) GetTask(args *api.GetTaskArgs, reply *api.Task) error {
 	util.DPrintf("task requested")
 
 	for i, task := range m.Tasks {
 		if task.Status == "unstarted" {
-			m.Tasks[i].Status = "active"
-			*reply = m.Tasks[i]
-			util.DPrintf("assigning task %v with location %v\n", task.ID, task.Location)
+			task.Status = "active"
+			task.WorkerID = args.WorkerID
+			task.LastUpdate = time.Now()
+
+			m.Tasks[i] = task
+			*reply = task
+			reply.Job = m.Job
+
+			log.Printf("assigning task %v job %v to worker %v\n", task.ID, m.Job.ID, args.WorkerID)
+
 			return nil
 		}
 	}
@@ -31,6 +39,13 @@ func (m *Master) Update(task, reply *api.Task) error {
 
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
+	reply.Job.ID = m.Job.ID
+
+	if task.Job.ID != m.Job.ID {
+		log.Printf("worker %v is out of date", task.WorkerID)
+		return nil
+	}
 
 	m.Tasks[task.ID] = *task
 

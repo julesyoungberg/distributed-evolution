@@ -2,7 +2,6 @@ package worker
 
 import (
 	"log"
-	"os"
 
 	"github.com/MaxHalford/eaopt"
 	"github.com/rickyfitts/distributed-evolution/go/api"
@@ -12,15 +11,15 @@ import (
 func (w *Worker) createGA() {
 	gaConfig := eaopt.GAConfig{
 		NPops:        1,
-		PopSize:      w.PopSize,
+		PopSize:      w.Job.PopSize,
 		HofSize:      1,
 		NGenerations: w.NGenerations,
 		Model: eaopt.ModGenerational{
 			Selector: eaopt.SelTournament{
-				NContestants: w.PoolSize,
+				NContestants: w.Job.PoolSize,
 			},
-			MutRate:   w.MutationRate,
-			CrossRate: w.CrossRate,
+			MutRate:   w.Job.MutationRate,
+			CrossRate: w.Job.CrossRate,
 		},
 		ParallelEval: false,
 	}
@@ -30,12 +29,10 @@ func (w *Worker) createGA() {
 		log.Fatal("error creating ga: ", err)
 	}
 
-	ga.Logger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
-
 	w.ga = ga
 }
 
-func createCallback(task api.Task) func(ga *eaopt.GA) {
+func (w *Worker) createCallback(task api.Task) func(ga *eaopt.GA) {
 	return func(ga *eaopt.GA) {
 		util.DPrintf("best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
 
@@ -57,6 +54,24 @@ func createCallback(task api.Task) func(ga *eaopt.GA) {
 
 		util.DPrintf("updating master")
 
-		api.Update(task)
+		jobId, err := api.Update(task)
+		if err != nil {
+			log.Printf("error %v", err)
+		}
+
+		if w.Job.ID != jobId {
+			log.Printf("out of date job of %v, updating to %v", w.Job.ID, jobId)
+			w.Job.ID = jobId
+		}
+	}
+}
+
+func (w *Worker) createEarlyStop(task api.Task) func(ga *eaopt.GA) bool {
+	return func(ga *eaopt.GA) bool {
+		if w.Job.ID != task.Job.ID {
+			log.Printf("earlystop")
+		}
+
+		return w.Job.ID != task.Job.ID
 	}
 }

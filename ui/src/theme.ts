@@ -7,7 +7,7 @@ const mTheme = {
     colors: {
         blue: '#07c',
         lightgray: '#f6f6ff',
-        primary: '#33e',
+        primary: '#73e',
     },
     space: [0, 4, 8, 16, 32, 64, 128, 256],
     fonts: {

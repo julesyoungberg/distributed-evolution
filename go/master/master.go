@@ -7,15 +7,18 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
+	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
-	"golang.org/x/net/websocket"
 )
 
 // TODO handle multiple jobs
 type Master struct {
 	Generations       Generations
+	Job               api.Job
 	NumWorkers        int
 	TargetImage       image.Image
 	TargetImageBase64 string
@@ -23,13 +26,14 @@ type Master struct {
 	TargetImageWidth  int
 	Tasks             []api.Task
 
-	mu sync.Mutex
-	ws *websocket.Conn
+	mu         sync.Mutex
+	conn       *websocket.Conn
+	lastUpdate time.Time
 }
 
 // populates the task queue with tasks, where each is a slice of the target image
 func (m *Master) generateTasks() {
-	util.DPrintf("%v workers available, generating tasks...", m.NumWorkers)
+	log.Printf("%v workers available, generating tasks...", m.NumWorkers)
 
 	s := int(math.Floor(math.Sqrt(float64(m.NumWorkers))))
 
@@ -41,7 +45,7 @@ func (m *Master) generateTasks() {
 	colWidth := int(math.Ceil(float64(width) / float64(s)))
 	rowWidth := int(math.Ceil(float64(height) / float64(s)))
 
-	util.DPrintf("splitting image into %v %vpx cols and %v %vpx rows", s, colWidth, s, rowWidth)
+	log.Printf("splitting image into %v %vpx cols and %v %vpx rows", s, colWidth, s, rowWidth)
 
 	rgbImg := m.TargetImage.(*image.YCbCr)
 
@@ -68,13 +72,11 @@ func (m *Master) generateTasks() {
 				Type:        "polygons",
 			}
 
-			util.DPrintf("creating task with location %v", task.Location)
-
 			m.Tasks[index] = task
 		}
 	}
 
-	util.DPrintf("%v tasks created", len(m.Tasks))
+	log.Printf("%v tasks created", len(m.Tasks))
 }
 
 func Run() {
@@ -83,9 +85,20 @@ func Run() {
 		log.Fatal("error parsing NUM_WORKERS: ", err)
 	}
 
+	jobId := uuid.New().ID()
+
 	m := Master{
 		Generations: make(Generations, 3),
 		NumWorkers:  numWorkers,
+		Job: api.Job{
+			ID:           jobId,
+			CrossRate:    0.2,
+			MutationRate: 0.021,
+			NumShapes:    1000,
+			PoolSize:     10,
+			PopSize:      50,
+			ShapeSize:    20,
+		},
 	}
 
 	util.DPrintf("fetching random image...")
