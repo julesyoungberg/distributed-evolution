@@ -1,24 +1,26 @@
 import getConfig from 'next/config'
 import { useEffect } from 'react'
 
-const { publicRuntimeConfig: { apiUrl } } = getConfig()
+import { Action } from '../state'
 
-export default function useWebsocket(handleMessage: (data: Record<string, any>) => void) {
+const { publicRuntimeConfig } = getConfig()
+
+export default function useChannel(dispatch: (action: Action) => void) {
     useEffect(() => {
         const onOpen = () => console.log('subscribed to server')
 
         const onMessage = (event: { data: string }) => {
             console.log('message from server')
-        
-            let json: Record<string, any> | undefined
+
+            let payload: Record<string, any>
 
             try {
-                json = JSON.parse(event.data)
+                payload = JSON.parse(event.data)
             } catch (e) {
-                /* silence is golden */
+                payload = { error: e }
             }
 
-            if (json) handleMessage(json)
+            dispatch({ type: 'update', payload })
         }
 
         const onClose = (e: any) => {
@@ -29,7 +31,7 @@ export default function useWebsocket(handleMessage: (data: Record<string, any>) 
         let socket
 
         const listener = () => {
-            socket = new WebSocket(`ws://${apiUrl}/subscribe`)
+            socket = new WebSocket(publicRuntimeConfig.channelUrl)
             socket.addEventListener('open', onOpen)
             socket.addEventListener('message', onMessage)
             socket.addEventListener('close', onClose)

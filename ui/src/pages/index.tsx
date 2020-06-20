@@ -1,58 +1,56 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
 import styled from '@emotion/styled'
+import { ThemeProvider } from 'emotion-theming'
 import Head from 'next/head'
-import { useState } from 'react'
+import { useReducer } from 'react'
+import { Heading } from 'rebass'
 
-import useWebsocket from '../hooks/useWebsocket'
+import Control from '../components/Control'
+import Status from '../components/Status'
 
-const Wrapper = styled.div`
-    display: flex;
+import useChannel from '../hooks/useChannel'
+import { initialState, StateContext } from '../state'
+import reducer from '../state/reducer'
+import theme from '../theme'
 
-    div {
-        flex: 1;
+const Main = styled.main`
+    font-family: 'system-ui', sans-serif;
+    font-weight: 700;
 
-        img {
-            max-width: 100%;
-        }
-    }
+    max-width: 1200px;
+    margin: auto;
+`
+
+const StyledHeading = styled(Heading)`
+    margin-bottom: 20px;
 `
 
 export default function Home() {
-    const [targetImage, setTargetImage] = useState<string | undefined>(undefined)
-    const [output, setOutput] = useState<string | undefined>(undefined)
-    const [generation, setGeneration] = useState<number>(0)
+    const [state, dispatch] = useReducer(reducer, initialState)
 
-    const onMessage = (data: Record<string, any>) => {
-        if (data.targetImage) setTargetImage(data.targetImage)
-        if (data.currentGeneration) setGeneration(data.currentGeneration)
-        if (data.output) setOutput(data.output)
-    }
-
-    useWebsocket(onMessage)
+    useChannel(dispatch)
 
     return (
-        <div className='container'>
+        <>
             <Head>
                 <title>Distributed Evolution</title>
                 <link rel='icon' href='/favicon.ico' />
             </Head>
 
-            <main>
-                <h1>Distributed Evolution</h1>
+            <ThemeProvider theme={theme}>
+                <StateContext.Provider value={{ dispatch, state }}>
+                    <Main>
+                        <StyledHeading color='primary' fontSize={[5, 6, 7]} letterSpacing='-2px'>
+                            Distributed Evolution
+                        </StyledHeading>
 
-                <Wrapper>
-                    <div>
-                        <h2>Target Image</h2>
-                        {targetImage && <img src={`data:image/jpg;base64, ${targetImage}`} />}
-                    </div>
+                        <Status />
 
-                    <div>
-                        <h2>Output - Generation: {generation}</h2>
-                        {output && <img src={`data:image/png;base64, ${output}`} />}
-                    </div>
-                </Wrapper>
-            </main>
-        </div>
+                        <Control />
+                    </Main>
+                </StateContext.Provider>
+            </ThemeProvider>
+        </>
     )
 }

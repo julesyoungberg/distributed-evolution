@@ -66,10 +66,10 @@ func Run() {
 		CrossRate:    0.2,
 		MutationRate: 0.021,
 		NGenerations: 100000,
-		NumShapes:    100,
-		PoolSize:     20,
-		PopSize:      100,
-		ShapeSize:    50,
+		NumShapes:    200,
+		PoolSize:     10,
+		PopSize:      50,
+		ShapeSize:    20,
 	}
 
 	w.createGA()

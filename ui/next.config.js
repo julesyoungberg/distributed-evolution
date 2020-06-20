@@ -1,6 +1,7 @@
 module.exports = {
     publicRuntimeConfig: {
         apiUrl: process.env.API_URL,
+        channelUrl: process.env.CHANNEL_URL,
         environment: process.env.NODE_ENV,
     },
     webpackDevMiddleware: config => {

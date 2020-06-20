@@ -83,12 +83,11 @@ func GetImageDimensions(img image.Image) (int, int) {
 }
 
 func RandomColor(rng *rand.Rand) color.RGBA {
-	return color.RGBA{
-		uint8(rng.Intn(255)),
-		uint8(rng.Intn(255)),
-		uint8(rng.Intn(255)),
-		uint8(rng.Intn(255)),
+	f := func() uint8 {
+		return uint8(rng.Intn(64) * 4)
 	}
+
+	return color.RGBA{f(), f(), f(), f()}
 }
 
 func RandomVector(rng *rand.Rand, bounds Vector) Vector {

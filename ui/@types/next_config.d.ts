@@ -1,8 +1,8 @@
 declare interface PublicRuntimeConfig {
     apiUrl: string
+    channelUrl: string
     environment: 'development' | 'production'
 }
-
 
 declare interface NextConfig {
     publicRuntimeConfig: PublicRuntimeConfig
