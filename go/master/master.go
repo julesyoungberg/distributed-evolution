@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/rickyfitts/distributed-evolution/api"
-	"github.com/rickyfitts/distributed-evolution/util"
+	"github.com/rickyfitts/distributed-evolution/go/api"
+	"github.com/rickyfitts/distributed-evolution/go/util"
 	"golang.org/x/net/websocket"
 )
 
@@ -65,7 +65,7 @@ func (m *Master) generateTasks() {
 				Location:    []int{x0, y0},
 				Status:      "unstarted",
 				TargetImage: util.EncodeImage(rgbImg.SubImage(rect)),
-				Type:        "triangles",
+				Type:        "polygons",
 			}
 
 			util.DPrintf("creating task with location %v", task.Location)

@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"encoding/base64"
 	"image"
+	"image/color"
 	"image/jpeg"
 	"log"
+	"math/rand"
 	"net/http"
 	"strings"
 )
@@ -78,4 +80,17 @@ func DecodeImage(data string) image.Image {
 func GetImageDimensions(img image.Image) (int, int) {
 	bounds := img.Bounds()
 	return bounds.Dx(), bounds.Dy()
+}
+
+func RandomColor(rng *rand.Rand) color.RGBA {
+	return color.RGBA{
+		uint8(rng.Intn(255)),
+		uint8(rng.Intn(255)),
+		uint8(rng.Intn(255)),
+		uint8(rng.Intn(255)),
+	}
+}
+
+func RandomVector(rng *rand.Rand, bounds Vector) Vector {
+	return Vector{X: rng.Float64() * bounds.X, Y: rng.Float64() * bounds.Y}
 }

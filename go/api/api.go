@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/MaxHalford/eaopt"
-	"github.com/rickyfitts/distributed-evolution/util"
+	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
 type Task struct {

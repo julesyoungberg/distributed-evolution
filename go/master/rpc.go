@@ -7,8 +7,8 @@ import (
 	"net/rpc"
 	"os"
 
-	"github.com/rickyfitts/distributed-evolution/api"
-	"github.com/rickyfitts/distributed-evolution/util"
+	"github.com/rickyfitts/distributed-evolution/go/api"
+	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
 func (m *Master) GetTask(args, reply *api.Task) error {
@@ -34,11 +34,14 @@ func (m *Master) Update(task, reply *api.Task) error {
 
 	m.Tasks[task.ID] = *task
 
-	genN := m.updateGenerations(*task)
+	generation := m.updateGeneration(task)
 
-	m.drawToGeneration(genN, *task)
+	m.drawToGeneration(generation, task)
 
-	m.updateUI(genN)
+	if generation.Done {
+		m.updateUI(generation)
+		delete(m.Generations, generation.Generation)
+	}
 
 	return nil
 }

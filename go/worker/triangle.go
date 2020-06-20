@@ -5,40 +5,30 @@ import (
 	"math/rand"
 
 	"github.com/fogleman/gg"
-
-	"github.com/rickyfitts/distributed-evolution/util"
+	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
 type Triangle struct {
-	Bounds   util.Vector
 	Color    color.RGBA
 	Vertices []util.Vector
 }
 
-// creates a random triangle
-func createTriangle(size float64, bounds util.Vector, rng *rand.Rand) Triangle {
-	clr := color.RGBA{
-		uint8(rng.Intn(255)),
-		uint8(rng.Intn(255)),
-		uint8(rng.Intn(255)),
-		uint8(rng.Intn(255)),
-	}
-
+func createTriangle(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
 	offset := func() float64 {
-		size := 100.0
-		return rng.Float64()*size - (size / 2.0)
+		return rng.Float64()*radius*2.0 - radius
 	}
 
-	p1 := util.Vector{X: rng.Float64() * bounds.X, Y: rng.Float64() * bounds.Y}
+	p1 := util.RandomVector(rng, bounds)
 	p2 := util.Vector{X: p1.X + offset(), Y: p1.Y + offset()}
 	p3 := util.Vector{X: p1.X + offset(), Y: p1.Y + offset()}
 
-	vrt := []util.Vector{p1, p2, p3}
-
-	return Triangle{Bounds: bounds, Color: clr, Vertices: vrt}
+	return Triangle{
+		Color:    util.RandomColor(rng),
+		Vertices: []util.Vector{p1, p2, p3},
+	}
 }
 
-func (t *Triangle) Draw(dc *gg.Context, offset util.Vector) {
+func (t Triangle) Draw(dc *gg.Context, offset util.Vector) {
 	dc.NewSubPath()
 	dc.MoveTo(t.Vertices[0].X+offset.X, t.Vertices[0].Y+offset.Y)
 	dc.LineTo(t.Vertices[1].X+offset.X, t.Vertices[1].Y+offset.Y)
@@ -47,20 +37,4 @@ func (t *Triangle) Draw(dc *gg.Context, offset util.Vector) {
 
 	dc.SetColor(t.Color)
 	dc.Fill()
-}
-
-// copy all the data without pointers
-// TODO figure out how deep this actually needs to be
-func (t *Triangle) Clone() Triangle {
-	clone := Triangle{
-		Bounds:   t.Bounds,
-		Color:    color.RGBA{t.Color.R, t.Color.G, t.Color.B, t.Color.A},
-		Vertices: make([]util.Vector, len(t.Vertices)),
-	}
-
-	for i, p := range t.Vertices {
-		clone.Vertices[i] = util.Vector{X: p.X, Y: p.Y}
-	}
-
-	return clone
 }

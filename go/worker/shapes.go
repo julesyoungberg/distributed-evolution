@@ -5,25 +5,47 @@ import (
 
 	"github.com/MaxHalford/eaopt"
 	"github.com/fogleman/gg"
-	"github.com/rickyfitts/distributed-evolution/util"
+	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
-type Shapes struct {
-	Context *Worker
-	Members []Triangle
+type Shape interface {
+	Draw(dc *gg.Context, offset util.Vector)
 }
 
-func createTrianglesFactory(ctx *Worker) func(rng *rand.Rand) eaopt.Genome {
+type Shapes struct {
+	Bounds  util.Vector
+	Context *Worker
+	Members []Shape
+	Type    string
+}
+
+func getCreateShapeFunc(shapeType string) func(size float64, bounds util.Vector, rng *rand.Rand) Shape {
+	if shapeType == "triangles" {
+		return createTriangle
+	}
+
+	if shapeType == "polygons" {
+		return createPolygon
+	}
+
+	return createCircle
+}
+
+func createShapesFactory(ctx *Worker, shapeType string) func(rng *rand.Rand) eaopt.Genome {
 	bounds := util.Vector{X: float64(ctx.TargetImage.Width), Y: float64(ctx.TargetImage.Height)}
+
+	createShape := getCreateShapeFunc(shapeType)
 
 	return func(rng *rand.Rand) eaopt.Genome {
 		shapes := Shapes{
+			Bounds:  bounds,
 			Context: ctx,
-			Members: make([]Triangle, ctx.NumShapes),
+			Members: make([]Shape, ctx.NumShapes),
+			Type:    shapeType,
 		}
 
 		for i := 0; i < ctx.NumShapes; i++ {
-			shapes.Members[i] = createTriangle(ctx.ShapeSize, bounds, rng)
+			shapes.Members[i] = createShape(ctx.ShapeSize, bounds, rng)
 		}
 
 		return shapes
@@ -47,9 +69,11 @@ func (s Shapes) Evaluate() (float64, error) {
 }
 
 func (s Shapes) Mutate(rng *rand.Rand) {
+	createShape := getCreateShapeFunc(s.Type)
+
 	for i := range s.Members {
 		if rng.Float64() < s.Context.MutationRate {
-			s.Members[i] = createTriangle(s.Context.ShapeSize, s.Members[i].Bounds, rng)
+			s.Members[i] = createShape(s.Context.ShapeSize, s.Bounds, rng)
 		}
 	}
 }
@@ -68,28 +92,20 @@ func (s Shapes) Crossover(g eaopt.Genome, rng *rand.Rand) {
 
 // copy all the data without pointers
 func (s Shapes) Clone() eaopt.Genome {
-	clone := Shapes{
+	return Shapes{
+		Bounds:  s.Bounds,
 		Context: s.Context,
-		Members: make([]Triangle, len(s.Members)),
+		Members: append([]Shape{}, s.Members...),
+		Type:    s.Type,
 	}
-
-	for i, m := range s.Members {
-		clone.Members[i] = m.Clone()
-	}
-
-	return clone
 }
 
 func (s Shapes) CloneWithoutContext() eaopt.Genome {
-	clone := Shapes{
-		Members: make([]Triangle, len(s.Members)),
+	return Shapes{
+		Bounds:  s.Bounds,
+		Members: append([]Shape{}, s.Members...),
+		Type:    s.Type,
 	}
-
-	for i, m := range s.Members {
-		clone.Members[i] = m.Clone()
-	}
-
-	return clone
 }
 
 func (s Shapes) At(i int) interface{} {
@@ -97,7 +113,7 @@ func (s Shapes) At(i int) interface{} {
 }
 
 func (s Shapes) Set(i int, v interface{}) {
-	s.Members[i] = v.(Triangle)
+	s.Members[i] = v.(Shape)
 }
 
 func (s Shapes) Len() int {
@@ -109,31 +125,25 @@ func (s Shapes) Swap(i, j int) {
 }
 
 func (s Shapes) Slice(a, b int) eaopt.Slice {
-	return Shapes{
-		Context: s.Context,
-		Members: s.Members[a:b],
-	}
+	slice := s.Clone()
+	s.Members = s.Members[a:b]
+	return slice.(eaopt.Slice)
 }
 
 func (s Shapes) Split(k int) (eaopt.Slice, eaopt.Slice) {
-	s1 := Shapes{
-		Context: s.Context,
-		Members: s.Members[:k],
-	}
+	s1 := s.Clone().(Shapes)
+	s1.Members = s.Members[:k]
 
-	s2 := Shapes{
-		Context: s.Context,
-		Members: s.Members[k:],
-	}
+	s2 := s.Clone().(Shapes)
+	s2.Members = s.Members[k:]
 
 	return s1, s2
 }
 
 func (s Shapes) Append(q eaopt.Slice) eaopt.Slice {
-	return Shapes{
-		Context: s.Context,
-		Members: append(s.Members, q.(Shapes).Members...),
-	}
+	new := s.Clone().(Shapes)
+	new.Members = append(s.Members, q.(Shapes).Members...)
+	return new
 }
 
 func (s Shapes) Replace(q eaopt.Slice) {
@@ -141,7 +151,5 @@ func (s Shapes) Replace(q eaopt.Slice) {
 }
 
 func (s Shapes) Copy() eaopt.Slice {
-	clone := Shapes{Context: s.Context}
-	copy(clone.Members, s.Members)
-	return clone
+	return s.Clone().(Shapes)
 }

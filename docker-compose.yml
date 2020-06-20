@@ -4,7 +4,7 @@ version: '3'
 services:
     master:
         build:
-            context: ./go
+            context: .
             dockerfile: ./master.Dockerfile
         environment: 
             HTTP_PORT: 9000
@@ -15,14 +15,14 @@ services:
             - 8080
     worker:
         build:
-            context: ./go
+            context: .
             dockerfile: ./worker.Dockerfile
         environment: 
             PORT: 8080
     ui:
         build:
-            context: ./ui
-            dockerfile: ./Dockerfile
+            context: .
+            dockerfile: ./ui.Dockerfile
         environment: 
             API_URL: localhost:9000
             NODE_ENV: development

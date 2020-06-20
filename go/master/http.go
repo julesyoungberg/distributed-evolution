@@ -6,8 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/rickyfitts/distributed-evolution/util"
-
+	"github.com/rickyfitts/distributed-evolution/go/util"
 	"golang.org/x/net/websocket"
 )
 
@@ -53,22 +52,13 @@ func (m *Master) subscribe(ws *websocket.Conn) {
 	}
 }
 
-func (m *Master) updateUI(genN uint) {
+func (m *Master) updateUI(generation Generation) {
+	genN := generation.Generation
+
 	util.DPrintf("updating ui with generation %v", genN)
 
 	if m.ws == nil {
 		util.DPrintf("no open ui connections")
-		return
-	}
-
-	generation, ok := m.Generations[genN]
-	if !ok {
-		log.Fatalf("error getting generation %v", genN)
-	}
-
-	// TODO move this?
-	if !generation.Done {
-		util.DPrintf("error, generation not done!")
 		return
 	}
 
@@ -88,8 +78,6 @@ func (m *Master) updateUI(genN uint) {
 	if err := websocket.JSON.Send(m.ws, msg); err != nil {
 		log.Println(err)
 	}
-
-	delete(m.Generations, genN)
 }
 
 // TODO take target image from http

@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/MaxHalford/eaopt"
-	"github.com/rickyfitts/distributed-evolution/api"
-	"github.com/rickyfitts/distributed-evolution/util"
+	"github.com/rickyfitts/distributed-evolution/go/api"
+	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
 func (w *Worker) createGA() {

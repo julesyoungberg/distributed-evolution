@@ -6,8 +6,8 @@ TODO:
 3. figure out how to import from a util package - DONE
 4. create websocket connection between master and interface for displaying the current image - DONE
 5. download random image (lorem ipsum?) in master and send to interface - DONE
-6. slice image up into jobs
-7. send jobs to workers
-8. excute genetic algorithm for each job
-9. combine result in master
+6. slice image up into jobs - DONE
+7. send jobs to workers - DONE
+8. excute genetic algorithm for each job - DONE
+9. combine result in master - DONE
 10. iterate

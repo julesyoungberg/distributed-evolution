@@ -1,14 +1,10 @@
 package master
 
 import (
-	"log"
-
-	"github.com/rickyfitts/distributed-evolution/util"
-
 	"github.com/fogleman/gg"
-
-	"github.com/rickyfitts/distributed-evolution/api"
-	"github.com/rickyfitts/distributed-evolution/worker"
+	"github.com/rickyfitts/distributed-evolution/go/api"
+	"github.com/rickyfitts/distributed-evolution/go/util"
+	"github.com/rickyfitts/distributed-evolution/go/worker"
 )
 
 type Generation struct {
@@ -20,7 +16,7 @@ type Generation struct {
 
 type Generations = map[uint]Generation
 
-func (m *Master) updateGenerations(task api.Task) uint {
+func (m *Master) updateGeneration(task *api.Task) Generation {
 	util.DPrintf("updating generation %v", task.Generation)
 
 	genN := task.Generation
@@ -30,13 +26,13 @@ func (m *Master) updateGenerations(task api.Task) uint {
 	if ok {
 		util.DPrintf("generation %v exists, appending", genN)
 		// great, the generation already exists, update it
-		generation.Tasks = append(generation.Tasks, task)
+		generation.Tasks = append(generation.Tasks, *task)
 	} else {
 		util.DPrintf("generation %v does not exist, creating", genN)
 		// this is the first slice of this generation, create it and remove an old one
 		generation = Generation{
 			Generation: genN,
-			Tasks:      []api.Task{task},
+			Tasks:      []api.Task{*task},
 		}
 
 		generation.Output = gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
@@ -56,26 +52,16 @@ func (m *Master) updateGenerations(task api.Task) uint {
 
 	m.Generations[genN] = generation
 
-	return genN
+	return generation
 }
 
-func (m *Master) drawToGeneration(genN uint, task api.Task) {
-	util.DPrintf("drawing to generation %v", genN)
-
-	generation, ok := m.Generations[genN]
-	if !ok {
-		// wtf
-		log.Fatalf("error getting generation %v", genN)
-	}
-
+func (m *Master) drawToGeneration(generation Generation, task *api.Task) {
 	offset := util.Vector{X: float64(task.Location[0]), Y: float64(task.Location[1])}
 
-	util.DPrintf("drawing with offset %v", offset)
+	util.DPrintf("drawing to generation %v with offset %v", generation.Generation, offset)
 
-	if task.Type == "triangles" {
-		t := task.BestFit.Genome.(worker.Shapes)
-		t.Draw(generation.Output, offset)
-	}
+	s := task.BestFit.Genome.(worker.Shapes)
+	s.Draw(generation.Output, offset)
 
-	m.Generations[genN] = generation
+	m.Generations[generation.Generation] = generation
 }

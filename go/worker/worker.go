@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/MaxHalford/eaopt"
-	"github.com/rickyfitts/distributed-evolution/api"
-	"github.com/rickyfitts/distributed-evolution/util"
+	"github.com/rickyfitts/distributed-evolution/go/api"
+	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
 type Image struct {
@@ -51,7 +51,7 @@ func (w *Worker) RunTask(task api.Task) {
 
 	w.ga.Callback = createCallback(task)
 
-	Factory := createTrianglesFactory(w)
+	Factory := createShapesFactory(w, task.Type)
 
 	util.DPrintf("evolving...")
 
@@ -69,10 +69,12 @@ func Run() {
 		NumShapes:    100,
 		PoolSize:     20,
 		PopSize:      100,
-		ShapeSize:    500,
+		ShapeSize:    50,
 	}
 
 	w.createGA()
+
+	util.DPrintf("waiting for master to start")
 
 	// wait for master to initialize
 	time.Sleep(10 * time.Second)
