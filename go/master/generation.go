@@ -1,6 +1,8 @@
 package master
 
 import (
+	"image"
+
 	"github.com/fogleman/gg"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
@@ -10,6 +12,7 @@ import (
 type Generation struct {
 	Done       bool
 	Generation uint
+	Image      image.Image
 	Output     *gg.Context
 	Tasks      []api.Task
 }
@@ -36,10 +39,6 @@ func (m *Master) updateGeneration(task *api.Task) Generation {
 		}
 
 		generation.Output = gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
-
-		// if len(m.Generations) > 50 {
-		// 	delete(m.Generations, genN-50)
-		// }
 	}
 
 	util.DPrintf("generation %v recieved %v out of %v tasks", genN, len(generation.Tasks), len(m.Tasks))

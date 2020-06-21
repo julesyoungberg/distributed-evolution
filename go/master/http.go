@@ -3,6 +3,7 @@ package master
 import (
 	"encoding/json"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"time"
@@ -14,7 +15,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
-	"github.com/rickyfitts/distributed-evolution/go/worker"
 )
 
 type State struct {
@@ -72,6 +72,9 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.Job = job
 	m.Job.ID = uuid.New().ID()
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
+
+	m.Generations = Generations{}
+	m.Outputs = map[int]Generation{}
 
 	log.Printf("generating tasks")
 
@@ -197,16 +200,26 @@ func (m *Master) updateUICombined(generation Generation) {
 }
 
 // draws the latest generations to a single image
-func (m *Master) updateUILatest(task *api.Task) {
+func (m *Master) updateUILatest() {
 	dc := gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
 
 	for _, t := range m.Tasks {
-		if t.BestFit.Genome == nil {
+		// if t.BestFit.Genome == nil {
+		// 	continue
+		// }
+
+		// s := t.BestFit.Genome.(worker.Shapes)
+		// s.Draw(dc, t.Offset)
+
+		out, ok := m.Outputs[t.ID]
+		if !ok {
 			continue
 		}
 
-		s := t.BestFit.Genome.(worker.Shapes)
-		s.Draw(dc, t.Offset)
+		centerX := int(math.Round(t.Offset.X + t.Dimensions.X/2.0))
+		centerY := int(math.Round(t.Offset.Y + t.Dimensions.Y/2.0))
+
+		dc.DrawImageAnchored(out.Image, centerX, centerY, 0.5, 0.5)
 	}
 
 	m.sendOutput(dc)

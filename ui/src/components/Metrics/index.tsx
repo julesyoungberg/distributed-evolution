@@ -29,11 +29,16 @@ const columns = [
 export default function Metrics() {
     const { state } = useAppState()
 
+    const now = new Date().getTime()
+
     return (
         <DataTable
             title="Workers"
             columns={columns}
-            data={state.tasks}
+            data={state.tasks?.map(task => ({
+                ...task,
+                lastUpdate: `${(now - (new Date(task.lastUpdate)).getTime()) / 1000} seconds ago`
+            }))}
         />
     )
 }

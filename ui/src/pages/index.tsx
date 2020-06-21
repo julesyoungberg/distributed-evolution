@@ -17,7 +17,6 @@ import theme from '../theme'
 
 const Main = styled.main`
     font-family: 'system-ui', sans-serif;
-    font-weight: 700;
 
     max-width: 1200px;
     margin: auto;

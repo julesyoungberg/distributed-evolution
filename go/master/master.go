@@ -20,6 +20,8 @@ type Master struct {
 	Generations       Generations
 	Job               api.Job
 	NumWorkers        int
+	Outputs           map[int]Generation
+	OverDraw          int
 	TargetImage       image.Image
 	TargetImageBase64 string
 	TargetImageHeight int
@@ -65,12 +67,17 @@ func (m *Master) generateTasks() {
 
 			index := (y * s) + x
 
+			subImg := img.SubImage(rect)
+
+			bounds := subImg.Bounds()
+
 			task := api.Task{
+				Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},
 				Generation:  1,
 				ID:          index,
 				Offset:      util.Vector{X: float64(x0), Y: float64(y0)},
 				Status:      "unstarted",
-				TargetImage: util.EncodeImage(img.SubImage(rect)),
+				TargetImage: util.EncodeImage(subImg),
 				Type:        "polygons",
 			}
 
@@ -92,12 +99,14 @@ func Run() {
 	m := Master{
 		Generations: Generations{},
 		NumWorkers:  numWorkers,
+		Outputs:     map[int]Generation{},
+		OverDraw:    10,
 		Job: api.Job{
 			ID:           jobId,
 			CrossRate:    0.2,
 			MutationRate: 0.021,
 			NumShapes:    200,
-			OutputMode:   "combined",
+			OutputMode:   "latest",
 			PoolSize:     10,
 			PopSize:      50,
 			ShapeSize:    20,

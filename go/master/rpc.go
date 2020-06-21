@@ -8,8 +8,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/fogleman/gg"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
+	"github.com/rickyfitts/distributed-evolution/go/worker"
 )
 
 func (m *Master) GetTask(args *api.GetTaskArgs, reply *api.Task) error {
@@ -47,7 +49,7 @@ func (m *Master) Update(task, reply *api.Task) error {
 		return nil
 	}
 
-	m.Tasks[task.ID] = *task
+	task.LastUpdate = time.Now()
 
 	if m.Job.OutputMode == "combined" {
 		generation := m.updateGeneration(task)
@@ -59,8 +61,28 @@ func (m *Master) Update(task, reply *api.Task) error {
 			delete(m.Generations, generation.Generation)
 		}
 	} else {
-		m.updateUILatest(task)
+		overDraw := m.OverDraw
+
+		m.mu.Unlock()
+
+		dc := gg.NewContext(int(task.Dimensions.X)+overDraw*2, int(task.Dimensions.Y)+overDraw*2)
+		s := task.BestFit.Genome.(worker.Shapes)
+		s.Draw(dc, util.Vector{X: float64(overDraw), Y: float64(overDraw)})
+		img := dc.Image()
+
+		m.mu.Lock()
+
+		if o, ok := m.Outputs[task.ID]; !ok || task.Generation > o.Generation {
+			m.Outputs[task.ID] = Generation{
+				Generation: task.Generation,
+				Image:      img,
+			}
+		}
+
+		m.updateUILatest()
 	}
+
+	m.Tasks[task.ID] = *task
 
 	return nil
 }

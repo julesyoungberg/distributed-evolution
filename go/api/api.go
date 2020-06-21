@@ -27,6 +27,7 @@ type GetTaskArgs struct {
 
 type Task struct {
 	BestFit     eaopt.Individual `json:"bestFit"`
+	Dimensions  util.Vector      `json:"dimensions"`
 	Generation  uint             `json:"generation"`
 	ID          int              `json:"ID"`
 	Job         Job              `json:"-"`
