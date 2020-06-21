@@ -56,12 +56,10 @@ func (m *Master) updateGeneration(task *api.Task) Generation {
 }
 
 func (m *Master) drawToGeneration(generation Generation, task *api.Task) {
-	offset := util.Vector{X: float64(task.Location[0]), Y: float64(task.Location[1])}
-
-	util.DPrintf("drawing to generation %v with offset %v", generation.Generation, offset)
+	util.DPrintf("drawing to generation %v with offset %v", generation.Generation, task.Offset)
 
 	s := task.BestFit.Genome.(worker.Shapes)
-	s.Draw(generation.Output, offset)
+	s.Draw(generation.Output, task.Offset)
 
 	m.Generations[generation.Generation] = generation
 }

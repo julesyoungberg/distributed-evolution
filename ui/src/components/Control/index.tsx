@@ -37,6 +37,7 @@ interface Config {
     poolSize: number
     mutationRate: number
     crossRate: number
+    outputMode: 'combined' | 'latest'
 }
 
 const initialConfig: Config = Object.freeze({
@@ -47,6 +48,7 @@ const initialConfig: Config = Object.freeze({
     poolSize: 10,
     mutationRate: 0.02,
     crossRate: 0.2,
+    outputMode: 'latest',
 })
 
 function getBase64Image(img: HTMLImageElement) {
@@ -84,7 +86,7 @@ export default function Control() {
         e.preventDefault()
         setLoading(true)
 
-        const body = { ...config, targetImage: state.targetImage }
+        const body = { ...config, targetImage: state.nextTargetImage }
         console.log('body', body)
 
         const response = await fetch(`${publicRuntimeConfig.apiUrl}/job`, {
@@ -123,7 +125,7 @@ export default function Control() {
     const disableButtons = loading || ['disconnected', 'error'].includes(state.status)
 
     return (
-        <form>
+        <form css={{ marginBottom: 20 }}>
             <Flex css={{ textAlign: 'center' }} justifyContent='space-around'>
                 <Box width={1 / 2}>
                     <StyledButton disabled={disableButtons} onClick={disableButtons ? undefined : getRangomTargetImage}>
@@ -173,6 +175,14 @@ export default function Control() {
                 <Field>
                     <Label htmlFor='crossRate'>Cross Rate</Label>
                     <Input type='number' step='0.001' min='0.0' max='1.0' {...fieldProps('crossRate')} />
+                </Field>
+                <Field>
+                    <Label htmlFor='outputMode'>Output Mode</Label>
+                    <Select {...fieldProps('outputMode')}>
+                        {['latest', 'combined'].map((type) => (
+                            <option key={type}>{type}</option>
+                        ))}
+                    </Select>
                 </Field>
             </Flex>
         </form>

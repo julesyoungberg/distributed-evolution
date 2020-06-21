@@ -49,13 +49,17 @@ func (m *Master) Update(task, reply *api.Task) error {
 
 	m.Tasks[task.ID] = *task
 
-	generation := m.updateGeneration(task)
+	if m.Job.OutputMode == "combined" {
+		generation := m.updateGeneration(task)
 
-	m.drawToGeneration(generation, task)
+		m.drawToGeneration(generation, task)
 
-	if generation.Done {
-		m.updateUI(generation)
-		delete(m.Generations, generation.Generation)
+		if generation.Done {
+			m.updateUICombined(generation)
+			delete(m.Generations, generation.Generation)
+		}
+	} else {
+		m.updateUILatest(task)
 	}
 
 	return nil

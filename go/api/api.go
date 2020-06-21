@@ -11,9 +11,10 @@ import (
 
 type Job struct {
 	CrossRate    float64 `json:"crossRate"`
-	ID           uint32  `json:"id"`
+	ID           uint32  `json:"ID"`
 	MutationRate float64 `json:"mutationRate"`
 	NumShapes    uint    `json:"numShapes"`
+	OutputMode   string  `json:"outputMode"`
 	PoolSize     uint    `json:"poolSize"`
 	PopSize      uint    `json:"popSize"`
 	ShapeSize    uint    `json:"shapeSize"`
@@ -27,10 +28,10 @@ type GetTaskArgs struct {
 type Task struct {
 	BestFit     eaopt.Individual `json:"bestFit"`
 	Generation  uint             `json:"generation"`
-	ID          int              `json:"id"`
+	ID          int              `json:"ID"`
 	Job         Job              `json:"-"`
-	LastUpdate  time.Time        `json:"lastUpdated"`
-	Location    []int            `json:"location"`
+	LastUpdate  time.Time        `json:"lastUpdate"`
+	Offset      util.Vector      `json:"offset"`
 	Status      string           `json:"status"`
 	TargetImage string           `json:"-"`
 	Type        string           `json:"type"`

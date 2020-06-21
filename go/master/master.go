@@ -47,7 +47,9 @@ func (m *Master) generateTasks() {
 
 	log.Printf("splitting image into %v %vpx cols and %v %vpx rows", s, colWidth, s, rowWidth)
 
-	rgbImg := m.TargetImage.(*image.YCbCr)
+	img := m.TargetImage.(interface {
+		SubImage(rect image.Rectangle) image.Image
+	})
 
 	m.Tasks = make([]api.Task, m.NumWorkers)
 
@@ -66,9 +68,9 @@ func (m *Master) generateTasks() {
 			task := api.Task{
 				Generation:  1,
 				ID:          index,
-				Location:    []int{x0, y0},
+				Offset:      util.Vector{X: float64(x0), Y: float64(y0)},
 				Status:      "unstarted",
-				TargetImage: util.EncodeImage(rgbImg.SubImage(rect)),
+				TargetImage: util.EncodeImage(img.SubImage(rect)),
 				Type:        "polygons",
 			}
 
@@ -88,13 +90,14 @@ func Run() {
 	jobId := uuid.New().ID()
 
 	m := Master{
-		Generations: make(Generations, 3),
+		Generations: Generations{},
 		NumWorkers:  numWorkers,
 		Job: api.Job{
 			ID:           jobId,
 			CrossRate:    0.2,
 			MutationRate: 0.021,
-			NumShapes:    1000,
+			NumShapes:    200,
+			OutputMode:   "combined",
 			PoolSize:     10,
 			PopSize:      50,
 			ShapeSize:    20,

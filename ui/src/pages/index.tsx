@@ -7,6 +7,7 @@ import { useReducer } from 'react'
 import { Heading } from 'rebass'
 
 import Control from '../components/Control'
+import Metrics from '../components/Metrics'
 import Status from '../components/Status'
 
 import useChannel from '../hooks/useChannel'
@@ -49,7 +50,7 @@ export default function Home() {
 
                         <Control />
 
-                        <pre>{JSON.stringify(state, null, 4)}</pre>
+                        <Metrics />
                     </Main>
                 </StateContext.Provider>
             </ThemeProvider>

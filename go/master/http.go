@@ -8,11 +8,13 @@ import (
 	"time"
 
 	"github.com/MaxHalford/eaopt"
+	"github.com/fogleman/gg"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
+	"github.com/rickyfitts/distributed-evolution/go/worker"
 )
 
 type State struct {
@@ -60,8 +62,8 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	prev := m.TargetImageBase64
 	m.TargetImageBase64 = job.TargetImage
 
-	log.Printf("SANITY CHECK 1 - job.TargetImage == prev: %v", job.TargetImage == prev)
-	log.Printf("SANITY CHECK 2 - prevTarget == newTarget: %v", prev == m.TargetImageBase64)
+	log.Printf("SANITY CHECK 1 - job.TargetImage != prev: %v", job.TargetImage == prev)
+	log.Printf("SANITY CHECK 2 - prevTarget != newTarget: %v", prev == m.TargetImageBase64)
 
 	if job.TargetImage == prev {
 		log.Printf("error, new target image is the same as current")
@@ -115,6 +117,8 @@ func (m *Master) keepAlive(c *websocket.Conn) {
 	}()
 }
 
+// subscribe handler creates a websocket connection with the client
+// TODO create connection mutex not to block other tasks
 // TODO handle multiple connections
 func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 	// TODO check
@@ -145,40 +149,67 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 	m.keepAlive(conn)
 }
 
-func (m *Master) updateUI(generation Generation) {
-	genN := generation.Generation
-
-	util.DPrintf("updating ui with generation %v", genN)
-
+func (m *Master) sendOutput(output *gg.Context) {
 	if m.conn == nil {
 		util.DPrintf("no open ui connections")
 		return
 	}
 
-	util.DPrintf("encoding output image for generation %v", genN)
-
 	// get resulting image
-	img := generation.Output.Image()
+	img := output.Image()
 
 	// send encoded image and current generation
 	state := State{
-		Generation: genN,
-		Output:     util.EncodeImage(img),
-		Tasks:      make([]api.Task, len(m.Tasks)),
+		Output: util.EncodeImage(img),
+		Tasks:  make([]api.Task, len(m.Tasks)),
 	}
+
+	var latest uint = 0
 
 	for i, t := range m.Tasks {
 		t.BestFit = eaopt.Individual{}
 		state.Tasks[i] = t
+
+		if t.Generation > latest {
+			latest = t.Generation
+		}
 	}
 
-	util.DPrintf("sending generation %v update to ui", genN)
+	state.Generation = latest
+
+	util.DPrintf("sending generation %v update to ui", latest)
 
 	if err := m.conn.WriteJSON(state); err != nil {
 		log.Println(err)
 	}
 
 	m.lastUpdate = time.Now()
+}
+
+// sends the given generation's output image to the UI
+func (m *Master) updateUICombined(generation Generation) {
+	genN := generation.Generation
+
+	util.DPrintf("updating ui with generation %v", genN)
+	util.DPrintf("encoding output image for generation %v", genN)
+
+	m.sendOutput(generation.Output)
+}
+
+// draws the latest generations to a single image
+func (m *Master) updateUILatest(task *api.Task) {
+	dc := gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
+
+	for _, t := range m.Tasks {
+		if t.BestFit.Genome == nil {
+			continue
+		}
+
+		s := t.BestFit.Genome.(worker.Shapes)
+		s.Draw(dc, t.Offset)
+	}
+
+	m.sendOutput(dc)
 }
 
 // TODO take target image from http

@@ -54,9 +54,9 @@ function reducer(state: State, action: Action): State {
 
 export default function(state: State, action: Action): State {
     const nextState = reducer(state, action)
-    if (action.type !== 'update') {
-        console.log('PREV STATE', state)
-        console.log('NEXT STATE', nextState)
-    }
+    // if (action.type !== 'update') {
+    //     console.log('PREV STATE', state)
+    //     console.log('NEXT STATE', nextState)
+    // }
     return nextState
 }
