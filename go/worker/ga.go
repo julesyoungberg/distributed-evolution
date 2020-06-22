@@ -8,6 +8,7 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
+// initialize GA
 func (w *Worker) createGA() {
 	gaConfig := eaopt.GAConfig{
 		NPops:        1,
@@ -32,33 +33,29 @@ func (w *Worker) createGA() {
 	w.ga = ga
 }
 
+// returns a closure to be called after each generation
 func (w *Worker) createCallback(task api.Task) func(ga *eaopt.GA) {
+	// send the currrent best fit and other data to the master
 	return func(ga *eaopt.GA) {
-		util.DPrintf("best fitness at generation %d: %f\n", ga.Generations, ga.HallOfFame[0].Fitness)
-
+		// get best fit
 		bestFit := ga.HallOfFame[0]
-		var genome eaopt.Genome
+		bestFit.Genome = bestFit.Genome.(Shapes).CloneForSending()
 
-		t := bestFit.Genome.(Shapes)
-		genome = t.CloneWithoutContext()
-
-		// for _, m := range t.Members {
-		// 	util.DPrintf("vertices: %v", m.Vertices)
-		// 	util.DPrintf("color: %v", m.Color)
-		// }
-
-		bestFit.Genome = genome
-
+		// add data to the task
 		task.BestFit = bestFit
 		task.Generation = ga.Generations
+		task.Output = util.EncodeImage(w.BestFit.Output)
 
-		util.DPrintf("updating master")
+		// clear state
+		w.BestFit = Output{}
 
+		// send results to master
 		jobId, err := api.Update(task)
 		if err != nil {
-			log.Printf("error %v", err)
+			log.Print("error ", err)
 		}
 
+		// if the master responded with a different job id we are out of date
 		if w.Job.ID != jobId {
 			log.Printf("out of date job of %v, updating to %v", w.Job.ID, jobId)
 			w.Job.ID = jobId
@@ -66,12 +63,9 @@ func (w *Worker) createCallback(task api.Task) func(ga *eaopt.GA) {
 	}
 }
 
+// returns a closure to check if the algorithm should stop (ie the job has changed)
 func (w *Worker) createEarlyStop(task api.Task) func(ga *eaopt.GA) bool {
 	return func(ga *eaopt.GA) bool {
-		if w.Job.ID != task.Job.ID {
-			log.Printf("earlystop")
-		}
-
 		return w.Job.ID != task.Job.ID
 	}
 }

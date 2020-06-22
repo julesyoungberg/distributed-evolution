@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"encoding/base64"
 	"image"
-	"image/color"
-	"image/jpeg"
+	"image/png"
 	"log"
-	"math/rand"
 	"net/http"
 	"strings"
 )
@@ -27,18 +25,6 @@ func DPrintf(format string, a ...interface{}) (n int, err error) {
 	return
 }
 
-func ClampFloat64(n, min, max float64) float64 {
-	if n < min {
-		return min
-	}
-
-	if n > max {
-		return max
-	}
-
-	return n
-}
-
 func GetRandomImage() image.Image {
 	imageUrl := "https://picsum.photos/900"
 
@@ -56,22 +42,23 @@ func GetRandomImage() image.Image {
 	return img
 }
 
+// EncodeImage encodes an image as png base64 string
 func EncodeImage(img image.Image) string {
 	buf := new(bytes.Buffer)
-
-	err := jpeg.Encode(buf, img, nil)
+	err := png.Encode(buf, img)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("encode error ", err)
 	}
 
 	return base64.StdEncoding.EncodeToString(buf.Bytes())
 }
 
+// DecodeImage decodes a base64 and returns an image
 func DecodeImage(data string) image.Image {
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
 	img, _, err := image.Decode(reader)
 	if err != nil {
-		log.Fatal("error decoding task target image ", err)
+		log.Fatal("decode error: ", err)
 	}
 
 	return img
@@ -80,16 +67,4 @@ func DecodeImage(data string) image.Image {
 func GetImageDimensions(img image.Image) (int, int) {
 	bounds := img.Bounds()
 	return bounds.Dx(), bounds.Dy()
-}
-
-func RandomColor(rng *rand.Rand) color.RGBA {
-	f := func() uint8 {
-		return uint8(rng.Intn(64) * 4)
-	}
-
-	return color.RGBA{f(), f(), f(), f()}
-}
-
-func RandomVector(rng *rand.Rand, bounds Vector) Vector {
-	return Vector{X: rng.Float64() * bounds.X, Y: rng.Float64() * bounds.Y}
 }

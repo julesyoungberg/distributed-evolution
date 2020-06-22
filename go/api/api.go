@@ -33,6 +33,7 @@ type Task struct {
 	Job         Job              `json:"-"`
 	LastUpdate  time.Time        `json:"lastUpdate"`
 	Offset      util.Vector      `json:"offset"`
+	Output      string           `json:"output"`
 	Status      string           `json:"status"`
 	TargetImage string           `json:"-"`
 	Type        string           `json:"type"`

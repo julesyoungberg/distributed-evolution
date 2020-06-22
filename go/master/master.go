@@ -55,20 +55,18 @@ func (m *Master) generateTasks() {
 
 	m.Tasks = make([]api.Task, m.NumWorkers)
 
+	// create a task for each slice of the image
 	for y := 0; y < s; y++ {
 		for x := 0; x < s; x++ {
 			x0 := x * colWidth
 			y0 := y * rowWidth
-
 			x1 := int(math.Min(float64(x0+colWidth), float64(width)))
 			y1 := int(math.Min(float64(y0+rowWidth), float64(height)))
-
 			rect := image.Rect(x0, y0, x1, y1)
 
 			index := (y * s) + x
 
 			subImg := img.SubImage(rect)
-
 			bounds := subImg.Bounds()
 
 			task := api.Task{

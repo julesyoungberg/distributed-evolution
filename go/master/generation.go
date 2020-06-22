@@ -19,19 +19,16 @@ type Generation struct {
 
 type Generations = map[uint]Generation
 
+// update the generation image with the result of the task
 func (m *Master) updateGeneration(task *api.Task) Generation {
-	util.DPrintf("updating generation %v", task.Generation)
-
 	genN := task.Generation
 
 	generation, ok := m.Generations[genN]
 
 	if ok {
-		util.DPrintf("generation %v exists, appending", genN)
 		// great, the generation already exists, update it
 		generation.Tasks = append(generation.Tasks, *task)
 	} else {
-		util.DPrintf("generation %v does not exist, creating", genN)
 		// this is the first slice of this generation, create it and remove an old one
 		generation = Generation{
 			Generation: genN,
@@ -41,10 +38,7 @@ func (m *Master) updateGeneration(task *api.Task) Generation {
 		generation.Output = gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
 	}
 
-	util.DPrintf("generation %v recieved %v out of %v tasks", genN, len(generation.Tasks), len(m.Tasks))
-
 	if len(generation.Tasks) == len(m.Tasks) {
-		util.DPrintf("all tasks complete, marking generation %v as done", genN)
 		// this is the last slice for this generation, mark it as done
 		generation.Done = true
 	}
@@ -54,11 +48,18 @@ func (m *Master) updateGeneration(task *api.Task) Generation {
 	return generation
 }
 
+// draw the task's output to the generation's drawing context
 func (m *Master) drawToGeneration(generation Generation, task *api.Task) {
 	util.DPrintf("drawing to generation %v with offset %v", generation.Generation, task.Offset)
 
-	s := task.BestFit.Genome.(worker.Shapes)
-	s.Draw(generation.Output, task.Offset)
+	// img := util.DecodeImage(task.Output)
+
+	// centerX := int(math.Round(task.Offset.X + task.Dimensions.X/2.0))
+	// centerY := int(math.Round(task.Offset.Y + task.Dimensions.Y/2.0))
+
+	// generation.Output.DrawImageAnchored(img, centerX, centerY, 0.5, 0.5)
+
+	task.BestFit.Genome.(worker.Shapes).Draw(generation.Output, task.Offset)
 
 	m.Generations[generation.Generation] = generation
 }

@@ -8,10 +8,6 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
-type Shape interface {
-	Draw(dc *gg.Context, offset util.Vector)
-}
-
 type Shapes struct {
 	Bounds  util.Vector
 	Context *Worker
@@ -19,18 +15,19 @@ type Shapes struct {
 	Type    string
 }
 
+// get the correct creation function based on the given shape type
 func getCreateShapeFunc(shapeType string) func(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
-	if shapeType == "triangles" {
+	switch shapeType {
+	case "triangles":
 		return createTriangle
-	}
-
-	if shapeType == "polygons" {
+	case "polygons":
 		return createPolygon
+	default:
+		return createCircle
 	}
-
-	return createCircle
 }
 
+// returns a closure with a reference to the context that can be used to generate a random shapes object
 func createShapesFactory(ctx *Worker, shapeType string) func(rng *rand.Rand) eaopt.Genome {
 	bounds := util.Vector{X: float64(ctx.TargetImage.Width), Y: float64(ctx.TargetImage.Height)}
 
@@ -52,22 +49,37 @@ func createShapesFactory(ctx *Worker, shapeType string) func(rng *rand.Rand) eao
 	}
 }
 
+// draw the shapes to the given draw context
 func (s Shapes) Draw(dc *gg.Context, offset util.Vector) {
 	for _, m := range s.Members {
 		m.Draw(dc, offset)
 	}
 }
 
+// evaluates the fitness of the shapes instance
+// TODO make this thread safe for parallelization
+// TODO overdraw and transparency
 func (s Shapes) Evaluate() (float64, error) {
+	// draw shapes
 	dc := gg.NewContext(s.Context.TargetImage.Width, s.Context.TargetImage.Height)
 	s.Draw(dc, util.Vector{X: 0, Y: 0})
 	out := dc.Image()
 
+	// calculate fitness as the difference between the target and output images
 	fitness := imgDiff(rgbaImg(out), rgbaImg(s.Context.TargetImage.Image))
+
+	// if this is the best fit we've seen, save it
+	if fitness > s.Context.BestFit.Fitness {
+		s.Context.BestFit = Output{
+			Fitness: fitness,
+			Output:  out,
+		}
+	}
 
 	return fitness, nil
 }
 
+// randomly replace members of the population with a new random shape
 func (s Shapes) Mutate(rng *rand.Rand) {
 	createShape := getCreateShapeFunc(s.Type)
 
@@ -78,6 +90,7 @@ func (s Shapes) Mutate(rng *rand.Rand) {
 	}
 }
 
+// randomly swap shapes between two populations
 func (s Shapes) Crossover(g eaopt.Genome, rng *rand.Rand) {
 	o := g.(Shapes)
 
@@ -90,6 +103,7 @@ func (s Shapes) Crossover(g eaopt.Genome, rng *rand.Rand) {
 	}
 }
 
+// create a new shapes instance with the same data
 // copy all the data without pointers
 func (s Shapes) Clone() eaopt.Genome {
 	return Shapes{
@@ -100,7 +114,8 @@ func (s Shapes) Clone() eaopt.Genome {
 	}
 }
 
-func (s Shapes) CloneWithoutContext() eaopt.Genome {
+// creates a copy of the instance without context
+func (s Shapes) CloneForSending() eaopt.Genome {
 	return Shapes{
 		Bounds:  s.Bounds,
 		Members: append([]Shape{}, s.Members...),

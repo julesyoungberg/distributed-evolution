@@ -10,4 +10,6 @@ TODO:
 7. send jobs to workers - DONE
 8. excute genetic algorithm for each job - DONE
 9. combine result in master - DONE
-10. iterate
+10. fix runtime errors and determine if draw once is _actually_ faster
+12. add overdraw to worker draw logic
+13. fault tolerance

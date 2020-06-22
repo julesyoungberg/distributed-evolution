@@ -8,13 +8,13 @@ import (
 	"os"
 	"time"
 
-	"github.com/MaxHalford/eaopt"
 	"github.com/fogleman/gg"
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
+	"github.com/rickyfitts/distributed-evolution/go/worker"
 )
 
 type State struct {
@@ -39,6 +39,7 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding")
 
+	// ignore preflight request
 	if r.Method == http.MethodOptions {
 		return
 	}
@@ -48,56 +49,42 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("starting new job")
 
+	// decode request body as job config
 	var job api.Job
-
 	err := json.NewDecoder(r.Body).Decode(&job)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	log.Printf("decoding target image")
-
+	// decode and save target image
 	m.TargetImage = util.DecodeImage(job.TargetImage)
-	prev := m.TargetImageBase64
 	m.TargetImageBase64 = job.TargetImage
 
-	log.Printf("SANITY CHECK 1 - job.TargetImage != prev: %v", job.TargetImage == prev)
-	log.Printf("SANITY CHECK 2 - prevTarget != newTarget: %v", prev == m.TargetImageBase64)
-
-	if job.TargetImage == prev {
-		log.Printf("error, new target image is the same as current")
-	}
-
+	// save the job with a new ID
 	m.Job = job
 	m.Job.ID = uuid.New().ID()
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
 
+	// reset state and generate tasks
 	m.Generations = Generations{}
 	m.Outputs = map[int]Generation{}
-
-	log.Printf("generating tasks")
-
 	m.generateTasks()
 
-	state := State{
+	response := State{
 		NumWorkers: m.NumWorkers,
-		Tasks:      make([]api.Task, len(m.Tasks)),
-	}
-
-	for i, t := range m.Tasks {
-		t.BestFit = eaopt.Individual{}
-		state.Tasks[i] = t
+		Tasks:      append([]api.Task{}, m.Tasks...),
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(state); err != nil {
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 }
 
 // keep websocket connection alive for as long as possible
+// by periodically sending a message
 func (m *Master) keepAlive(c *websocket.Conn) {
 	go func() {
 		for {
@@ -137,13 +124,11 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("new websocket connection request")
 
+	// save the connection for updates
 	m.conn = conn
 
-	state := State{TargetImage: m.TargetImageBase64}
-
-	log.Printf("sending data")
-
-	if err := conn.WriteJSON(state); err != nil {
+	response := State{TargetImage: m.TargetImageBase64}
+	if err := conn.WriteJSON(response); err != nil {
 		log.Println(err)
 	}
 
@@ -170,7 +155,7 @@ func (m *Master) sendOutput(output *gg.Context) {
 	var latest uint = 0
 
 	for i, t := range m.Tasks {
-		t.BestFit = eaopt.Individual{}
+		t.BestFit.Genome = worker.Shapes{}
 		state.Tasks[i] = t
 
 		if t.Generation > latest {
@@ -179,8 +164,6 @@ func (m *Master) sendOutput(output *gg.Context) {
 	}
 
 	state.Generation = latest
-
-	util.DPrintf("sending generation %v update to ui", latest)
 
 	if err := m.conn.WriteJSON(state); err != nil {
 		log.Println(err)
@@ -204,13 +187,6 @@ func (m *Master) updateUILatest() {
 	dc := gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
 
 	for _, t := range m.Tasks {
-		// if t.BestFit.Genome == nil {
-		// 	continue
-		// }
-
-		// s := t.BestFit.Genome.(worker.Shapes)
-		// s.Draw(dc, t.Offset)
-
 		out, ok := m.Outputs[t.ID]
 		if !ok {
 			continue
@@ -225,15 +201,13 @@ func (m *Master) updateUILatest() {
 	m.sendOutput(dc)
 }
 
-// TODO take target image from http
-// allow multiple jobs at the same time, take number of workers from request too??
+// handles requests from the ui and websocket communication
 func (m *Master) httpServer() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
 
 	r.HandleFunc("/subscribe", m.subscribe)
-	// http.Handle("/subscribe", websocket.Handler(m.subscribe))
 
 	port := os.Getenv("HTTP_PORT")
 

@@ -18,9 +18,14 @@ type Image struct {
 	Height int
 }
 
+type Output struct {
+	Fitness float64
+	Output  image.Image
+}
+
 type Worker struct {
 	ID           uint32
-	CurrentTask  api.Task
+	BestFit      Output
 	Job          api.Job
 	NGenerations uint
 	TargetImage  Image
@@ -28,50 +33,43 @@ type Worker struct {
 	ga *eaopt.GA
 }
 
-// TODO figure out how we can set an initial population to start from
-// maybe make another version of createTriangleFactory that accepts a seed population
+// RunTask executes the genetic algorithm for a given task
+// TODO set an initial population to start from
 func (w *Worker) RunTask(task api.Task) {
-	log.Printf("assigned task %v\n", task.ID)
-
-	util.DPrintf("decoding image...")
+	// decode and save target image
 	img := util.DecodeImage(task.TargetImage)
 	width, height := util.GetImageDimensions(img)
-
-	util.DPrintf("saving task data...")
-	w.CurrentTask = task
 	w.TargetImage = Image{
 		Image:  img,
 		Width:  width,
 		Height: height,
 	}
 
-	util.DPrintf("preparing ga...")
-	util.DPrintf("setting ID to %v", task.Job.ID)
-
+	// save job information for createGA to use
 	w.Job = task.Job
-	util.DPrintf("ID: %v", w.Job.ID)
+
+	// clear job data from task to keep update messages small
+	// the master only needs to confirm that the ID is correct
+	task.Job = api.Job{ID: task.Job.ID}
 
 	w.createGA()
 
-	task.Job = api.Job{ID: task.Job.ID}
-
+	// create clsoure functions with context
 	w.ga.Callback = w.createCallback(task)
 	w.ga.EarlyStop = w.createEarlyStop(task)
 	Factory := createShapesFactory(w, task.Type)
 
-	util.DPrintf("evolving...")
-
+	// evolve
 	err := w.ga.Minimize(Factory)
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	log.Printf("finishing task")
 }
 
 func Run() {
 	w := Worker{
 		ID:           uuid.New().ID(),
+		BestFit:      Output{},
 		NGenerations: 1000000000000, // 1 trillion
 		Job: api.Job{
 			ID:           uuid.New().ID(),
@@ -89,13 +87,15 @@ func Run() {
 
 	for {
 		task, err := api.GetTask(w.ID)
-		// if generation is zero this is an empty response, if so just wait for more work
+
 		if err == nil && task.Generation != 0 {
+			log.Print("assigned task ", task.ID)
 			w.RunTask(task)
+			log.Print("finished task ", task.ID)
 		} else if err != nil {
-			log.Printf("error: %v", err)
+			log.Print("error: ", err)
 		} else {
-			log.Print("empty task response...")
+			log.Print("empty task response, waiting for work")
 		}
 
 		time.Sleep(time.Second)
