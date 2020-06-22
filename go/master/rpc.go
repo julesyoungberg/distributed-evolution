@@ -15,9 +15,9 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/worker"
 )
 
+// assigns a task to a worker
 func (m *Master) GetTask(args *api.GetTaskArgs, reply *api.Task) error {
-	util.DPrintf("task requested")
-
+	// find an unstarted task to reply with
 	for i, task := range m.Tasks {
 		if task.Status == "unstarted" {
 			task.Status = "active"
@@ -37,9 +37,8 @@ func (m *Master) GetTask(args *api.GetTaskArgs, reply *api.Task) error {
 	return nil
 }
 
+// handles a progress update from a worker, updates the state, and updates the ui
 func (m *Master) Update(task, reply *api.Task) error {
-	util.DPrintf("update for generation %v received from task %v", task.Generation, task.ID)
-
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -53,6 +52,7 @@ func (m *Master) Update(task, reply *api.Task) error {
 	task.LastUpdate = time.Now()
 
 	if m.Job.OutputMode == "combined" {
+		// draw the output to the corresponding generation
 		generation := m.updateGeneration(task)
 
 		m.drawToGeneration(generation, task)
@@ -62,11 +62,19 @@ func (m *Master) Update(task, reply *api.Task) error {
 			delete(m.Generations, generation.Generation)
 		}
 	} else {
+		// save the output to the outputs map if the generation is the latest
+		if o, ok := m.Outputs[task.ID]; ok && task.Generation < o.Generation {
+			// this update is old, must have been delayed, ignore
+			return
+		}
+
 		var img image.Image
 
 		if m.Job.DrawOnce {
+			// the worker has already drawn the generation, use that
 			img = util.DecodeImage(task.Output)
 		} else {
+			// draw the generation
 			overDraw := m.Job.OverDraw
 
 			m.mu.Unlock()
@@ -79,13 +87,13 @@ func (m *Master) Update(task, reply *api.Task) error {
 			m.mu.Lock()
 		}
 
-		if o, ok := m.Outputs[task.ID]; !ok || task.Generation > o.Generation {
-			m.Outputs[task.ID] = Generation{
-				Generation: task.Generation,
-				Image:      img,
-			}
+		// save the output
+		m.Outputs[task.ID] = Generation{
+			Generation: task.Generation,
+			Image:      img,
 		}
 
+		// TODO throttle this to increase performance
 		m.updateUILatest()
 	}
 

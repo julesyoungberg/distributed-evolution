@@ -106,10 +106,10 @@ func Run() {
 		TargetImage: util.Image{},
 	}
 
-	util.DPrintf("fetching random image...")
+	log.Print("fetching random image...")
 	m.TargetImage.Image = util.GetRandomImage()
 
-	util.DPrintf("encoding image...")
+	log.Print("encoding image...")
 	m.TargetImageBase64 = util.EncodeImage(m.TargetImage.Image)
 
 	m.generateTasks()

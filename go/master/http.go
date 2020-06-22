@@ -85,25 +85,23 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 // keep websocket connection alive for as long as possible
 // by periodically sending a message
 func (m *Master) keepAlive(c *websocket.Conn) {
-	go func() {
-		for {
-			m.mu.Lock()
+	for {
+		m.mu.Lock()
 
-			if time.Since(m.lastUpdate) > time.Second {
-				err := c.WriteMessage(websocket.PingMessage, []byte("keepalive"))
-				if err != nil {
-					m.mu.Unlock()
-					return
-				}
-
-				m.lastUpdate = time.Now()
+		if time.Since(m.lastUpdate) > time.Second {
+			err := c.WriteMessage(websocket.PingMessage, []byte("keepalive"))
+			if err != nil {
+				m.mu.Unlock()
+				return
 			}
 
-			m.mu.Unlock()
-
-			time.Sleep(200 * time.Millisecond)
+			m.lastUpdate = time.Now()
 		}
-	}()
+
+		m.mu.Unlock()
+
+		time.Sleep(200 * time.Millisecond)
+	}
 }
 
 // subscribe handler creates a websocket connection with the client
@@ -133,12 +131,12 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 
 	m.mu.Unlock()
 
-	m.keepAlive(conn)
+	go m.keepAlive(conn)
 }
 
 func (m *Master) sendOutput(output *gg.Context, generation uint) {
 	if m.conn == nil {
-		util.DPrintf("no open ui connections")
+		// no open connections
 		return
 	}
 
@@ -161,12 +159,7 @@ func (m *Master) sendOutput(output *gg.Context, generation uint) {
 
 // sends the given generation's output image to the UI
 func (m *Master) updateUICombined(generation Generation) {
-	genN := generation.Generation
-
-	util.DPrintf("updating ui with generation %v", genN)
-	util.DPrintf("encoding output image for generation %v", genN)
-
-	m.sendOutput(generation.Output, genN)
+	m.sendOutput(generation.Output, generation.Generation)
 }
 
 // draws the latest generations to a single image

@@ -43,8 +43,6 @@ type Task struct {
 }
 
 func GetTask(workerId uint32) (Task, error) {
-	util.DPrintf("requesting task")
-
 	args := GetTaskArgs{WorkerID: workerId}
 	var reply Task
 
@@ -54,8 +52,6 @@ func GetTask(workerId uint32) (Task, error) {
 }
 
 func Update(args Task) (uint32, error) {
-	util.DPrintf("sending progress")
-
 	var reply Task
 
 	err := Call("Master.Update", &args, &reply)
@@ -67,8 +63,6 @@ func Update(args Task) (uint32, error) {
 // usually returns true.
 // returns false if something goes wrong.
 func Call(rpcname string, args interface{}, reply interface{}) error {
-	util.DPrintf("making a request")
-
 	port := os.Getenv("PORT")
 	c, err := rpc.DialHTTP("tcp", "master:"+port)
 	if err != nil {

@@ -14,3 +14,8 @@
     - add disconnect buttons to the ui
     - keep track of perceived connectedness on the master
     - support multiple tasks on a worker
+
+## Deployment
+https://kubernetes.io/docs/tutorials/configuration/configure-redis-using-configmap/
+https://www.callicoder.com/deploy-multi-container-go-redis-app-kubernetes/
+https://cloud.google.com/memorystore/docs/redis/connect-redis-instance-gke

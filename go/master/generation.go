@@ -51,9 +51,8 @@ func (m *Master) updateGeneration(task *api.Task) Generation {
 
 // draw the task's output to the generation's drawing context
 func (m *Master) drawToGeneration(generation Generation, task *api.Task) {
-	util.DPrintf("drawing to generation %v with offset %v", generation.Generation, task.Offset)
-
 	if m.Job.DrawOnce {
+		// the generation has already been drawn, draw the image to the output
 		img := util.DecodeImage(task.Output)
 
 		centerX := int(math.Round(task.Offset.X + task.Dimensions.X/2.0))
@@ -61,6 +60,7 @@ func (m *Master) drawToGeneration(generation Generation, task *api.Task) {
 
 		generation.Output.DrawImageAnchored(img, centerX, centerY, 0.5, 0.5)
 	} else {
+		// draw the generation to the output
 		task.BestFit.Genome.(worker.Shapes).Draw(generation.Output, task.Offset)
 	}
 
