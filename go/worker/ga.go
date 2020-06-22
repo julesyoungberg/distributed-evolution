@@ -47,7 +47,7 @@ func (w *Worker) createCallback(task api.Task) func(ga *eaopt.GA) {
 			w.mu.Unlock()
 
 			if output == nil {
-				log.Printf("error! best fit image is nil at generation %v - bestFit: %v", ga.Generations, .BestFit)
+				log.Printf("error! best fit image is nil at generation %v - bestFit: %v", ga.Generations, w.BestFit)
 				return
 			}
 

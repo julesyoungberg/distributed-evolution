@@ -89,7 +89,7 @@ func Run() {
 			w.RunTask(task)
 			log.Print("finished task ", task.ID)
 		} else if err != nil {
-			log.Print("error: ", err)
+			log.Fatal("error: ", err)
 		} else {
 			log.Print("empty task response, waiting for work")
 		}

@@ -71,14 +71,14 @@ func (s Shapes) Evaluate() (float64, error) {
 		dc := gg.NewContext(width, height)
 
 		s.Draw(dc, util.Vector{X: float64(overDraw), Y: float64(overDraw)})
-		img := dc.Image()
+		img = dc.Image()
 
 		rect := image.Rect(overDraw, overDraw, width-overDraw, height-overDraw)
-		out := util.GetSubImage(img, rect)
+		out = util.GetSubImage(img, rect)
 	} else {
 		dc := gg.NewContext(s.Context.TargetImage.Width, s.Context.TargetImage.Height)
 		s.Draw(dc, util.Vector{X: 0, Y: 0})
-		out := dc.Image()
+		out = dc.Image()
 	}
 
 	// calculate fitness as the difference between the target and output images

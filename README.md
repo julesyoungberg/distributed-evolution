@@ -10,8 +10,7 @@
 7. send jobs to workers - DONE
 8. excute genetic algorithm for each job - DONE
 9. combine result in master - DONE
-10. fix runtime errors and determine if draw once is _actually_ faster
-11. fault tolerance!!
+10. fault tolerance!!
     - add disconnect buttons to the ui
     - keep track of perceived connectedness on the master
-    - supports multiple tasks on workers
+    - support multiple tasks on a worker

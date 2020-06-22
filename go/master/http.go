@@ -136,7 +136,7 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 	m.keepAlive(conn)
 }
 
-func (m *Master) sendOutput(output *gg.Context, generation int) {
+func (m *Master) sendOutput(output *gg.Context, generation uint) {
 	if m.conn == nil {
 		util.DPrintf("no open ui connections")
 		return
@@ -149,7 +149,7 @@ func (m *Master) sendOutput(output *gg.Context, generation int) {
 	state := State{
 		Generation: generation,
 		Output:     util.EncodeImage(img),
-		Tasks:      make([]api.Task, len(m.Tasks)),
+		Tasks:      append([]api.Task{}, m.Tasks...),
 	}
 
 	if err := m.conn.WriteJSON(state); err != nil {
@@ -173,7 +173,7 @@ func (m *Master) updateUICombined(generation Generation) {
 func (m *Master) updateUILatest() {
 	dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
 
-	latest := 0
+	var latest uint = 0
 
 	for _, t := range m.Tasks {
 		out, ok := m.Outputs[t.ID]
