@@ -11,10 +11,12 @@ import (
 
 type Job struct {
 	CrossRate    float64 `json:"crossRate"`
+	DrawOnce     bool    `json:"drawOnce"`
 	ID           uint32  `json:"ID"`
 	MutationRate float64 `json:"mutationRate"`
 	NumShapes    uint    `json:"numShapes"`
 	OutputMode   string  `json:"outputMode"`
+	OverDraw     int     `json:"overDraw"`
 	PoolSize     uint    `json:"poolSize"`
 	PopSize      uint    `json:"popSize"`
 	ShapeSize    uint    `json:"shapeSize"`

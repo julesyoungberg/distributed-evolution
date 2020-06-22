@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/MaxHalford/eaopt"
@@ -11,12 +12,6 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
-
-type Image struct {
-	Image  image.Image
-	Width  int
-	Height int
-}
 
 type Output struct {
 	Fitness float64
@@ -28,9 +23,10 @@ type Worker struct {
 	BestFit      Output
 	Job          api.Job
 	NGenerations uint
-	TargetImage  Image
+	TargetImage  util.Image
 
 	ga *eaopt.GA
+	mu sync.Mutex
 }
 
 // RunTask executes the genetic algorithm for a given task
@@ -39,7 +35,7 @@ func (w *Worker) RunTask(task api.Task) {
 	// decode and save target image
 	img := util.DecodeImage(task.TargetImage)
 	width, height := util.GetImageDimensions(img)
-	w.TargetImage = Image{
+	w.TargetImage = util.Image{
 		Image:  img,
 		Width:  width,
 		Height: height,

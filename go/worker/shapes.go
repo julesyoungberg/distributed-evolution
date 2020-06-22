@@ -57,8 +57,7 @@ func (s Shapes) Draw(dc *gg.Context, offset util.Vector) {
 }
 
 // evaluates the fitness of the shapes instance
-// TODO make this thread safe for parallelization
-// TODO overdraw and transparency
+// TODO overdraw!
 func (s Shapes) Evaluate() (float64, error) {
 	// draw shapes
 	dc := gg.NewContext(s.Context.TargetImage.Width, s.Context.TargetImage.Height)
@@ -68,12 +67,18 @@ func (s Shapes) Evaluate() (float64, error) {
 	// calculate fitness as the difference between the target and output images
 	fitness := imgDiff(rgbaImg(out), rgbaImg(s.Context.TargetImage.Image))
 
-	// if this is the best fit we've seen, save it
-	if fitness > s.Context.BestFit.Fitness {
-		s.Context.BestFit = Output{
-			Fitness: fitness,
-			Output:  out,
+	if s.Context.Job.DrawOnce {
+		s.Context.mu.Lock()
+
+		// if this is the best fit we've seen, save it
+		if fitness > s.Context.BestFit.Fitness {
+			s.Context.BestFit = Output{
+				Fitness: fitness,
+				Output:  out,
+			}
 		}
+
+		s.Context.mu.Unlock()
 	}
 
 	return fitness, nil

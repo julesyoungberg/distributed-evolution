@@ -58,13 +58,17 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode and save target image
-	m.TargetImage = util.DecodeImage(job.TargetImage)
+	m.TargetImage = util.Image{Image: util.DecodeImage(job.TargetImage)}
 	m.TargetImageBase64 = job.TargetImage
 
 	// save the job with a new ID
 	m.Job = job
 	m.Job.ID = uuid.New().ID()
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
+
+	// TODO remove and take these from the request
+	m.Job.OverDraw = 10
+	m.Job.DrawOnce = true
 
 	// reset state and generate tasks
 	m.Generations = Generations{}
@@ -183,8 +187,9 @@ func (m *Master) updateUICombined(generation Generation) {
 }
 
 // draws the latest generations to a single image
+// TODO overdraw!
 func (m *Master) updateUILatest() {
-	dc := gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
+	dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
 
 	for _, t := range m.Tasks {
 		out, ok := m.Outputs[t.ID]

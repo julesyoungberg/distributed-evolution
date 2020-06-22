@@ -10,6 +10,12 @@ import (
 	"strings"
 )
 
+type Image struct {
+	Image  image.Image
+	Width  int
+	Height int
+}
+
 type Vector struct {
 	X float64 `json:"x"`
 	Y float64 `json:"y"`

@@ -21,11 +21,8 @@ type Master struct {
 	Job               api.Job
 	NumWorkers        int
 	Outputs           map[int]Generation
-	OverDraw          int
-	TargetImage       image.Image
+	TargetImage       util.Image
 	TargetImageBase64 string
-	TargetImageHeight int
-	TargetImageWidth  int
 	Tasks             []api.Task
 
 	mu         sync.Mutex
@@ -39,17 +36,17 @@ func (m *Master) generateTasks() {
 
 	s := int(math.Floor(math.Sqrt(float64(m.NumWorkers))))
 
-	width, height := util.GetImageDimensions(m.TargetImage)
+	width, height := util.GetImageDimensions(m.TargetImage.Image)
 
-	m.TargetImageWidth = width
-	m.TargetImageHeight = height
+	m.TargetImage.Width = width
+	m.TargetImage.Height = height
 
 	colWidth := int(math.Ceil(float64(width) / float64(s)))
 	rowWidth := int(math.Ceil(float64(height) / float64(s)))
 
 	log.Printf("splitting image into %v %vpx cols and %v %vpx rows", s, colWidth, s, rowWidth)
 
-	img := m.TargetImage.(interface {
+	img := m.TargetImage.Image.(interface {
 		SubImage(rect image.Rectangle) image.Image
 	})
 
@@ -98,24 +95,26 @@ func Run() {
 		Generations: Generations{},
 		NumWorkers:  numWorkers,
 		Outputs:     map[int]Generation{},
-		OverDraw:    10,
 		Job: api.Job{
 			ID:           jobId,
+			DrawOnce:     true,
 			CrossRate:    0.2,
 			MutationRate: 0.021,
 			NumShapes:    200,
 			OutputMode:   "combined",
+			OverDraw:     10,
 			PoolSize:     10,
 			PopSize:      50,
 			ShapeSize:    20,
 		},
+		TargetImage: util.Image{},
 	}
 
 	util.DPrintf("fetching random image...")
-	m.TargetImage = util.GetRandomImage()
+	m.TargetImage.Image = util.GetRandomImage()
 
 	util.DPrintf("encoding image...")
-	m.TargetImageBase64 = util.EncodeImage(m.TargetImage)
+	m.TargetImageBase64 = util.EncodeImage(m.TargetImage.Image)
 
 	m.generateTasks()
 

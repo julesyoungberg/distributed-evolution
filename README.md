@@ -11,5 +11,8 @@ TODO:
 8. excute genetic algorithm for each job - DONE
 9. combine result in master - DONE
 10. fix runtime errors and determine if draw once is _actually_ faster
-12. add overdraw to worker draw logic
-13. fault tolerance
+12. add overdraw to draw once logic
+13. fault tolerance!!
+    - add disconnect buttons to the ui
+    - keep track of perceived connectedness on the master
+    - supports multiple tasks on workers

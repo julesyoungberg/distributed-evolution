@@ -2,6 +2,7 @@ package master
 
 import (
 	"image"
+	"math"
 
 	"github.com/fogleman/gg"
 	"github.com/rickyfitts/distributed-evolution/go/api"
@@ -35,7 +36,7 @@ func (m *Master) updateGeneration(task *api.Task) Generation {
 			Tasks:      []api.Task{*task},
 		}
 
-		generation.Output = gg.NewContext(m.TargetImageWidth, m.TargetImageHeight)
+		generation.Output = gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
 	}
 
 	if len(generation.Tasks) == len(m.Tasks) {
@@ -52,14 +53,17 @@ func (m *Master) updateGeneration(task *api.Task) Generation {
 func (m *Master) drawToGeneration(generation Generation, task *api.Task) {
 	util.DPrintf("drawing to generation %v with offset %v", generation.Generation, task.Offset)
 
-	// img := util.DecodeImage(task.Output)
+	if m.Job.DrawOnce {
+		// TODO overdraw!
+		img := util.DecodeImage(task.Output)
 
-	// centerX := int(math.Round(task.Offset.X + task.Dimensions.X/2.0))
-	// centerY := int(math.Round(task.Offset.Y + task.Dimensions.Y/2.0))
+		centerX := int(math.Round(task.Offset.X + task.Dimensions.X/2.0))
+		centerY := int(math.Round(task.Offset.Y + task.Dimensions.Y/2.0))
 
-	// generation.Output.DrawImageAnchored(img, centerX, centerY, 0.5, 0.5)
-
-	task.BestFit.Genome.(worker.Shapes).Draw(generation.Output, task.Offset)
+		generation.Output.DrawImageAnchored(img, centerX, centerY, 0.5, 0.5)
+	} else {
+		task.BestFit.Genome.(worker.Shapes).Draw(generation.Output, task.Offset)
+	}
 
 	m.Generations[generation.Generation] = generation
 }

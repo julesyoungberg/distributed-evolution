@@ -1,6 +1,7 @@
 package master
 
 import (
+	"image"
 	"log"
 	"net"
 	"net/http"
@@ -61,16 +62,22 @@ func (m *Master) Update(task, reply *api.Task) error {
 			delete(m.Generations, generation.Generation)
 		}
 	} else {
-		overDraw := m.OverDraw
+		var img image.Image
 
-		m.mu.Unlock()
+		if m.Job.DrawOnce {
+			img = util.DecodeImage(task.Output)
+		} else {
+			overDraw := m.Job.OverDraw
 
-		dc := gg.NewContext(int(task.Dimensions.X)+overDraw*2, int(task.Dimensions.Y)+overDraw*2)
-		s := task.BestFit.Genome.(worker.Shapes)
-		s.Draw(dc, util.Vector{X: float64(overDraw), Y: float64(overDraw)})
-		img := dc.Image()
+			m.mu.Unlock()
 
-		m.mu.Lock()
+			dc := gg.NewContext(int(task.Dimensions.X)+overDraw*2, int(task.Dimensions.Y)+overDraw*2)
+			s := task.BestFit.Genome.(worker.Shapes)
+			s.Draw(dc, util.Vector{X: float64(overDraw), Y: float64(overDraw)})
+			img = dc.Image()
+
+			m.mu.Lock()
+		}
 
 		if o, ok := m.Outputs[task.ID]; !ok || task.Generation > o.Generation {
 			m.Outputs[task.ID] = Generation{

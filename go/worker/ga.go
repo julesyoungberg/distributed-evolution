@@ -39,12 +39,28 @@ func (w *Worker) createCallback(task api.Task) func(ga *eaopt.GA) {
 	return func(ga *eaopt.GA) {
 		// get best fit
 		bestFit := ga.HallOfFame[0]
-		bestFit.Genome = bestFit.Genome.(Shapes).CloneForSending()
+
+		// if draw once is active add the output and clear the genome
+		if w.Job.DrawOnce {
+			w.mu.Lock()
+			output := w.BestFit.Output
+			w.mu.Unlock()
+
+			if output == nil {
+				log.Printf("Error!!!!!!!!! Best fit image is nil - bestFit: %v", w.BestFit)
+				return
+			}
+
+			task.Output = util.EncodeImage(output)
+			bestFit.Genome = Shapes{}
+		} else {
+			// otherwise just add the genome
+			bestFit.Genome = bestFit.Genome.(Shapes).CloneForSending()
+		}
 
 		// add data to the task
 		task.BestFit = bestFit
 		task.Generation = ga.Generations
-		task.Output = util.EncodeImage(w.BestFit.Output)
 
 		// clear state
 		w.BestFit = Output{}
