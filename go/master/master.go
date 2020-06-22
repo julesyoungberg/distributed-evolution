@@ -106,7 +106,7 @@ func Run() {
 			CrossRate:    0.2,
 			MutationRate: 0.021,
 			NumShapes:    200,
-			OutputMode:   "latest",
+			OutputMode:   "combined",
 			PoolSize:     10,
 			PopSize:      50,
 			ShapeSize:    20,

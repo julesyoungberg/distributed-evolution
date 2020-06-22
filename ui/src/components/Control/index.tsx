@@ -48,7 +48,7 @@ const initialConfig: Config = Object.freeze({
     poolSize: 10,
     mutationRate: 0.02,
     crossRate: 0.2,
-    outputMode: 'latest',
+    outputMode: 'combined',
 })
 
 function getBase64Image(img: HTMLImageElement) {
@@ -179,7 +179,7 @@ export default function Control() {
                 <Field>
                     <Label htmlFor='outputMode'>Output Mode</Label>
                     <Select {...fieldProps('outputMode')}>
-                        {['latest', 'combined'].map((type) => (
+                        {['combined', 'latest'].map((type) => (
                             <option key={type}>{type}</option>
                         ))}
                     </Select>

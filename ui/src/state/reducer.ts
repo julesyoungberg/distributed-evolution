@@ -16,6 +16,10 @@ function handleUpdate(state: State, payload: Record<string, any>): Partial<State
         return { error: payload.error, status: state.status === 'editing' ? 'editing' : 'error' }
     }
 
+    if (payload.generation < state.generation) {
+        return state
+    }
+
     const nextState: Partial<State> = { status: state.status === 'editing' ? 'editing' : 'active' }
     
     const fields = ['generation', 'numWorkers', 'output', 'targetImage', 'tasks']
