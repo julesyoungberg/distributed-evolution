@@ -14,7 +14,6 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
-	"github.com/rickyfitts/distributed-evolution/go/worker"
 )
 
 type State struct {
@@ -65,10 +64,6 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.Job = job
 	m.Job.ID = uuid.New().ID()
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
-
-	// TODO remove and take these from the request
-	m.Job.OverDraw = 10
-	m.Job.DrawOnce = true
 
 	// reset state and generate tasks
 	m.Generations = Generations{}
@@ -141,7 +136,7 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 	m.keepAlive(conn)
 }
 
-func (m *Master) sendOutput(output *gg.Context) {
+func (m *Master) sendOutput(output *gg.Context, generation int) {
 	if m.conn == nil {
 		util.DPrintf("no open ui connections")
 		return
@@ -152,22 +147,10 @@ func (m *Master) sendOutput(output *gg.Context) {
 
 	// send encoded image and current generation
 	state := State{
-		Output: util.EncodeImage(img),
-		Tasks:  make([]api.Task, len(m.Tasks)),
+		Generation: generation,
+		Output:     util.EncodeImage(img),
+		Tasks:      make([]api.Task, len(m.Tasks)),
 	}
-
-	var latest uint = 0
-
-	for i, t := range m.Tasks {
-		t.BestFit.Genome = worker.Shapes{}
-		state.Tasks[i] = t
-
-		if t.Generation > latest {
-			latest = t.Generation
-		}
-	}
-
-	state.Generation = latest
 
 	if err := m.conn.WriteJSON(state); err != nil {
 		log.Println(err)
@@ -183,13 +166,14 @@ func (m *Master) updateUICombined(generation Generation) {
 	util.DPrintf("updating ui with generation %v", genN)
 	util.DPrintf("encoding output image for generation %v", genN)
 
-	m.sendOutput(generation.Output)
+	m.sendOutput(generation.Output, genN)
 }
 
 // draws the latest generations to a single image
-// TODO overdraw!
 func (m *Master) updateUILatest() {
 	dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
+
+	latest := 0
 
 	for _, t := range m.Tasks {
 		out, ok := m.Outputs[t.ID]
@@ -201,9 +185,13 @@ func (m *Master) updateUILatest() {
 		centerY := int(math.Round(t.Offset.Y + t.Dimensions.Y/2.0))
 
 		dc.DrawImageAnchored(out.Image, centerX, centerY, 0.5, 0.5)
+
+		if t.Generation > latest {
+			latest = t.Generation
+		}
 	}
 
-	m.sendOutput(dc)
+	m.sendOutput(dc, latest)
 }
 
 // handles requests from the ui and websocket communication

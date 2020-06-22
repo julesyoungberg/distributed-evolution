@@ -46,10 +46,6 @@ func (m *Master) generateTasks() {
 
 	log.Printf("splitting image into %v %vpx cols and %v %vpx rows", s, colWidth, s, rowWidth)
 
-	img := m.TargetImage.Image.(interface {
-		SubImage(rect image.Rectangle) image.Image
-	})
-
 	m.Tasks = make([]api.Task, m.NumWorkers)
 
 	// create a task for each slice of the image
@@ -63,7 +59,7 @@ func (m *Master) generateTasks() {
 
 			index := (y * s) + x
 
-			subImg := img.SubImage(rect)
+			subImg := util.GetSubImage(m.TargetImage.Image, rect)
 			bounds := subImg.Bounds()
 
 			task := api.Task{

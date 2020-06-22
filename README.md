@@ -1,6 +1,6 @@
 # Distributed Evolution
 
-TODO:
+## TODO:
 1. get rpc working: https://www.youtube.com/watch?v=ZONL-6jBevc - DONE
 2. get multiple workers running, ideally > 25 - DONE: `docker-compose up --build --scale worker=25`
 3. figure out how to import from a util package - DONE
@@ -11,8 +11,7 @@ TODO:
 8. excute genetic algorithm for each job - DONE
 9. combine result in master - DONE
 10. fix runtime errors and determine if draw once is _actually_ faster
-12. add overdraw to draw once logic
-13. fault tolerance!!
+11. fault tolerance!!
     - add disconnect buttons to the ui
     - keep track of perceived connectedness on the master
     - supports multiple tasks on workers

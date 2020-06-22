@@ -54,7 +54,6 @@ func (m *Master) drawToGeneration(generation Generation, task *api.Task) {
 	util.DPrintf("drawing to generation %v with offset %v", generation.Generation, task.Offset)
 
 	if m.Job.DrawOnce {
-		// TODO overdraw!
 		img := util.DecodeImage(task.Output)
 
 		centerX := int(math.Round(task.Offset.X + task.Dimensions.X/2.0))

@@ -74,3 +74,9 @@ func GetImageDimensions(img image.Image) (int, int) {
 	bounds := img.Bounds()
 	return bounds.Dx(), bounds.Dy()
 }
+
+func GetSubImage(img image.Image, rect image.Rectangle) image.Image {
+	return img.(interface {
+		SubImage(rect image.Rectangle) image.Image
+	}).SubImage(rect)
+}

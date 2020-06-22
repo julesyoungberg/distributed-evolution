@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"image"
 	"math/rand"
 
 	"github.com/MaxHalford/eaopt"
@@ -57,12 +58,28 @@ func (s Shapes) Draw(dc *gg.Context, offset util.Vector) {
 }
 
 // evaluates the fitness of the shapes instance
-// TODO overdraw!
 func (s Shapes) Evaluate() (float64, error) {
 	// draw shapes
-	dc := gg.NewContext(s.Context.TargetImage.Width, s.Context.TargetImage.Height)
-	s.Draw(dc, util.Vector{X: 0, Y: 0})
-	out := dc.Image()
+	var img image.Image
+	var out image.Image
+
+	if s.Context.Job.DrawOnce {
+		// if we are drawing once we need to account for overdraw here
+		overDraw := s.Context.Job.OverDraw
+		width := s.Context.TargetImage.Width + overDraw*2
+		height := s.Context.TargetImage.Height + overDraw*2
+		dc := gg.NewContext(width, height)
+
+		s.Draw(dc, util.Vector{X: float64(overDraw), Y: float64(overDraw)})
+		img := dc.Image()
+
+		rect := image.Rect(overDraw, overDraw, width-overDraw, height-overDraw)
+		out := util.GetSubImage(img, rect)
+	} else {
+		dc := gg.NewContext(s.Context.TargetImage.Width, s.Context.TargetImage.Height)
+		s.Draw(dc, util.Vector{X: 0, Y: 0})
+		out := dc.Image()
+	}
 
 	// calculate fitness as the difference between the target and output images
 	fitness := imgDiff(rgbaImg(out), rgbaImg(s.Context.TargetImage.Image))
@@ -74,7 +91,7 @@ func (s Shapes) Evaluate() (float64, error) {
 		if fitness > s.Context.BestFit.Fitness {
 			s.Context.BestFit = Output{
 				Fitness: fitness,
-				Output:  out,
+				Output:  img,
 			}
 		}
 

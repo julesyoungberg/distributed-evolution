@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
 import styled from '@emotion/styled'
-import { Input, Label, Select } from '@rebass/forms'
+import { Checkbox, Input, Label, Select } from '@rebass/forms'
 import fetch from 'isomorphic-fetch'
 import getConfig from 'next/config'
 import { useState, FormEvent } from 'react'
@@ -38,6 +38,8 @@ interface Config {
     mutationRate: number
     crossRate: number
     outputMode: 'combined' | 'latest'
+    overDraw: number
+    drawOnce: boolean
 }
 
 const initialConfig: Config = Object.freeze({
@@ -49,6 +51,8 @@ const initialConfig: Config = Object.freeze({
     mutationRate: 0.02,
     crossRate: 0.2,
     outputMode: 'combined',
+    overDraw: 10,
+    drawOnce: true,
 })
 
 function getBase64Image(img: HTMLImageElement) {
@@ -183,6 +187,24 @@ export default function Control() {
                             <option key={type}>{type}</option>
                         ))}
                     </Select>
+                </Field>
+                <Field>
+                    <Label htmlFor='overDraw'>Over Draw</Label>
+                    <Input type='number' step='1' min='0' max='100' {...fieldProps('overDraw')} />
+                </Field>
+                <Field>
+                    <Label htmlFor='drawOnce'>Draw Once</Label>
+                    <Checkbox
+                        checked={config.drawOnce}
+                        id='drawOnce'
+                        name='drawOnce'
+                        onChange={() => {
+                            setConfig({
+                                ...config,
+                                drawOnce: !config.drawOnce,
+                            })
+                        }}
+                    />
                 </Field>
             </Flex>
         </form>

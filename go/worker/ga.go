@@ -47,12 +47,15 @@ func (w *Worker) createCallback(task api.Task) func(ga *eaopt.GA) {
 			w.mu.Unlock()
 
 			if output == nil {
-				log.Printf("Error!!!!!!!!! Best fit image is nil - bestFit: %v", w.BestFit)
+				log.Printf("error! best fit image is nil at generation %v - bestFit: %v", ga.Generations, .BestFit)
 				return
 			}
 
 			task.Output = util.EncodeImage(output)
 			bestFit.Genome = Shapes{}
+
+			// clear state
+			w.BestFit = Output{}
 		} else {
 			// otherwise just add the genome
 			bestFit.Genome = bestFit.Genome.(Shapes).CloneForSending()
@@ -61,9 +64,6 @@ func (w *Worker) createCallback(task api.Task) func(ga *eaopt.GA) {
 		// add data to the task
 		task.BestFit = bestFit
 		task.Generation = ga.Generations
-
-		// clear state
-		w.BestFit = Output{}
 
 		// send results to master
 		jobId, err := api.Update(task)
