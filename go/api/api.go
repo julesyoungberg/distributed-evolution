@@ -34,8 +34,10 @@ type Task struct {
 	ID          int              `json:"ID"`
 	Job         Job              `json:"-"`
 	LastUpdate  time.Time        `json:"lastUpdate"`
+	Linked      []int            `json:"linked"`
 	Offset      util.Vector      `json:"offset"`
 	Output      string           `json:"output"`
+	Population  eaopt.Population `json:"population"`
 	Status      string           `json:"status"`
 	TargetImage string           `json:"-"`
 	Type        string           `json:"type"`

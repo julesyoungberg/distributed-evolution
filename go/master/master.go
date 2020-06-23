@@ -12,6 +12,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
+	"github.com/rickyfitts/distributed-evolution/go/cache"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
@@ -26,6 +27,7 @@ type Master struct {
 	Tasks             []api.Task
 
 	mu         sync.Mutex
+	cache      cache.Cache
 	conn       *websocket.Conn
 	lastUpdate time.Time
 }
@@ -85,14 +87,13 @@ func Run() {
 		log.Fatal("error parsing NUM_WORKERS: ", err)
 	}
 
-	jobId := uuid.New().ID()
-
 	m := Master{
+		cache:       cache.NewConnection()
 		Generations: Generations{},
 		NumWorkers:  numWorkers,
 		Outputs:     map[int]Generation{},
 		Job: api.Job{
-			ID:           jobId,
+			ID:           uuid.New().ID(),
 			DrawOnce:     true,
 			CrossRate:    0.2,
 			MutationRate: 0.021,

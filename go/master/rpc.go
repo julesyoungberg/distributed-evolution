@@ -17,6 +17,8 @@ import (
 
 // assigns a task to a worker
 func (m *Master) GetTask(args *api.GetTaskArgs, reply *api.Task) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	// find an unstarted task to reply with
 	for i, task := range m.Tasks {
 		if task.Status == "unstarted" {
@@ -49,6 +51,28 @@ func (m *Master) Update(task, reply *api.Task) error {
 		return nil
 	}
 
+	// check if a new task has been assigned to this machine
+	newTasks := []api.Task{}
+	linked := m.Tasks[task.ID].Linked
+
+	if len(task.Linked) < len(linked) {
+		for _, i := range linked {
+			t := m.Tasks[i]
+
+			if t.Status == "recovering" {
+				util.DPrintf("assigning task %v to worker %v", t.ID, task.WorkerID)
+				t.Status = "active"
+				t.WorkerID = task.WorkerID
+				t.LastUpdate = time.Now()
+
+				newTasks = append(newTasks, t)
+				m.Tasks[i] = t
+			}
+		}
+
+		task.Linked = linked
+	}
+
 	task.LastUpdate = time.Now()
 
 	if m.Job.OutputMode == "combined" {
@@ -65,7 +89,7 @@ func (m *Master) Update(task, reply *api.Task) error {
 		// save the output to the outputs map if the generation is the latest
 		if o, ok := m.Outputs[task.ID]; ok && task.Generation < o.Generation {
 			// this update is old, must have been delayed, ignore
-			return
+			return nil
 		}
 
 		var img image.Image

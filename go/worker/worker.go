@@ -26,7 +26,7 @@ type Worker struct {
 	TargetImage  util.Image
 	Task         api.Task
 
-	cache *cache.Cache
+	cache cache.Cache
 	ga    *eaopt.GA
 	mu    sync.Mutex
 }
@@ -61,8 +61,8 @@ func (w *Worker) RunTask(task api.Task) {
 func Run() {
 	w := Worker{
 		ID:           uuid.New().ID(),
-		cache:        cache.NewConnection(),
 		BestFit:      Output{},
+		cache:        cache.NewConnection(),
 		NGenerations: 1000000000000, // 1 trillion
 	}
 

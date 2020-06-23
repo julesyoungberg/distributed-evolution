@@ -3,13 +3,13 @@ package cache
 import (
 	"context"
 	"os"
-	
+
 	"github.com/go-redis/redis/v8"
 )
 
 var ctx = context.Background()
 
-type Cache interface {
+type Cache struct {
 	Client *redis.Client
 }
 
@@ -21,11 +21,11 @@ func NewConnection() Cache {
 		DB:       0,
 	})
 
-	return client
+	return Cache{Client: client}
 }
 
 func (c *Cache) Set(key string, value string) error {
-	err = c.Client.Set(ctx, key, value, 0).Err()
+	err := c.Client.Set(ctx, key, value, 0).Err()
 	return err
 }
 

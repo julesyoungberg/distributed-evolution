@@ -3,6 +3,7 @@ package util
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"image"
 	"image/png"
 	"log"
@@ -22,7 +23,7 @@ type Vector struct {
 }
 
 // Debugging
-const Debug = 0
+const Debug = 1
 
 func DPrintf(format string, a ...interface{}) (n int, err error) {
 	if Debug > 0 {
@@ -79,4 +80,8 @@ func GetSubImage(img image.Image, rect image.Rectangle) image.Image {
 	return img.(interface {
 		SubImage(rect image.Rectangle) image.Image
 	}).SubImage(rect)
+}
+
+func GetSnapshotKey(id int) string {
+	return fmt.Sprintf("taskID%v", id)
 }
