@@ -63,7 +63,7 @@ func Update(args Task) (uint32, error) {
 // usually returns true.
 // returns false if something goes wrong.
 func Call(rpcname string, args interface{}, reply interface{}) error {
-	port := os.Getenv("PORT")
+	port := os.Getenv("MASTER_PORT")
 	c, err := rpc.DialHTTP("tcp", "master:"+port)
 	if err != nil {
 		return err

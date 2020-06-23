@@ -10,6 +10,7 @@ import (
 	"github.com/MaxHalford/eaopt"
 	"github.com/google/uuid"
 	"github.com/rickyfitts/distributed-evolution/go/api"
+	"github.com/rickyfitts/distributed-evolution/go/cache"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
@@ -21,17 +22,19 @@ type Output struct {
 type Worker struct {
 	ID           uint32
 	BestFit      Output
-	Job          api.Job
 	NGenerations uint
 	TargetImage  util.Image
+	Task         api.Task
 
-	ga *eaopt.GA
-	mu sync.Mutex
+	cache *cache.Cache
+	ga    *eaopt.GA
+	mu    sync.Mutex
 }
 
 // RunTask executes the genetic algorithm for a given task
 // TODO set an initial population to start from
 func (w *Worker) RunTask(task api.Task) {
+	w.Task = task
 	// decode and save target image
 	img := util.DecodeImage(task.TargetImage)
 	width, height := util.GetImageDimensions(img)
@@ -41,18 +44,11 @@ func (w *Worker) RunTask(task api.Task) {
 		Height: height,
 	}
 
-	// save job information for createGA to use
-	w.Job = task.Job
-
-	// clear job data from task to keep update messages small
-	// the master only needs to confirm that the ID is correct
-	task.Job = api.Job{ID: task.Job.ID}
-
 	w.createGA()
 
 	// create clsoure functions with context
-	w.ga.Callback = w.createCallback(task)
-	w.ga.EarlyStop = w.createEarlyStop(task)
+	w.ga.Callback = w.createCallback()
+	w.ga.EarlyStop = w.createEarlyStop(task.Job.ID)
 	Factory := createShapesFactory(w, task.Type)
 
 	// evolve
@@ -65,17 +61,9 @@ func (w *Worker) RunTask(task api.Task) {
 func Run() {
 	w := Worker{
 		ID:           uuid.New().ID(),
+		cache:        cache.NewConnection(),
 		BestFit:      Output{},
 		NGenerations: 1000000000000, // 1 trillion
-		Job: api.Job{
-			ID:           uuid.New().ID(),
-			CrossRate:    0.2,
-			MutationRate: 0.021,
-			NumShapes:    200,
-			PoolSize:     10,
-			PopSize:      50,
-			ShapeSize:    20,
-		},
 	}
 
 	// wait for master to initialize

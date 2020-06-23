@@ -6,6 +6,8 @@ module github.com/rickyfitts/distributed-evolution
 require (
 	github.com/MaxHalford/eaopt v0.1.1-0.20200203085436-ba4b9950c779
 	github.com/fogleman/gg v1.3.0
+	github.com/go-redis/redis v6.15.8+incompatible
+	github.com/go-redis/redis/v8 v8.0.0-beta.5
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/handlers v1.4.2
