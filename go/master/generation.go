@@ -50,7 +50,7 @@ func (m *Master) updateGeneration(task *api.Task) Generation {
 }
 
 // draw the task's output to the generation's drawing context
-func (m *Master) drawToGeneration(generation Generation, task *api.Task) {
+func (m *Master) drawToGeneration(generation *Generation, task *api.Task) {
 	if m.Job.DrawOnce {
 		// the generation has already been drawn, draw the image to the output
 		img := util.DecodeImage(task.Output)
@@ -63,6 +63,21 @@ func (m *Master) drawToGeneration(generation Generation, task *api.Task) {
 		// draw the generation to the output
 		task.BestFit.Genome.(worker.Shapes).Draw(generation.Output, task.Offset)
 	}
+}
 
-	m.Generations[generation.Generation] = generation
+func (m *Master) getLatestGeneration() Generation {
+	latest := Generation{
+		Output: gg.NewContext(m.TargetImage.Width, m.TargetImage.Height),
+		Tasks:  m.Tasks,
+	}
+
+	for _, t := range m.Tasks {
+		if t.Generation > latest.Generation {
+			latest.Generation = t.Generation
+		}
+
+		m.drawToGeneration(&latest, &t)
+	}
+
+	return latest
 }

@@ -7,7 +7,6 @@ services:
             context: .
             dockerfile: ./master.Dockerfile
         environment: 
-            CACHE_PORT: 6379
             HTTP_PORT: 9000
             NUM_WORKERS: 1
             RPC_PORT: 8080

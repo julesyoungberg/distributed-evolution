@@ -1,7 +1,6 @@
 package master
 
 import (
-	"image"
 	"log"
 	"net"
 	"net/http"
@@ -9,10 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/fogleman/gg"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
-	"github.com/rickyfitts/distributed-evolution/go/worker"
 )
 
 // assigns a task to a worker
@@ -39,19 +36,7 @@ func (m *Master) GetTask(args *api.GetTaskArgs, reply *api.Task) error {
 	return nil
 }
 
-// handles a progress update from a worker, updates the state, and updates the ui
-func (m *Master) Update(task, reply *api.Task) error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	reply.Job.ID = m.Job.ID
-
-	if task.Job.ID != m.Job.ID {
-		log.Printf("worker %v is out of date", task.WorkerID)
-		return nil
-	}
-
-	// check if a new task has been assigned to this machine
+func (m *Master) addNewLinkedTasks(task, reply *api.Task) {
 	newTasks := []api.Task{}
 	linked := m.Tasks[task.ID].Linked
 
@@ -71,54 +56,40 @@ func (m *Master) Update(task, reply *api.Task) error {
 		}
 
 		task.Linked = linked
+		reply.Linked = linked
 	}
+}
+
+// handles a progress update from a worker, updates the state, and updates the ui
+func (m *Master) Update(task, reply *api.Task) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	reply.Job.ID = m.Job.ID
+
+	if task.Job.ID != m.Job.ID {
+		log.Printf("worker %v is out of date", task.WorkerID)
+		return nil
+	}
+
+	m.addNewLinkedTasks(task, reply)
 
 	task.LastUpdate = time.Now()
 
 	if m.Job.OutputMode == "combined" {
 		// draw the output to the corresponding generation
 		generation := m.updateGeneration(task)
-
-		m.drawToGeneration(generation, task)
+		m.drawToGeneration(&generation, task)
+		m.Generations[generation.Generation] = generation
 
 		if generation.Done {
 			m.updateUICombined(generation)
 			delete(m.Generations, generation.Generation)
 		}
 	} else {
-		// save the output to the outputs map if the generation is the latest
-		if o, ok := m.Outputs[task.ID]; ok && task.Generation < o.Generation {
-			// this update is old, must have been delayed, ignore
-			return nil
+		if time.Since(m.lastUpdate) > m.wsHeartbeatTimeout/2.0 {
+			m.updateUILatest()
 		}
-
-		var img image.Image
-
-		if m.Job.DrawOnce {
-			// the worker has already drawn the generation, use that
-			img = util.DecodeImage(task.Output)
-		} else {
-			// draw the generation
-			overDraw := m.Job.OverDraw
-
-			m.mu.Unlock()
-
-			dc := gg.NewContext(int(task.Dimensions.X)+overDraw*2, int(task.Dimensions.Y)+overDraw*2)
-			s := task.BestFit.Genome.(worker.Shapes)
-			s.Draw(dc, util.Vector{X: float64(overDraw), Y: float64(overDraw)})
-			img = dc.Image()
-
-			m.mu.Lock()
-		}
-
-		// save the output
-		m.Outputs[task.ID] = Generation{
-			Generation: task.Generation,
-			Image:      img,
-		}
-
-		// TODO throttle this to increase performance
-		m.updateUILatest()
 	}
 
 	m.Tasks[task.ID] = *task

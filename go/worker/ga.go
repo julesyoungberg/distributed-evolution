@@ -37,7 +37,7 @@ func (w *Worker) createGA() {
 func (w *Worker) createCallback() func(ga *eaopt.GA) {
 	// send the currrent best fit and other data to the master
 	return func(ga *eaopt.GA) {
-		w.saveWorkerSnapshot()
+		w.SaveTaskSnapshot()
 
 		// get best fit
 		bestFit := ga.HallOfFame[0]
@@ -77,7 +77,10 @@ func (w *Worker) createCallback() func(ga *eaopt.GA) {
 		if w.Task.Job.ID != jobId {
 			log.Printf("out of date job of %v, updating to %v", w.Task.Job.ID, jobId)
 			w.Task.Job.ID = jobId
+			return
 		}
+
+		// TODO: hamdle newly assigned / linked tasks
 	}
 }
 

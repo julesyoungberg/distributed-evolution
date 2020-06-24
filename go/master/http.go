@@ -3,7 +3,6 @@ package master
 import (
 	"encoding/json"
 	"log"
-	"math"
 	"net/http"
 	"os"
 	"time"
@@ -67,7 +66,6 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 
 	// reset state and generate tasks
 	m.Generations = Generations{}
-	m.Outputs = map[int]Generation{}
 	m.generateTasks()
 
 	response := State{
@@ -88,7 +86,7 @@ func (m *Master) keepAlive(c *websocket.Conn) {
 	for {
 		m.mu.Lock()
 
-		if time.Since(m.lastUpdate) > time.Second {
+		if time.Since(m.lastUpdate) > m.wsHeartbeatTimeout {
 			err := c.WriteMessage(websocket.PingMessage, []byte("keepalive"))
 			if err != nil {
 				m.mu.Unlock()
@@ -135,6 +133,8 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Master) sendOutput(output *gg.Context, generation uint) {
+	m.lastUpdate = time.Now()
+
 	if m.conn == nil {
 		// no open connections
 		return
@@ -164,27 +164,8 @@ func (m *Master) updateUICombined(generation Generation) {
 
 // draws the latest generations to a single image
 func (m *Master) updateUILatest() {
-	dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
-
-	var latest uint = 0
-
-	for _, t := range m.Tasks {
-		out, ok := m.Outputs[t.ID]
-		if !ok {
-			continue
-		}
-
-		centerX := int(math.Round(t.Offset.X + t.Dimensions.X/2.0))
-		centerY := int(math.Round(t.Offset.Y + t.Dimensions.Y/2.0))
-
-		dc.DrawImageAnchored(out.Image, centerX, centerY, 0.5, 0.5)
-
-		if t.Generation > latest {
-			latest = t.Generation
-		}
-	}
-
-	m.sendOutput(dc, latest)
+	latest := m.getLatestGeneration()
+	m.sendOutput(latest.Output, latest.Generation)
 }
 
 // handles requests from the ui and websocket communication

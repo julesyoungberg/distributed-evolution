@@ -12,7 +12,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
-	"github.com/rickyfitts/distributed-evolution/go/cache"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
@@ -21,15 +20,14 @@ type Master struct {
 	Generations       Generations
 	Job               api.Job
 	NumWorkers        int
-	Outputs           map[int]Generation
 	TargetImage       util.Image
 	TargetImageBase64 string
 	Tasks             []api.Task
 
-	mu         sync.Mutex
-	cache      cache.Cache
-	conn       *websocket.Conn
-	lastUpdate time.Time
+	mu                 sync.Mutex
+	conn               *websocket.Conn
+	lastUpdate         time.Time
+	wsHeartbeatTimeout time.Duration
 }
 
 // populates the task queue with tasks, where each is a slice of the target image
@@ -88,10 +86,8 @@ func Run() {
 	}
 
 	m := Master{
-		cache:       cache.NewConnection()
 		Generations: Generations{},
 		NumWorkers:  numWorkers,
-		Outputs:     map[int]Generation{},
 		Job: api.Job{
 			ID:           uuid.New().ID(),
 			DrawOnce:     true,
@@ -104,7 +100,9 @@ func Run() {
 			PopSize:      50,
 			ShapeSize:    20,
 		},
-		TargetImage: util.Image{},
+		lastUpdate:         time.Now(),
+		TargetImage:        util.Image{},
+		wsHeartbeatTimeout: 2 * time.Second,
 	}
 
 	log.Print("fetching random image...")
@@ -116,6 +114,8 @@ func Run() {
 	m.generateTasks()
 
 	go m.httpServer()
+
+	go m.DetectFailures()
 
 	m.rpcServer()
 }

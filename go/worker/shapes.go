@@ -38,12 +38,12 @@ func createShapesFactory(ctx *Worker, shapeType string) func(rng *rand.Rand) eao
 		shapes := Shapes{
 			Bounds:  bounds,
 			Context: ctx,
-			Members: make([]Shape, ctx.Job.NumShapes),
+			Members: make([]Shape, ctx.Task.Job.NumShapes),
 			Type:    shapeType,
 		}
 
-		for i := 0; i < int(ctx.Job.NumShapes); i++ {
-			shapes.Members[i] = createShape(float64(ctx.Job.ShapeSize), bounds, rng)
+		for i := 0; i < int(ctx.Task.Job.NumShapes); i++ {
+			shapes.Members[i] = createShape(float64(ctx.Task.Job.ShapeSize), bounds, rng)
 		}
 
 		return shapes
@@ -63,9 +63,9 @@ func (s Shapes) Evaluate() (float64, error) {
 	var img image.Image
 	var out image.Image
 
-	if s.Context.Job.DrawOnce {
+	if s.Context.Task.Job.DrawOnce {
 		// if we are drawing once we need to account for overdraw here
-		overDraw := s.Context.Job.OverDraw
+		overDraw := s.Context.Task.Job.OverDraw
 		width := s.Context.TargetImage.Width + overDraw*2
 		height := s.Context.TargetImage.Height + overDraw*2
 		dc := gg.NewContext(width, height)
@@ -84,7 +84,7 @@ func (s Shapes) Evaluate() (float64, error) {
 	// calculate fitness as the difference between the target and output images
 	fitness := imgDiff(rgbaImg(out), rgbaImg(s.Context.TargetImage.Image))
 
-	if s.Context.Job.DrawOnce {
+	if s.Context.Task.Job.DrawOnce {
 		s.Context.mu.Lock()
 
 		// if this is the best fit we've seen, save it
@@ -106,8 +106,8 @@ func (s Shapes) Mutate(rng *rand.Rand) {
 	createShape := getCreateShapeFunc(s.Type)
 
 	for i := range s.Members {
-		if rng.Float64() < s.Context.Job.MutationRate {
-			s.Members[i] = createShape(float64(s.Context.Job.ShapeSize), s.Bounds, rng)
+		if rng.Float64() < s.Context.Task.Job.MutationRate {
+			s.Members[i] = createShape(float64(s.Context.Task.Job.ShapeSize), s.Bounds, rng)
 		}
 	}
 }
