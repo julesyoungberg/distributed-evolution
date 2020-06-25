@@ -19,12 +19,18 @@ type Output struct {
 	Output  image.Image
 }
 
+type WorkerTask struct {
+	BestFit     Output
+	TargetImage util.Image
+	Task        api.Task
+
+	mu sync.Mutex
+}
+
 type Worker struct {
 	ID           uint32
-	BestFit      Output
 	NGenerations uint
-	TargetImage  util.Image
-	Task         api.Task
+	Tasks        map[int]*WorkerTask
 
 	cache cache.Cache
 	ga    *eaopt.GA
@@ -34,22 +40,24 @@ type Worker struct {
 // RunTask executes the genetic algorithm for a given task
 // TODO set an initial population to start from
 func (w *Worker) RunTask(task api.Task) {
-	w.Task = task
+	t := WorkerTask{Task: task}
 	// decode and save target image
 	img := util.DecodeImage(task.TargetImage)
 	width, height := util.GetImageDimensions(img)
-	w.TargetImage = util.Image{
+	t.TargetImage = util.Image{
 		Image:  img,
 		Width:  width,
 		Height: height,
 	}
 
-	w.createGA()
+	w.ga = createGA(task.Job, w.NGenerations)
 
 	// create clsoure functions with context
-	w.ga.Callback = w.createCallback()
-	w.ga.EarlyStop = w.createEarlyStop(task.Job.ID)
-	Factory := createShapesFactory(w, task.Type)
+	w.ga.Callback = w.createCallback(task.ID)
+	w.ga.EarlyStop = w.createEarlyStop(task.ID, task.Job.ID)
+	Factory := createShapesFactory(&t, task.Type)
+
+	w.Tasks[task.ID] = &t
 
 	// evolve
 	err := w.ga.Minimize(Factory)
@@ -61,9 +69,9 @@ func (w *Worker) RunTask(task api.Task) {
 func Run() {
 	w := Worker{
 		ID:           uuid.New().ID(),
-		BestFit:      Output{},
 		cache:        cache.NewConnection(),
 		NGenerations: 1000000000000, // 1 trillion
+		Tasks:        map[int]*WorkerTask{},
 	}
 
 	// wait for master to initialize

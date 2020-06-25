@@ -9,8 +9,8 @@ import (
 )
 
 // saves a task snapshot as a serialized JSON string to the cache
-func (w *Worker) SaveTaskSnapshot() {
-	task := w.Task
+func (w *Worker) SaveTaskSnapshot(state *WorkerTask) {
+	task := state.Task
 	task.Population = w.ga.Populations[0]
 
 	encoded, err := json.Marshal(task)

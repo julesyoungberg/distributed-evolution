@@ -11,7 +11,7 @@ import (
 
 type Shapes struct {
 	Bounds  util.Vector
-	Context *Worker
+	Context *WorkerTask
 	Members []Shape
 	Type    string
 }
@@ -29,7 +29,7 @@ func getCreateShapeFunc(shapeType string) func(radius float64, bounds util.Vecto
 }
 
 // returns a closure with a reference to the context that can be used to generate a random shapes object
-func createShapesFactory(ctx *Worker, shapeType string) func(rng *rand.Rand) eaopt.Genome {
+func createShapesFactory(ctx *WorkerTask, shapeType string) func(rng *rand.Rand) eaopt.Genome {
 	bounds := util.Vector{X: float64(ctx.TargetImage.Width), Y: float64(ctx.TargetImage.Height)}
 
 	createShape := getCreateShapeFunc(shapeType)
