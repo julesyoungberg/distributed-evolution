@@ -29,17 +29,17 @@ func getCreateShapeFunc(shapeType string) func(radius float64, bounds util.Vecto
 }
 
 // returns a closure with a reference to the context that can be used to generate a random shapes object
-func createShapesFactory(ctx *WorkerTask, shapeType string) func(rng *rand.Rand) eaopt.Genome {
+func createShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
 	bounds := util.Vector{X: float64(ctx.TargetImage.Width), Y: float64(ctx.TargetImage.Height)}
 
-	createShape := getCreateShapeFunc(shapeType)
+	createShape := getCreateShapeFunc(ctx.Task.Type)
 
 	return func(rng *rand.Rand) eaopt.Genome {
 		shapes := Shapes{
 			Bounds:  bounds,
 			Context: ctx,
 			Members: make([]Shape, ctx.Task.Job.NumShapes),
-			Type:    shapeType,
+			Type:    ctx.Task.Type,
 		}
 
 		for i := 0; i < int(ctx.Task.Job.NumShapes); i++ {
@@ -48,6 +48,32 @@ func createShapesFactory(ctx *WorkerTask, shapeType string) func(rng *rand.Rand)
 
 		return shapes
 	}
+}
+
+func createShapesFactoryFromPopulation(ctx *WorkerTask, initialPopulation eaopt.Population) func(rng *rand.Rand) eaopt.Genome {
+	population := initialPopulation.Individuals
+
+	return func(rng *rand.Rand) eaopt.Genome {
+		membersLeft := len(population)
+
+		member := population[membersLeft-1]
+
+		population = population[:membersLeft-2]
+
+		s := member.Genome.(Shapes)
+
+		s.Context = ctx
+
+		return s
+	}
+}
+
+func getShapesFactory(ctx *WorkerTask, initialPopulation eaopt.Population) func(rng *rand.Rand) eaopt.Genome {
+	if len(initialPopulation.Individuals) > 0 {
+		return createShapesFactoryFromPopulation(ctx, initialPopulation)
+	}
+
+	return createShapesFactory(ctx)
 }
 
 // draw the shapes to the given draw context

@@ -70,22 +70,27 @@ func (w *Worker) createCallback(id int) func(ga *eaopt.GA) {
 		state.Task.Generation = ga.Generations
 
 		// send results to master
-		jobId, err := api.Update(state.Task)
+		task, err := api.Update(state.Task)
 		if err != nil {
 			log.Print("error ", err)
 		}
 
 		// if the master responded with a different job id we are out of date
-		if state.Task.Job.ID != jobId {
+		if state.Task.Job.ID != task.Job.ID {
 			log.Printf("out of date job of %v, updating to %v", state.Task.Job.ID, jobId)
-			state.Task.Job.ID = jobId
+			state.Task.Job.ID = task.Job.ID
 		}
+
+		state.Task.Linked = task.Linked
 
 		w.mu.Lock()
 		w.Tasks[id] = state
+		nTasks := len(w.Tasks)
 		w.mu.Unlock()
 
-		// TODO: hamdle newly assigned / linked tasks
+		if len(state.Task.Linked) > nTasks {
+			w.recoverTasks(state.Task.Linked)
+		}
 	}
 }
 

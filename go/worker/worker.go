@@ -37,9 +37,30 @@ type Worker struct {
 	mu    sync.Mutex
 }
 
+func (w *Worker) recoverTask(id int) {
+	snapshot, err := w.GetTaskSnapshot(id)
+	if err != nil {
+		fmt.Print("error recovering task: ", err)
+		return
+	}
+
+	w.RunTask(snapshot)
+}
+
+func (w *Worker) recoverTasks(ids []int) {
+	w.mu.Lock()
+	for _, id := range ids {
+		if _, ok := w.Tasks[id]; !ok {
+			go w.recoverTask(id)
+		}
+	}
+	w.mu.Unlock()
+}
+
 // RunTask executes the genetic algorithm for a given task
-// TODO set an initial population to start from
 func (w *Worker) RunTask(task api.Task) {
+	population := task.Population
+	task.Population = eaopt.Population{}
 	t := WorkerTask{Task: task}
 	// decode and save target image
 	img := util.DecodeImage(task.TargetImage)
@@ -55,12 +76,12 @@ func (w *Worker) RunTask(task api.Task) {
 	// create clsoure functions with context
 	w.ga.Callback = w.createCallback(task.ID)
 	w.ga.EarlyStop = w.createEarlyStop(task.ID, task.Job.ID)
-	Factory := createShapesFactory(&t, task.Type)
+	factory := getShapesFactory(&t, population)
 
 	w.Tasks[task.ID] = &t
 
 	// evolve
-	err := w.ga.Minimize(Factory)
+	err := w.ga.Minimize(factory)
 	if err != nil {
 		fmt.Println(err)
 	}

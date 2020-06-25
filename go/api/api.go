@@ -53,12 +53,12 @@ func GetTask(workerId uint32) (Task, error) {
 	return reply, err
 }
 
-func Update(args Task) (uint32, error) {
+func Update(args Task) (Task, error) {
 	var reply Task
 
 	err := Call("Master.Update", &args, &reply)
 
-	return reply.Job.ID, err
+	return reply, err
 }
 
 // send an RPC request to the master, wait for the response.

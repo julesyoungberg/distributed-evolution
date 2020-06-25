@@ -29,7 +29,7 @@ func (w *Worker) SaveTaskSnapshot(state *WorkerTask) {
 func (w *Worker) GetTaskSnapshot(id int) (api.Task, error) {
 	val, err := w.cache.Get(util.GetSnapshotKey(id))
 	if err != nil {
-		e := fmt.Errorf("error fetching snapshot for worker %v: %v", id, err)
+		e := fmt.Errorf("error fetching snapshot for task %v: %v", id, err)
 		return api.Task{}, e
 	}
 
@@ -39,7 +39,7 @@ func (w *Worker) GetTaskSnapshot(id int) (api.Task, error) {
 
 	err = json.Unmarshal(bytes, &snapshot)
 	if err != nil {
-		e := fmt.Errorf("error parsing snapshot for worker %v: %v", id, err)
+		e := fmt.Errorf("error parsing snapshot for task%v: %v", id, err)
 		return api.Task{}, e
 	}
 
