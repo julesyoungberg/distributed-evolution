@@ -37,9 +37,7 @@ interface Config {
     poolSize: number
     mutationRate: number
     crossRate: number
-    outputMode: 'combined' | 'latest'
     overDraw: number
-    drawOnce: boolean
 }
 
 const initialConfig: Config = Object.freeze({
@@ -50,9 +48,7 @@ const initialConfig: Config = Object.freeze({
     poolSize: 10,
     mutationRate: 0.02,
     crossRate: 0.2,
-    outputMode: 'combined',
     overDraw: 10,
-    drawOnce: true,
 })
 
 function getBase64Image(img: HTMLImageElement) {
@@ -181,30 +177,8 @@ export default function Control() {
                     <Input type='number' step='0.001' min='0.0' max='1.0' {...fieldProps('crossRate')} />
                 </Field>
                 <Field>
-                    <Label htmlFor='outputMode'>Output Mode</Label>
-                    <Select {...fieldProps('outputMode')}>
-                        {['combined', 'latest'].map((type) => (
-                            <option key={type}>{type}</option>
-                        ))}
-                    </Select>
-                </Field>
-                <Field>
                     <Label htmlFor='overDraw'>Over Draw</Label>
                     <Input type='number' step='1' min='0' max='100' {...fieldProps('overDraw')} />
-                </Field>
-                <Field>
-                    <Label htmlFor='drawOnce'>Draw Once</Label>
-                    <Checkbox
-                        checked={config.drawOnce}
-                        id='drawOnce'
-                        name='drawOnce'
-                        onChange={() => {
-                            setConfig({
-                                ...config,
-                                drawOnce: !config.drawOnce,
-                            })
-                        }}
-                    />
                 </Field>
             </Flex>
         </form>

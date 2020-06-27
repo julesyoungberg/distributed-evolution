@@ -46,11 +46,11 @@ func Run() {
 			ID:           1,
 			CrossRate:    0.2,
 			MutationRate: 0.021,
-			NumShapes:    200,
+			NumShapes:    300,
 			OverDraw:     10,
 			PoolSize:     10,
 			PopSize:      50,
-			ShapeSize:    20,
+			ShapeSize:    30,
 		},
 		lastUpdate:         time.Now(),
 		TargetImage:        util.Image{},
@@ -75,7 +75,7 @@ func Run() {
 
 	go m.httpServer()
 
-	// go m.detectFailures()
+	go m.detectFailures()
 
 	go m.combine()
 
