@@ -11,8 +11,7 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/api"
 )
 
-const TASK_QUEUE = "queue:task"
-const OUTPUT_CHANNEL = "channel:output"
+const TASK_QUEUE = "task_queue"
 
 var ctx = context.Background()
 
@@ -54,8 +53,7 @@ func (db *DB) SaveTask(task api.Task) error {
 	return nil
 }
 
-func (db *DB) GetTask(id uint32) (api.Task, error) {
-	log.Printf("getting task %v", id)
+func (db *DB) GetTask(id int) (api.Task, error) {
 	task := api.Task{ID: id}
 
 	json, err := db.Get(task.Key())
@@ -71,7 +69,7 @@ func (db *DB) GetTask(id uint32) (api.Task, error) {
 	return task, err
 }
 
-func (db *DB) PushTaskID(id uint32) error {
+func (db *DB) PushTaskID(id int) error {
 	_, err := db.Client.RPush(ctx, TASK_QUEUE, fmt.Sprint(id)).Result()
 	if err != nil {
 		return fmt.Errorf("pushing task %v to queue: %v", id, err)
@@ -95,12 +93,10 @@ func (db *DB) PullTask() (api.Task, error) {
 		return api.Task{}, fmt.Errorf("pulling task from queue: %v", err)
 	}
 
-	log.Printf("from queue: %v", val)
-
-	id, err := strconv.ParseUint(val, 10, 32)
+	id, err := strconv.Atoi(val)
 	if err != nil {
 		return api.Task{}, fmt.Errorf("parsing task id %v: %v", val, err)
 	}
 
-	return db.GetTask(uint32(id))
+	return db.GetTask(id)
 }

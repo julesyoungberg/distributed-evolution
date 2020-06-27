@@ -5,8 +5,6 @@ import (
 	"log"
 	"math"
 
-	"github.com/google/uuid"
-
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
@@ -50,18 +48,23 @@ func (m *Master) generateTasks() {
 			subImg := util.GetSubImage(m.TargetImage.Image, rect)
 			bounds := subImg.Bounds()
 
+			encoded, err := util.EncodeImage(subImg)
+			if err != nil {
+				log.Fatal(err)
+			}
+
 			task := api.Task{
 				Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},
 				Generation:  1,
-				ID:          uuid.New().ID(),
+				ID:          y*int(M) + x + 1,
 				Job:         m.Job,
 				Offset:      offset,
 				Status:      "unstarted",
-				TargetImage: util.EncodeImage(subImg),
+				TargetImage: encoded,
 				Type:        "polygons",
 			}
 
-			err := m.db.PushTask(task)
+			err = m.db.PushTask(task)
 			if err != nil {
 				// shit - TODO try again?
 				log.Fatalf("error pushing task to task queue: %v", err)

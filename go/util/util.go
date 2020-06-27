@@ -3,9 +3,11 @@ package util
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	_ "image/jpeg"
 	"image/png"
 	"log"
 	"math"
@@ -52,27 +54,25 @@ func GetRandomImage() image.Image {
 }
 
 // EncodeImage encodes an image as png base64 string
-func EncodeImage(img image.Image) string {
+func EncodeImage(img image.Image) (string, error) {
 	buf := new(bytes.Buffer)
 	err := png.Encode(buf, img)
 	if err != nil {
-		log.Fatal("encode error ", err)
+		return "", fmt.Errorf("encode: %v", err)
 	}
 
-	return base64.StdEncoding.EncodeToString(buf.Bytes())
+	return base64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }
 
 // DecodeImage decodes a base64 and returns an image
-func DecodeImage(data string) image.Image {
-	// reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
-	// img, _, err := image.Decode(reader)
+func DecodeImage(data string) (image.Image, error) {
 	unbased, _ := base64.StdEncoding.DecodeString(data)
 	img, err := png.Decode(bytes.NewReader(unbased))
 	if err != nil {
-		log.Fatal("decode error: ", err)
+		return nil, fmt.Errorf("decode error: %v", err)
 	}
 
-	return img
+	return img, nil
 }
 
 func GetImageDimensions(img image.Image) (int, int) {

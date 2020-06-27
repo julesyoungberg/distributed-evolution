@@ -28,7 +28,7 @@ type WorkerTask struct {
 
 type Job struct {
 	CrossRate    float64 `json:"crossRate"`
-	ID           uint32  `json:"ID"`
+	ID           int     `json:"ID"`
 	MutationRate float64 `json:"mutationRate"`
 	NumShapes    uint    `json:"numShapes"`
 	OverDraw     int     `json:"overDraw"`
@@ -42,7 +42,7 @@ type Task struct {
 	BestFit     eaopt.Individual  `json:"-"`
 	Dimensions  util.Vector       `json:"dimensions"`
 	Generation  uint              `json:"generation"`
-	ID          uint32            `json:"ID"`
+	ID          int               `json:"ID"`
 	Job         Job               `json:"job"`
 	LastUpdate  time.Time         `json:"lastUpdate"`
 	Offset      util.Vector       `json:"offset"`
@@ -84,7 +84,7 @@ func (t Task) UpdateMaster(status string) (Task, error) {
 		Job:        Job{ID: t.Job.ID},
 		Status:     status,
 		Thread:     t.Thread,
-		WorkerID:   t.ID,
+		WorkerID:   t.WorkerID,
 	})
 }
 

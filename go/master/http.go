@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/fogleman/gg"
-	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
@@ -16,12 +15,12 @@ import (
 )
 
 type State struct {
-	Generation       uint                 `json:"generation"`
-	NumWorkers       int                  `json:"numWorkers"`
-	Output           string               `json:"output"`
-	TargetImage      string               `json:"targetImage"`
-	Tasks            map[uint32]*api.Task `json:"tasks"`
-	ThreadsPerWorker int                  `json:"threadsPerWorker"`
+	Generation       uint              `json:"generation"`
+	NumWorkers       int               `json:"numWorkers"`
+	Output           string            `json:"output"`
+	TargetImage      string            `json:"targetImage"`
+	Tasks            map[int]*api.Task `json:"tasks"`
+	ThreadsPerWorker int               `json:"threadsPerWorker"`
 }
 
 var upgrader = websocket.Upgrader{
@@ -52,17 +51,26 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	var job api.Job
 	err := json.NewDecoder(r.Body).Decode(&job)
 	if err != nil {
+		log.Printf("error decoding new job request body")
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// decode and save target image
 	m.TargetImageBase64 = job.TargetImage
-	m.setTargetImage(util.DecodeImage(job.TargetImage))
+	img, err := util.DecodeImage(job.TargetImage)
+	if err != nil {
+		log.Printf("error decoding target image")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	m.setTargetImage(img)
 
 	// save the job with a new ID
+	newID := m.Job.ID + 1
 	m.Job = job
-	m.Job.ID = uuid.New().ID()
+	m.Job.ID = newID
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
 
 	m.generateTasks()
@@ -141,12 +149,16 @@ func (m *Master) sendOutput(output *gg.Context, generation uint) {
 	}
 
 	// get resulting image
-	img := output.Image()
+	img, err := util.EncodeImage(output.Image())
+	if err != nil {
+		log.Print("error sending output: ", err)
+		return
+	}
 
 	// send encoded image and current generation
 	state := State{
 		Generation: generation,
-		Output:     util.EncodeImage(img),
+		Output:     img,
 		Tasks:      m.Tasks,
 	}
 

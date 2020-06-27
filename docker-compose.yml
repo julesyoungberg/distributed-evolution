@@ -9,7 +9,7 @@ services:
         environment: 
             DB_URL: db:6379
             HTTP_PORT: 9000
-            WORKERS: 4
+            WORKERS: 1
             WORKER_THREADS: 4
             RPC_PORT: 8080
         ports:
@@ -42,10 +42,13 @@ services:
     db:
         image: redis
         ports:
-            - 6379
-        # volumes:
-        #     - ./redis.conf:/usr/local/etc/redis/redis.conf
-        # command: redis-server /usr/local/etc/redis/redis.conf
+            - 6379:6379
+        volumes:
+            - ./redis.conf:/usr/local/etc/redis/redis.conf
+        command: redis-server /usr/local/etc/redis/redis.conf
+        # networks:
+        #     node_net:
+        #         ipv4_address: 172.28.1.4
 
 networks:
     default:

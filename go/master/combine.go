@@ -1,6 +1,7 @@
 package master
 
 import (
+	"log"
 	"math"
 	"time"
 
@@ -29,7 +30,11 @@ func (m *Master) combine() {
 				latest = task.Generation
 			}
 
-			img := util.DecodeImage(task.Output)
+			img, err := util.DecodeImage(task.Output)
+			if err != nil {
+				log.Print("error: ", err)
+				continue
+			}
 
 			centerX := int(math.Round(task.Offset.X + task.Dimensions.X/2.0))
 			centerY := int(math.Round(task.Offset.Y + task.Dimensions.Y/2.0))

@@ -16,7 +16,7 @@ import (
 type Worker struct {
 	ID           uint32
 	NGenerations uint
-	Tasks        map[uint32]*api.WorkerTask
+	Tasks        map[int]*api.WorkerTask
 
 	db db.DB
 	ga *eaopt.GA
@@ -28,7 +28,7 @@ func Run() {
 		ID:           uuid.New().ID(),
 		db:           db.NewConnection(),
 		NGenerations: 1000000000000, // 1 trillion
-		Tasks:        map[uint32]*api.WorkerTask{},
+		Tasks:        map[int]*api.WorkerTask{},
 	}
 
 	nThreads, err := strconv.Atoi(os.Getenv("THREADS"))
@@ -63,7 +63,7 @@ func Run() {
 
 				time.Sleep(10 * time.Second)
 			}
-		}(i)
+		}(i + 1)
 	}
 
 	wg.Wait()

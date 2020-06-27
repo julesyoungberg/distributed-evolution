@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/db"
@@ -19,7 +18,7 @@ type Master struct {
 	NumWorkers        int
 	TargetImage       util.Image
 	TargetImageBase64 string
-	Tasks             map[uint32]*api.Task
+	Tasks             map[int]*api.Task
 	ThreadsPerWorker  int
 
 	db                 db.DB
@@ -44,7 +43,7 @@ func Run() {
 		db:         db.NewConnection(),
 		NumWorkers: numWorkers,
 		Job: api.Job{
-			ID:           uuid.New().ID(),
+			ID:           1,
 			CrossRate:    0.2,
 			MutationRate: 0.021,
 			NumShapes:    200,
@@ -55,7 +54,7 @@ func Run() {
 		},
 		lastUpdate:         time.Now(),
 		TargetImage:        util.Image{},
-		Tasks:              map[uint32]*api.Task{},
+		Tasks:              map[int]*api.Task{},
 		ThreadsPerWorker:   workerThreads,
 		wsHeartbeatTimeout: 2 * time.Second,
 	}
@@ -64,8 +63,12 @@ func Run() {
 	image := util.GetRandomImage()
 
 	log.Print("encoding image...")
-	m.TargetImageBase64 = util.EncodeImage(image)
+	encodedImg, err := util.EncodeImage(image)
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	m.TargetImageBase64 = encodedImg
 	m.setTargetImage(image)
 
 	go m.generateTasks()

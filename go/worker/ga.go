@@ -34,7 +34,7 @@ func createGA(config api.Job, nGenerations uint) *eaopt.GA {
 }
 
 // returns a closure to be called after each generation
-func (w *Worker) createCallback(id uint32, thread int) func(ga *eaopt.GA) {
+func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 	// send the currrent best fit and other data to the master
 	return func(ga *eaopt.GA) {
 		w.mu.Lock()
@@ -51,7 +51,13 @@ func (w *Worker) createCallback(id uint32, thread int) func(ga *eaopt.GA) {
 			return
 		}
 
-		state.Task.Output = util.EncodeImage(output)
+		encoded, err := util.EncodeImage(output)
+		if err != nil {
+			log.Printf("error saving task: %v", err)
+			return
+		}
+
+		state.Task.Output = encoded
 		bestFit.Genome = api.Shapes{}
 
 		// clear state
@@ -77,7 +83,7 @@ func (w *Worker) createCallback(id uint32, thread int) func(ga *eaopt.GA) {
 }
 
 // returns a closure to check if the algorithm should stop (ie the job has changed)
-func (w *Worker) createEarlyStop(taskID uint32, jobID uint32) func(ga *eaopt.GA) bool {
+func (w *Worker) createEarlyStop(taskID int, jobID int) func(ga *eaopt.GA) bool {
 	return func(ga *eaopt.GA) bool {
 		return w.Tasks[taskID].Task.Job.ID != jobID
 	}

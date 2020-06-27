@@ -31,7 +31,12 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	t := api.WorkerTask{Task: task}
 
 	// decode and save target image
-	img := util.DecodeImage(task.TargetImage)
+	img, err := util.DecodeImage(task.TargetImage)
+	if err != nil {
+		log.Printf("error decoding task target image: %v", err)
+		return
+	}
+
 	width, height := util.GetImageDimensions(img)
 	t.TargetImage = util.Image{
 		Image:  img,
@@ -49,7 +54,7 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	w.Tasks[task.ID] = &t
 
 	// evolve
-	err := w.ga.Minimize(factory)
+	err = w.ga.Minimize(factory)
 	if err != nil {
 		log.Print(err)
 	}
