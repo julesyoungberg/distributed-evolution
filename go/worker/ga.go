@@ -65,7 +65,7 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 
 		// add data to the task
 		state.Task.BestFit = bestFit
-		state.Task.Generation = ga.Generations
+		state.Task.Generation = state.GenOffset + ga.Generations
 
 		w.saveTaskSnapshot(state, thread)
 

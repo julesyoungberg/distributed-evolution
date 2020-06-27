@@ -29,7 +29,7 @@ func (m *Master) recover(id int) {
 // if a task timesout, mark it as failed and begin recovery process
 func (m *Master) detectFailures() {
 	timeout := 30 * time.Second
-	queueTimeout := 60 * time.Second
+	queueTimeout := timeout * 2
 
 	for {
 		time.Sleep(timeout / 2)

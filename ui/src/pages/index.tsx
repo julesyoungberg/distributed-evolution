@@ -7,7 +7,7 @@ import { useReducer } from 'react'
 import { Heading } from 'rebass'
 
 import Control from '../components/Control'
-import Metrics from '../components/Metrics'
+import Table from '../components/Table'
 import Status from '../components/Status'
 
 import useChannel from '../hooks/useChannel'
@@ -26,10 +26,6 @@ const StyledHeading = styled(Heading)`
     margin-bottom: 20px;
 `
 
-const B = styled.span`
-    color: black;
-`
-
 export default function Home() {
     const [state, dispatch] = useReducer(reducer, initialState)
 
@@ -46,14 +42,14 @@ export default function Home() {
                 <StateContext.Provider value={{ dispatch, state }}>
                     <Main>
                         <StyledHeading color='primary' fontSize={[5, 6, 7]} letterSpacing='-2px'>
-                            D<B>i</B>st<B>r</B>ibu<B>t</B>ed Ev<B>o</B>lut<B>i</B>on
+                            Distributed Evolution
                         </StyledHeading>
 
                         <Status />
 
                         <Control />
 
-                        <Metrics />
+                        <Table />
                     </Main>
                 </StateContext.Provider>
             </ThemeProvider>

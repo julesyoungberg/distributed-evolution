@@ -20,15 +20,13 @@ func (w *Worker) saveTaskSnapshot(state *api.WorkerTask, thread int) {
 
 // RunTask executes the genetic algorithm for a given task
 func (w *Worker) RunTask(task api.Task, thread int) {
-	log.Printf("[thread %v] assigned task %v", thread, task.ID)
+	log.Printf("[thread %v] assigned task %v with population len: %v", thread, task.ID, len(task.Population))
 
 	population := task.Population
-
-	task.Population = eaopt.Individuals{}
 	task.WorkerID = w.ID
 	task.Thread = thread
 
-	t := api.WorkerTask{Task: task}
+	t := api.WorkerTask{GenOffset: task.Generation, Task: task}
 
 	// decode and save target image
 	img, err := util.DecodeImage(task.TargetImage)
@@ -50,6 +48,8 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	w.ga.Callback = w.createCallback(task.ID, thread)
 	w.ga.EarlyStop = w.createEarlyStop(task.ID, task.Job.ID)
 	factory := api.GetShapesFactory(&t, population)
+
+	task.Population = eaopt.Individuals{}
 
 	w.mu.Lock()
 	w.Tasks[task.ID] = &t

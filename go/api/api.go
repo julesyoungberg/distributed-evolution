@@ -23,6 +23,7 @@ type Output struct {
 
 type WorkerTask struct {
 	BestFit     Output
+	GenOffset   uint
 	Mu          sync.Mutex
 	TargetImage util.Image
 	Task        Task

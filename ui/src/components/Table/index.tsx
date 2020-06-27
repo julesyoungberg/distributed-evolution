@@ -52,7 +52,7 @@ const ConnectionButton = styled(Button)<{ disabled: boolean }, Theme>`
     cursor: pointer;
 `
 
-export default function Metrics() {
+export default function Table() {
     const { state } = useAppState()
 
     const now = new Date().getTime()
@@ -76,7 +76,7 @@ export default function Metrics() {
                 lastUpdate: `${(now - (new Date(task.lastUpdate)).getTime()) / 1000} seconds ago`,
                 connection: (
                     <ConnectionButton
-                        disabled={!task.connected}
+                        disabled={!(task.connected && task.status == 'inprogress')}
                         onClick={disconnect(task)}
                     >
                         DISCONNECT

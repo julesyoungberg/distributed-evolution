@@ -17,7 +17,9 @@ func (m *Master) Update(args, reply *api.Task) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	if !m.Tasks[args.ID].Connected {
+	task := m.Tasks[args.ID]
+
+	if task.Status == "inprogress" && !task.Connected {
 		return fmt.Errorf("disconnected")
 	}
 
@@ -28,7 +30,7 @@ func (m *Master) Update(args, reply *api.Task) error {
 		return nil
 	}
 
-	task := m.Tasks[args.ID]
+	task.Connected = true
 	task.Generation = args.Generation
 	task.Status = args.Status
 	task.Thread = args.Thread
