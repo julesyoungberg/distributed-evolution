@@ -8,7 +8,7 @@ import (
 )
 
 // recovers a failed task by fetching the
-func (m *Master) recoverTask(id uint32) {
+func (m *Master) recover(id uint32) {
 	m.mu.Lock()
 	task := m.Tasks[id]
 	task.Status = "recovering"
@@ -38,7 +38,7 @@ func (m *Master) detectFailures() {
 			if t.Status == "inprogress" && time.Since(t.LastUpdate) > timeout {
 				util.DPrintf("task %v timed out! recovering...", i)
 				m.Tasks[i].Status = "failed"
-				go m.recoverTask(i)
+				go m.recover(i)
 			}
 		}
 

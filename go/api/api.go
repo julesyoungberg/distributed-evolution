@@ -23,10 +23,6 @@ type Job struct {
 	TargetImage  string  `json:"targetImage"`
 }
 
-type GetTaskArgs struct {
-	WorkerID uint32
-}
-
 type Task struct {
 	BestFit     eaopt.Individual `json:"bestFit"`
 	Dimensions  util.Vector      `json:"dimensions"`
@@ -43,33 +39,6 @@ type Task struct {
 	Thread      int              `json:"thread"`
 	Type        string           `json:"type"`
 	WorkerID    uint32           `json:"workerID"`
-}
-
-func Update(args Task) (Task, error) {
-	var reply Task
-
-	err := Call("Master.Update", &args, &reply)
-
-	return reply, err
-}
-
-// send an RPC request to the master, wait for the response.
-// usually returns true.
-// returns false if something goes wrong.
-func Call(rpcname string, args interface{}, reply interface{}) error {
-	c, err := rpc.DialHTTP("tcp", os.Getenv("MASTER_URL"))
-	if err != nil {
-		return err
-	}
-
-	defer c.Close()
-
-	err = c.Call(rpcname, args, reply)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (t Task) Key() string {
@@ -106,4 +75,31 @@ func (t Task) UpdateMaster(status string) (Task, error) {
 		Thread:     t.Thread,
 		WorkerID:   t.ID,
 	})
+}
+
+func Update(args Task) (Task, error) {
+	var reply Task
+
+	err := Call("Master.Update", &args, &reply)
+
+	return reply, err
+}
+
+// send an RPC request to the master, wait for the response.
+// usually returns true.
+// returns false if something goes wrong.
+func Call(rpcname string, args interface{}, reply interface{}) error {
+	c, err := rpc.DialHTTP("tcp", os.Getenv("MASTER_URL"))
+	if err != nil {
+		return err
+	}
+
+	defer c.Close()
+
+	err = c.Call(rpcname, args, reply)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
