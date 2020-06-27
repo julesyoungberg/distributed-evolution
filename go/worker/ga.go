@@ -52,10 +52,10 @@ func (w *Worker) createCallback(id uint32, thread int) func(ga *eaopt.GA) {
 		}
 
 		state.Task.Output = util.EncodeImage(output)
-		bestFit.Genome = Shapes{}
+		bestFit.Genome = api.Shapes{}
 
 		// clear state
-		state.BestFit = Output{}
+		state.BestFit = api.Output{}
 
 		// add data to the task
 		state.Task.BestFit = bestFit

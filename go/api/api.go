@@ -1,15 +1,30 @@
 package api
 
 import (
-	"encoding/json"
+	"encoding/gob"
 	"fmt"
+	"image"
+	"image/color"
 	"net/rpc"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/MaxHalford/eaopt"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
+
+type Output struct {
+	Fitness float64
+	Output  image.Image
+}
+
+type WorkerTask struct {
+	BestFit     Output
+	Mu          sync.Mutex
+	TargetImage util.Image
+	Task        Task
+}
 
 type Job struct {
 	CrossRate    float64 `json:"crossRate"`
@@ -24,46 +39,42 @@ type Job struct {
 }
 
 type Task struct {
-	BestFit     eaopt.Individual `json:"bestFit"`
-	Dimensions  util.Vector      `json:"dimensions"`
-	Generation  uint             `json:"generation"`
-	ID          uint32           `json:"ID"`
-	Job         Job              `json:"-"`
-	LastUpdate  time.Time        `json:"lastUpdate"`
-	Linked      []int            `json:"linked"`
-	Offset      util.Vector      `json:"offset"`
-	Output      string           `json:"output"`
-	Population  eaopt.Population `json:"population"`
-	Status      string           `json:"status"`
-	TargetImage string           `json:"-"`
-	Thread      int              `json:"thread"`
-	Type        string           `json:"type"`
-	WorkerID    uint32           `json:"workerID"`
+	BestFit     eaopt.Individual  `json:"-"`
+	Dimensions  util.Vector       `json:"dimensions"`
+	Generation  uint              `json:"generation"`
+	ID          uint32            `json:"ID"`
+	Job         Job               `json:"job"`
+	LastUpdate  time.Time         `json:"lastUpdate"`
+	Offset      util.Vector       `json:"offset"`
+	Output      string            `json:"output"`
+	Population  eaopt.Individuals `json:"-"`
+	Status      string            `json:"status"`
+	TargetImage string            `json:"targetImage"`
+	Thread      int               `json:"thread"`
+	Type        string            `json:"type"`
+	WorkerID    uint32            `json:"workerID"`
+}
+
+func Register() {
+	gob.Register(color.RGBA{})
+	gob.Register(image.YCbCr{})
+
+	gob.Register(Circle{})
+	gob.Register(Polygon{})
+	gob.Register(Triangle{})
+	gob.Register(Shapes{})
 }
 
 func (t Task) Key() string {
 	return fmt.Sprintf("task:%v", t.ID)
 }
 
-func (t Task) ToJson() (string, error) {
-	encoded, err := json.Marshal(t)
-	if err != nil {
-		return "", fmt.Errorf("error encoding task %v: %v", t.ID, err)
-	}
+func Update(args Task) (Task, error) {
+	var reply Task
 
-	return string(encoded), nil
-}
+	err := Call("Master.Update", &args, &reply)
 
-func ParseTaskJson(s string) (Task, error) {
-	bytes := []byte(s)
-	var task Task
-
-	err := json.Unmarshal(bytes, &task)
-	if err != nil {
-		return Task{}, fmt.Errorf("error parsing task: %v", err)
-	}
-
-	return task, nil
+	return reply, err
 }
 
 func (t Task) UpdateMaster(status string) (Task, error) {
@@ -75,14 +86,6 @@ func (t Task) UpdateMaster(status string) (Task, error) {
 		Thread:     t.Thread,
 		WorkerID:   t.ID,
 	})
-}
-
-func Update(args Task) (Task, error) {
-	var reply Task
-
-	err := Call("Master.Update", &args, &reply)
-
-	return reply, err
 }
 
 // send an RPC request to the master, wait for the response.

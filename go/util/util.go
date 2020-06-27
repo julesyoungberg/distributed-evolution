@@ -4,10 +4,13 @@ import (
 	"bytes"
 	"encoding/base64"
 	"image"
+	"image/color"
+	"image/draw"
 	"image/png"
 	"log"
+	"math"
+	"math/rand"
 	"net/http"
-	"strings"
 )
 
 type Image struct {
@@ -61,8 +64,10 @@ func EncodeImage(img image.Image) string {
 
 // DecodeImage decodes a base64 and returns an image
 func DecodeImage(data string) image.Image {
-	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
-	img, _, err := image.Decode(reader)
+	// reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
+	// img, _, err := image.Decode(reader)
+	unbased, _ := base64.StdEncoding.DecodeString(data)
+	img, err := png.Decode(bytes.NewReader(unbased))
 	if err != nil {
 		log.Fatal("decode error: ", err)
 	}
@@ -79,4 +84,39 @@ func GetSubImage(img image.Image, rect image.Rectangle) image.Image {
 	return img.(interface {
 		SubImage(rect image.Rectangle) image.Image
 	}).SubImage(rect)
+}
+
+func RandomColor(rng *rand.Rand) color.RGBA {
+	f := func() uint8 {
+		return uint8(rng.Intn(64) * 4)
+	}
+
+	return color.RGBA{f(), f(), f(), f()}
+}
+
+func RandomVector(rng *rand.Rand, bounds Vector) Vector {
+	return Vector{X: rng.Float64() * bounds.X, Y: rng.Float64() * bounds.Y}
+}
+
+func SquareDifference(x, y float64) float64 {
+	d := x - y
+	return d * d
+}
+
+func RgbaImg(img image.Image) *image.RGBA {
+	bounds := img.Bounds()
+	rgba := image.NewRGBA(image.Rect(0, 0, bounds.Dx(), bounds.Dy()))
+	draw.Draw(rgba, rgba.Bounds(), img, bounds.Min, draw.Src)
+	return rgba
+}
+
+func ImgDiff(ai, bi image.Image) float64 {
+	a := RgbaImg(ai)
+	b := RgbaImg(bi)
+	var d float64
+	for i := 0; i < len(a.Pix); i++ {
+		d += SquareDifference(float64(a.Pix[i]), float64(b.Pix[i]))
+	}
+
+	return math.Sqrt(d)
 }

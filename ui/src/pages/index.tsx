@@ -48,8 +48,6 @@ export default function Home() {
                         <Status />
 
                         <Control />
-
-                        <Metrics />
                     </Main>
                 </StateContext.Provider>
             </ThemeProvider>

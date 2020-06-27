@@ -9,8 +9,8 @@ services:
         environment: 
             DB_URL: db:6379
             HTTP_PORT: 9000
-            WORKERS: 1
-            WORKER_THREADS: 3
+            WORKERS: 4
+            WORKER_THREADS: 4
             RPC_PORT: 8080
         ports:
             - 9000:9000
@@ -22,7 +22,7 @@ services:
         environment: 
             DB_URL: db:6379
             MASTER_URL: master:8080
-            THREADS: 3
+            THREADS: 4
     ui:
         build:
             context: .
@@ -43,8 +43,9 @@ services:
         image: redis
         ports:
             - 6379
-        volumes:
-            - ./redis.conf:/usr/local/etc/redis/redis.conf
+        # volumes:
+        #     - ./redis.conf:/usr/local/etc/redis/redis.conf
+        # command: redis-server /usr/local/etc/redis/redis.conf
 
 networks:
     default:

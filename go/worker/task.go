@@ -1,4 +1,4 @@
-package task
+package worker
 
 import (
 	"log"
@@ -9,21 +9,26 @@ import (
 )
 
 // saves a task snapshot as a serialized JSON string to the cache
-func (w *Worker) saveTaskSnapshot(state *WorkerTask) {
+func (w *Worker) saveTaskSnapshot(state *api.WorkerTask) {
 	task := state.Task
-	task.Population = w.ga.Populations[0]
-	w.db.SaveTask(task)
+	task.Population = w.ga.Populations[0].Individuals
+	err := w.db.SaveTask(task)
+	if err != nil {
+		log.Printf("error saving task %v snapshot: %v", task.ID, err)
+	}
 }
 
 // RunTask executes the genetic algorithm for a given task
 func (w *Worker) RunTask(task api.Task, thread int) {
+	log.Printf("[thread %v] assigned task %v", thread, task.ID)
+
 	population := task.Population
 
-	task.Population = eaopt.Population{}
+	task.Population = eaopt.Individuals{}
 	task.WorkerID = w.ID
 	task.Thread = thread
 
-	t := WorkerTask{Task: task}
+	t := api.WorkerTask{Task: task}
 
 	// decode and save target image
 	img := util.DecodeImage(task.TargetImage)
@@ -39,11 +44,9 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	// create closure functions with context
 	w.ga.Callback = w.createCallback(task.ID, thread)
 	w.ga.EarlyStop = w.createEarlyStop(task.ID, task.Job.ID)
-	factory := getShapesFactory(&t, population)
+	factory := api.GetShapesFactory(&t, population)
 
 	w.Tasks[task.ID] = &t
-
-	task.UpdateMaster("inprogress")
 
 	// evolve
 	err := w.ga.Minimize(factory)

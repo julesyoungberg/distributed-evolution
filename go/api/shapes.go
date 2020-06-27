@@ -1,4 +1,4 @@
-package worker
+package api
 
 import (
 	"image"
@@ -17,22 +17,22 @@ type Shapes struct {
 }
 
 // get the correct creation function based on the given shape type
-func getCreateShapeFunc(shapeType string) func(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
+func GetCreateShapeFunc(shapeType string) func(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
 	switch shapeType {
 	case "triangles":
-		return createTriangle
+		return CreateTriangle
 	case "polygons":
-		return createPolygon
+		return CreatePolygon
 	default:
-		return createCircle
+		return CreateCircle
 	}
 }
 
 // returns a closure with a reference to the context that can be used to generate a random shapes object
-func createShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
+func CreateShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
 	bounds := util.Vector{X: float64(ctx.TargetImage.Width), Y: float64(ctx.TargetImage.Height)}
 
-	createShape := getCreateShapeFunc(ctx.Task.Type)
+	createShape := GetCreateShapeFunc(ctx.Task.Type)
 
 	return func(rng *rand.Rand) eaopt.Genome {
 		shapes := Shapes{
@@ -50,15 +50,15 @@ func createShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
 	}
 }
 
-func createShapesFactoryFromPopulation(ctx *WorkerTask, initialPopulation eaopt.Population) func(rng *rand.Rand) eaopt.Genome {
-	population := initialPopulation.Individuals
+func CreateShapesFactoryFromPopulation(ctx *WorkerTask, initialPopulation eaopt.Individuals) func(rng *rand.Rand) eaopt.Genome {
+	population := initialPopulation
 
 	return func(rng *rand.Rand) eaopt.Genome {
-		membersLeft := len(population)
+		index := len(population) - 1
 
-		member := population[membersLeft-1]
+		member := population[index]
 
-		population = population[:membersLeft-2]
+		population = population[:index]
 
 		s := member.Genome.(Shapes)
 
@@ -68,12 +68,12 @@ func createShapesFactoryFromPopulation(ctx *WorkerTask, initialPopulation eaopt.
 	}
 }
 
-func getShapesFactory(ctx *WorkerTask, initialPopulation eaopt.Population) func(rng *rand.Rand) eaopt.Genome {
-	if len(initialPopulation.Individuals) > 0 {
-		return createShapesFactoryFromPopulation(ctx, initialPopulation)
+func GetShapesFactory(ctx *WorkerTask, initialPopulation eaopt.Individuals) func(rng *rand.Rand) eaopt.Genome {
+	if len(initialPopulation) > 0 {
+		return CreateShapesFactoryFromPopulation(ctx, initialPopulation)
 	}
 
-	return createShapesFactory(ctx)
+	return CreateShapesFactory(ctx)
 }
 
 // draw the shapes to the given draw context
@@ -98,9 +98,9 @@ func (s Shapes) Evaluate() (float64, error) {
 	out := util.GetSubImage(img, rect)
 
 	// calculate fitness as the difference between the target and output images
-	fitness := imgDiff(rgbaImg(out), rgbaImg(s.Context.TargetImage.Image))
+	fitness := util.ImgDiff(out, s.Context.TargetImage.Image)
 
-	s.Context.mu.Lock()
+	s.Context.Mu.Lock()
 
 	// if this is the best fit we've seen, save it
 	if fitness > s.Context.BestFit.Fitness {
@@ -110,14 +110,14 @@ func (s Shapes) Evaluate() (float64, error) {
 		}
 	}
 
-	s.Context.mu.Unlock()
+	s.Context.Mu.Unlock()
 
 	return fitness, nil
 }
 
 // randomly replace members of the population with a new random shape
 func (s Shapes) Mutate(rng *rand.Rand) {
-	createShape := getCreateShapeFunc(s.Type)
+	createShape := GetCreateShapeFunc(s.Type)
 
 	for i := range s.Members {
 		if rng.Float64() < s.Context.Task.Job.MutationRate {

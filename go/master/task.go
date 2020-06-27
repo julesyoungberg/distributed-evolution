@@ -54,7 +54,7 @@ func (m *Master) generateTasks() {
 				Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},
 				Generation:  1,
 				ID:          uuid.New().ID(),
-				Linked:      []int{},
+				Job:         m.Job,
 				Offset:      offset,
 				Status:      "unstarted",
 				TargetImage: util.EncodeImage(subImg),

@@ -1,4 +1,4 @@
-package worker
+package api
 
 import (
 	"image/color"
@@ -22,10 +22,10 @@ type Circle struct {
 	Radius   float64
 }
 
-func createCircle(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
+func CreateCircle(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
 	return Circle{
-		Color:    randomColor(rng),
-		Position: randomVector(rng, bounds),
+		Color:    util.RandomColor(rng),
+		Position: util.RandomVector(rng, bounds),
 		Radius:   (rng.Float64()*radius)/2.0 + radius/2.0, // from radius/2 to radius
 	}
 }
@@ -47,10 +47,10 @@ type Polygon struct {
 	Sides    int
 }
 
-func createPolygon(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
+func CreatePolygon(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
 	return Polygon{
-		Color:    randomColor(rng),
-		Position: randomVector(rng, bounds),
+		Color:    util.RandomColor(rng),
+		Position: util.RandomVector(rng, bounds),
 		Radius:   (rng.Float64()*radius)/2.0 + radius/2.0,
 		Rotation: (rng.Float64() * 2 * math.Pi),
 		Sides:    rng.Intn(8) + 1,
@@ -71,17 +71,17 @@ type Triangle struct {
 	Vertices []util.Vector
 }
 
-func createTriangle(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
+func CreateTriangle(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
 	offset := func() float64 {
 		return rng.Float64()*radius*2.0 - radius
 	}
 
-	p1 := randomVector(rng, bounds)
+	p1 := util.RandomVector(rng, bounds)
 	p2 := util.Vector{X: p1.X + offset(), Y: p1.Y + offset()}
 	p3 := util.Vector{X: p1.X + offset(), Y: p1.Y + offset()}
 
 	return Triangle{
-		Color:    randomColor(rng),
+		Color:    util.RandomColor(rng),
 		Vertices: []util.Vector{p1, p2, p3},
 	}
 }

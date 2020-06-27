@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
-	"time"
 
 	"github.com/rickyfitts/distributed-evolution/go/api"
 )
@@ -23,8 +22,10 @@ func (m *Master) Update(task, reply *api.Task) error {
 		return nil
 	}
 
-	task.LastUpdate = time.Now()
-	m.Tasks[task.ID] = task
+	m.Tasks[task.ID].Generation = task.Generation
+	m.Tasks[task.ID].Status = task.Status
+	m.Tasks[task.ID].Thread = task.Thread
+	m.Tasks[task.ID].WorkerID = task.WorkerID
 
 	return nil
 }

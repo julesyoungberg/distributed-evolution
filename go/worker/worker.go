@@ -1,7 +1,6 @@
 package worker
 
 import (
-	"image"
 	"log"
 	"os"
 	"strconv"
@@ -12,26 +11,12 @@ import (
 	"github.com/google/uuid"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/db"
-	"github.com/rickyfitts/distributed-evolution/go/util"
 )
-
-type Output struct {
-	Fitness float64
-	Output  image.Image
-}
-
-type WorkerTask struct {
-	BestFit     Output
-	TargetImage util.Image
-	Task        api.Task
-
-	mu sync.Mutex
-}
 
 type Worker struct {
 	ID           uint32
 	NGenerations uint
-	Tasks        map[uint32]*WorkerTask
+	Tasks        map[uint32]*api.WorkerTask
 
 	db db.DB
 	ga *eaopt.GA
@@ -43,7 +28,7 @@ func Run() {
 		ID:           uuid.New().ID(),
 		db:           db.NewConnection(),
 		NGenerations: 1000000000000, // 1 trillion
-		Tasks:        map[uint32]*WorkerTask{},
+		Tasks:        map[uint32]*api.WorkerTask{},
 	}
 
 	nThreads, err := strconv.Atoi(os.Getenv("THREADS"))
@@ -51,27 +36,35 @@ func Run() {
 		log.Fatalf("invalid THREADS value: %v", err)
 	}
 
+	log.Print("threads: ", nThreads)
+
 	// wait for master to initialize
 	time.Sleep(10 * time.Second)
 
+	var wg sync.WaitGroup
+
 	for i := 0; i < nThreads; i++ {
+		wg.Add(1)
+
 		go func(thread int) {
 			for {
+				log.Printf("[thread %v] getting task", thread)
+
 				task, err := w.db.PullTask()
 
 				if err == nil && task.Generation != 0 {
-					log.Print("assigned task ", task.ID)
 					w.RunTask(task, thread)
-					log.Print("finished task ", task.ID)
+					log.Printf("[thread %v] finished task %v", thread, task.ID)
 				} else if err != nil {
-					// TODO change to log.Print for fault tolerance
-					log.Print("error: ", err)
+					log.Printf("[thread %v] error: %v", thread, err)
 				} else {
-					log.Print("empty task response, waiting for work")
+					log.Printf("[thread %v] empty task response, waiting for work", thread)
 				}
 
 				time.Sleep(10 * time.Second)
 			}
 		}(i)
 	}
+
+	wg.Wait()
 }

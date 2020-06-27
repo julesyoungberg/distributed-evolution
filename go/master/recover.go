@@ -27,7 +27,7 @@ func (m *Master) recover(id uint32) {
 // check that each inprogress task is active by checking its last update
 // if a task timesout, mark it as failed and begin recovery process
 func (m *Master) detectFailures() {
-	timeout := 20 * time.Second
+	timeout := 60 * time.Second
 
 	for {
 		time.Sleep(time.Second)
