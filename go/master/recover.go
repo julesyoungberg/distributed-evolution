@@ -16,8 +16,9 @@ func (m *Master) recover(id int) {
 
 	err := m.db.PushTaskID(m.Tasks[id].ID)
 	if err != nil {
-		log.Printf("[failure detector] error pushing task to task queue: %v", err)
+		log.Printf("[failure detector] error %v", err)
 
+		// try again next round
 		m.mu.Lock()
 		m.Tasks[id].Status = "inprogress"
 		m.mu.Unlock()

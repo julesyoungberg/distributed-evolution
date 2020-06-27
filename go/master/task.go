@@ -30,6 +30,8 @@ func (m *Master) getTaskRect(x, y, colWidth, rowWidth int) (image.Rectangle, uti
 func (m *Master) generateTasks() {
 	log.Printf("[task generator] %v workers with %v threads each available, generating tasks...", m.NumWorkers, m.ThreadsPerWorker)
 
+	m.Tasks = map[int]*api.Task{}
+
 	totalThreads := m.NumWorkers * m.ThreadsPerWorker
 
 	N := math.Floor(math.Sqrt(float64(totalThreads)))

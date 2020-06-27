@@ -51,7 +51,9 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	w.ga.EarlyStop = w.createEarlyStop(task.ID, task.Job.ID)
 	factory := api.GetShapesFactory(&t, population)
 
+	w.mu.Lock()
 	w.Tasks[task.ID] = &t
+	w.mu.Unlock()
 
 	// evolve
 	err = w.ga.Minimize(factory)

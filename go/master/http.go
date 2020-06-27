@@ -92,33 +92,13 @@ func (m *Master) disconnectTask(w http.ResponseWriter, r *http.Request) {
 	m.mu.Unlock()
 }
 
-func (m *Master) reconnectTask(w http.ResponseWriter, r *http.Request) {
-	cors(w)
-	params := mux.Vars(r)
-	id, err := strconv.Atoi(params["id"])
-	if err != nil {
-		log.Printf("error parsing task id")
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	log.Printf("reconnecting task %v", id)
-
-	m.mu.Lock()
-	m.Tasks[id].Connected = true
-	m.mu.Unlock()
-}
-
 // handles requests from the ui and websocket communication
 func (m *Master) httpServer() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
-
-	r.HandleFunc("/subscribe", m.subscribe)
-
 	r.HandleFunc("/tasks/{id:[0-9]+}/disconnect", m.disconnectTask).Methods(http.MethodGet, http.MethodOptions)
-	r.HandleFunc("/tasks/{id:[0-9]+}/reconnect", m.reconnectTask).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/subscribe", m.subscribe)
 
 	port := os.Getenv("HTTP_PORT")
 

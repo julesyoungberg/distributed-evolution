@@ -8,13 +8,11 @@ import { Button } from 'rebass'
 
 import useAppState from '../../hooks/useAppState'
 
+import { Theme } from '../../theme'
+
 const { publicRuntimeConfig } = getConfig()
 
 const columns = [
-    {
-        name: 'Connection',
-        selector: 'connection',
-    },
     {
         name: 'ID',
         selector: 'ID',
@@ -42,11 +40,15 @@ const columns = [
     {
         name: 'Status',
         selector: 'status',
-    }
+    },
+    {
+        name: 'Connection',
+        selector: 'connection',
+    },
 ]
 
-const ConnectionButton = styled(Button)<{ connected: boolean }>`
-    background-color: ${({ connected }) => connected ? 'red' : 'green'};
+const ConnectionButton = styled(Button)<{ disabled: boolean }, Theme>`
+    background-color: ${({ disabled, theme }) => disabled ? theme.colors.lightgray : theme.colors.blue};
     cursor: pointer;
 `
 
@@ -55,11 +57,10 @@ export default function Metrics() {
 
     const now = new Date().getTime()
 
-    const toggleConnection = (task) => async () => {
-        const action = task.connected ? 'disconnect' : 'reconnect'
-        const path = `tasks/${task.ID}/${action}`
+    const disconnect = (task) => async () => {
+        const path = `tasks/${task.ID}/disconnect`
 
-        console.log(`${action}ing task ${task.ID}`)
+        console.log(`disconnecting task ${task.ID}`)
         
         const response = await fetch(`${publicRuntimeConfig.apiUrl}/${path}`)
 
@@ -74,8 +75,11 @@ export default function Metrics() {
                 ...task,
                 lastUpdate: `${(now - (new Date(task.lastUpdate)).getTime()) / 1000} seconds ago`,
                 connection: (
-                    <ConnectionButton connected={task.connected} onClick={toggleConnection(task)}>
-                        {task.connected ? 'DISCONNECT' : 'RECONNECT'}
+                    <ConnectionButton
+                        disabled={!task.connected}
+                        onClick={disconnect(task)}
+                    >
+                        DISCONNECT
                     </ConnectionButton>
                 )
             }))}

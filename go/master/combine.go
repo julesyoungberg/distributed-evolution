@@ -1,7 +1,6 @@
 package master
 
 import (
-	"log"
 	"math"
 	"time"
 
@@ -14,19 +13,24 @@ func (m *Master) combine() {
 	for {
 		time.Sleep(5 * time.Second)
 
+		// log.Printf("[combiner] getting task IDs")
+
 		m.mu.Lock()
+		ids := []int{}
+		for id := range m.Tasks {
+			ids = append(ids, id)
+		}
+		m.mu.Unlock()
 
 		dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
 
 		var latest uint = 0
 
-		log.Printf("[combiner] combining outputs")
+		// log.Printf("[combiner] combining outputs")
 
-		for id := range m.Tasks {
-			m.mu.Unlock()
-
+		for _, id := range ids {
 			task, err := m.db.GetTask(id)
-			if err != nil {
+			if err != nil || task.ID == 0 {
 				continue
 			}
 
@@ -36,7 +40,6 @@ func (m *Master) combine() {
 
 			img, err := util.DecodeImage(task.Output)
 			if err != nil {
-				log.Print("error: ", err)
 				continue
 			}
 
@@ -44,13 +47,9 @@ func (m *Master) combine() {
 			centerY := int(math.Round(task.Offset.Y + task.Dimensions.Y/2.0))
 
 			dc.DrawImageAnchored(img, centerX, centerY, 0.5, 0.5)
-
-			m.mu.Lock()
 		}
 
-		m.mu.Unlock()
-
-		log.Printf("[combiner] sending output")
+		// log.Printf("[combiner] sending output")
 
 		m.sendOutput(dc, latest)
 	}

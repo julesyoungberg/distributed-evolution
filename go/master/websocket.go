@@ -88,7 +88,7 @@ func (m *Master) sendOutput(output *gg.Context, generation uint) {
 	// get resulting image
 	img, err := util.EncodeImage(output.Image())
 	if err != nil {
-		log.Print("error sending output: ", err)
+		log.Print("[combiner] error sending output: ", err)
 		return
 	}
 
