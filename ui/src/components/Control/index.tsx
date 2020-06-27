@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
 import styled from '@emotion/styled'
-import { Checkbox, Input, Label, Select } from '@rebass/forms'
+import { Input, Label, Select } from '@rebass/forms'
 import fetch from 'isomorphic-fetch'
 import getConfig from 'next/config'
 import { useState, FormEvent } from 'react'

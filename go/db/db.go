@@ -28,14 +28,16 @@ func NewConnection() DB {
 	return DB{Client: client}
 }
 
+func (db *DB) Flush() error {
+	return db.Client.FlushAll(ctx).Err()
+}
+
 func (db *DB) Set(key string, value string) error {
-	err := db.Client.Set(ctx, key, value, 0).Err()
-	return err
+	return db.Client.Set(ctx, key, value, 0).Err()
 }
 
 func (db *DB) Get(key string) (string, error) {
-	val, err := db.Client.Get(ctx, key).Result()
-	return val, err
+	return db.Client.Get(ctx, key).Result()
 }
 
 func (db *DB) SaveTask(task api.Task) error {

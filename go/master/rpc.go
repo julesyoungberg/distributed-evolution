@@ -1,6 +1,7 @@
 package master
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -15,6 +16,10 @@ import (
 func (m *Master) Update(args, reply *api.Task) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
+
+	if !m.Tasks[args.ID].Connected {
+		return fmt.Errorf("disconnected")
+	}
 
 	reply.Job.ID = m.Job.ID
 

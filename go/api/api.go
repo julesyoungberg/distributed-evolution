@@ -14,6 +14,8 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
+const RPC_TIMEOUT = 1
+
 type Output struct {
 	Fitness float64
 	Output  image.Image
@@ -40,6 +42,7 @@ type Job struct {
 
 type Task struct {
 	BestFit     eaopt.Individual  `json:"-"`
+	Connected   bool              `json:"connected"`
 	Dimensions  util.Vector       `json:"dimensions"`
 	Generation  uint              `json:"generation"`
 	ID          int               `json:"ID"`
@@ -99,10 +102,31 @@ func Call(rpcname string, args interface{}, reply interface{}) error {
 
 	defer c.Close()
 
-	err = c.Call(rpcname, args, reply)
-	if err != nil {
-		return err
+	_, timeout := handleRPC(func() bool {
+		err = c.Call(rpcname, args, reply)
+		return true
+	})
+
+	if timeout {
+		return fmt.Errorf("rpc call timed out")
 	}
 
-	return nil
+	return err
+}
+
+func handleRPC(rpcCall func() bool) (bool, bool) {
+	timeout := false
+	success := false
+	c := make(chan bool, 1)
+
+	go func() { c <- rpcCall() }()
+
+	select {
+	case s := <-c:
+		success = s
+	case <-time.After(time.Second):
+		timeout = true
+	}
+
+	return success, timeout
 }

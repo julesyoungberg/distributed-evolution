@@ -28,7 +28,7 @@ func (m *Master) getTaskRect(x, y, colWidth, rowWidth int) (image.Rectangle, uti
 
 // populates the task queue with tasks, where each is a slice of the target image
 func (m *Master) generateTasks() {
-	log.Printf("%v workers with %v threads each available, generating tasks...", m.NumWorkers, m.ThreadsPerWorker)
+	log.Printf("[task generator] %v workers with %v threads each available, generating tasks...", m.NumWorkers, m.ThreadsPerWorker)
 
 	totalThreads := m.NumWorkers * m.ThreadsPerWorker
 
@@ -38,7 +38,13 @@ func (m *Master) generateTasks() {
 	colWidth := int(math.Ceil(float64(m.TargetImage.Width) / N))
 	rowWidth := int(math.Ceil(float64(m.TargetImage.Height) / M))
 
-	log.Printf("splitting image into %v %vpx cols and %v %vpx rows", N, colWidth, M, rowWidth)
+	log.Printf("[task generator] splitting image into %v %vpx cols and %v %vpx rows", N, colWidth, M, rowWidth)
+
+	err := m.db.Flush()
+	if err != nil {
+		log.Printf("[task generator] failed to flush db: %v", err)
+		return
+	}
 
 	// create a task for each slice of the image
 	for y := 0; y < int(N); y++ {
@@ -54,25 +60,26 @@ func (m *Master) generateTasks() {
 			}
 
 			task := api.Task{
+				Connected:   true,
 				Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},
 				Generation:  1,
 				ID:          y*int(M) + x + 1,
 				Job:         m.Job,
 				Offset:      offset,
-				Status:      "unstarted",
+				Status:      "queued",
 				TargetImage: encoded,
 				Type:        "polygons",
 			}
 
 			err = m.db.PushTask(task)
 			if err != nil {
-				// shit - TODO try again?
-				log.Fatalf("error pushing task to task queue: %v", err)
+				// let it timeout and try again
+				log.Fatalf("[task generator] error pushing task to task queue: %v", err)
 			}
 
 			m.Tasks[task.ID] = &task
 		}
 	}
 
-	log.Printf("%v tasks created", len(m.Tasks))
+	log.Printf("[task generator] %v tasks created", len(m.Tasks))
 }

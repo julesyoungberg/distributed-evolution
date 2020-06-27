@@ -9,12 +9,12 @@ import (
 )
 
 // saves a task snapshot as a serialized JSON string to the cache
-func (w *Worker) saveTaskSnapshot(state *api.WorkerTask) {
+func (w *Worker) saveTaskSnapshot(state *api.WorkerTask, thread int) {
 	task := state.Task
 	task.Population = w.ga.Populations[0].Individuals
 	err := w.db.SaveTask(task)
 	if err != nil {
-		log.Printf("error saving task %v snapshot: %v", task.ID, err)
+		log.Printf("[thread %v] error saving task %v snapshot: %v", thread, task.ID, err)
 	}
 }
 
@@ -33,7 +33,7 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	// decode and save target image
 	img, err := util.DecodeImage(task.TargetImage)
 	if err != nil {
-		log.Printf("error decoding task target image: %v", err)
+		log.Printf("[thrad %v] error decoding task target image: %v", thread, err)
 		return
 	}
 

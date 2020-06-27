@@ -47,13 +47,13 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 		output := state.BestFit.Output
 
 		if output == nil {
-			log.Printf("error! best fit image is nil at generation %v - bestFit: %v", ga.Generations, state.BestFit)
+			log.Printf("[thread %v] error! best fit image is nil at generation %v - bestFit: %v", thread, ga.Generations, state.BestFit)
 			return
 		}
 
 		encoded, err := util.EncodeImage(output)
 		if err != nil {
-			log.Printf("error saving task: %v", err)
+			log.Printf("[thread %v] error saving task: %v", thread, err)
 			return
 		}
 
@@ -67,16 +67,18 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 		state.Task.BestFit = bestFit
 		state.Task.Generation = ga.Generations
 
-		w.saveTaskSnapshot(state)
+		w.saveTaskSnapshot(state, thread)
 
 		task, err := state.Task.UpdateMaster("inprogress")
 		if err != nil {
-			log.Print("error ", err)
+			log.Printf("[thread %v] failed to update master %v", thread, err)
+			state.Task.Job.ID = 0
+			return
 		}
 
 		// if the master responded with a different job id we are out of date
 		if state.Task.Job.ID != task.Job.ID {
-			log.Printf("out of date job of %v, updating to %v", state.Task.Job.ID, task.Job.ID)
+			log.Printf("[thrad %v] out of date job of %v, updating to %v", thread, state.Task.Job.ID, task.Job.ID)
 			state.Task.Job.ID = task.Job.ID
 		}
 	}

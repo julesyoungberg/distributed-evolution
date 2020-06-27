@@ -5,20 +5,24 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gorilla/mux"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
+func cors(w http.ResponseWriter) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding")
+}
+
 // handler for POST /job requests
 // abandons current job and start on the new one
 func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	log.Printf("##### New Job Request - %v #####", http.MethodOptions)
-	// Allow CORS here By * or specific origin
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding")
+	cors(w)
 
 	// ignore preflight request
 	if r.Method == http.MethodOptions {
@@ -71,6 +75,40 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (m *Master) disconnectTask(w http.ResponseWriter, r *http.Request) {
+	cors(w)
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		log.Printf("error parsing task id")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("disconnecting task %v", id)
+
+	m.mu.Lock()
+	m.Tasks[id].Connected = false
+	m.mu.Unlock()
+}
+
+func (m *Master) reconnectTask(w http.ResponseWriter, r *http.Request) {
+	cors(w)
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	if err != nil {
+		log.Printf("error parsing task id")
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("reconnecting task %v", id)
+
+	m.mu.Lock()
+	m.Tasks[id].Connected = true
+	m.mu.Unlock()
+}
+
 // handles requests from the ui and websocket communication
 func (m *Master) httpServer() {
 	r := mux.NewRouter()
@@ -78,6 +116,9 @@ func (m *Master) httpServer() {
 	r.HandleFunc("/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
 
 	r.HandleFunc("/subscribe", m.subscribe)
+
+	r.HandleFunc("/tasks/{id:[0-9]+}/disconnect", m.disconnectTask).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/tasks/{id:[0-9]+}/reconnect", m.reconnectTask).Methods(http.MethodGet, http.MethodOptions)
 
 	port := os.Getenv("HTTP_PORT")
 
