@@ -75,7 +75,7 @@ func Run() {
 
 	go m.httpServer()
 
-	go m.detectFailures()
+	// go m.detectFailures()
 
 	go m.combine()
 

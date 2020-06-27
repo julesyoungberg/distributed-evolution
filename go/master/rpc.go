@@ -6,26 +6,30 @@ import (
 	"net/http"
 	"net/rpc"
 	"os"
+	"time"
 
 	"github.com/rickyfitts/distributed-evolution/go/api"
 )
 
 // handles a progress update from a worker, updates the state, and updates the ui
-func (m *Master) Update(task, reply *api.Task) error {
+func (m *Master) Update(args, reply *api.Task) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	reply.Job.ID = m.Job.ID
 
-	if task.Job.ID != m.Job.ID {
-		log.Printf("worker %v is out of date", task.WorkerID)
+	if args.Job.ID != m.Job.ID {
+		log.Printf("worker %v is out of date", args.WorkerID)
 		return nil
 	}
 
-	m.Tasks[task.ID].Generation = task.Generation
-	m.Tasks[task.ID].Status = task.Status
-	m.Tasks[task.ID].Thread = task.Thread
-	m.Tasks[task.ID].WorkerID = task.WorkerID
+	task := m.Tasks[args.ID]
+	task.Generation = args.Generation
+	task.Status = args.Status
+	task.Thread = args.Thread
+	task.WorkerID = args.WorkerID
+	task.LastUpdate = time.Now()
+	m.Tasks[args.ID] = task
 
 	return nil
 }

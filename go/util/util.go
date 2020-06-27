@@ -88,7 +88,7 @@ func GetSubImage(img image.Image, rect image.Rectangle) image.Image {
 
 func RandomColor(rng *rand.Rand) color.RGBA {
 	f := func() uint8 {
-		return uint8(rng.Intn(64) * 4)
+		return uint8(rng.Intn(4) * 64)
 	}
 
 	return color.RGBA{f(), f(), f(), f()}

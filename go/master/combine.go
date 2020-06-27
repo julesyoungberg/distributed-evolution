@@ -12,7 +12,7 @@ import (
 // periodically read all tasks from db, combine results, save and update ui
 func (m *Master) combine() {
 	for {
-		time.Sleep(15 * time.Second)
+		time.Sleep(5 * time.Second)
 
 		m.mu.Lock()
 

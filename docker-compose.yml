@@ -9,8 +9,8 @@ services:
         environment: 
             DB_URL: db:6379
             HTTP_PORT: 9000
-            WORKERS: 1
-            WORKER_THREADS: 4
+            WORKERS: 5
+            WORKER_THREADS: 5
             RPC_PORT: 8080
         ports:
             - 9000:9000
@@ -22,7 +22,7 @@ services:
         environment: 
             DB_URL: db:6379
             MASTER_URL: master:8080
-            THREADS: 4
+            THREADS: 5
     ui:
         build:
             context: .

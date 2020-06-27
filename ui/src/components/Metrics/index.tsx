@@ -11,6 +11,15 @@ const columns = [
         sortable: true,
     },
     {
+        name: 'Worker ID',
+        selector: 'workerID',
+        sortable: true,
+    },
+    {
+        name: 'Thread',
+        selector: 'thread',
+    },
+    {
         name: 'Generation',
         selector: 'generation',
         sortable: true,
@@ -35,7 +44,7 @@ export default function Metrics() {
         <DataTable
             title="Workers"
             columns={columns}
-            data={state.tasks?.map(task => ({
+            data={Object.values(state.tasks || {}).map(task => ({
                 ...task,
                 lastUpdate: `${(now - (new Date(task.lastUpdate)).getTime()) / 1000} seconds ago`
             }))}

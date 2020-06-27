@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
@@ -61,8 +60,6 @@ func (db *DB) GetTask(id int) (api.Task, error) {
 		e := fmt.Errorf("fetching snapshot for task %v: %v", id, err)
 		return task, e
 	}
-
-	log.Printf("parsing task %v", id)
 
 	err = task.UnmarshalJSON([]byte(json))
 
