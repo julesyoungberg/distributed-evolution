@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/rpc"
 	"os"
 	"time"
@@ -11,11 +13,9 @@ import (
 
 type Job struct {
 	CrossRate    float64 `json:"crossRate"`
-	DrawOnce     bool    `json:"drawOnce"`
 	ID           uint32  `json:"ID"`
 	MutationRate float64 `json:"mutationRate"`
 	NumShapes    uint    `json:"numShapes"`
-	OutputMode   string  `json:"outputMode"`
 	OverDraw     int     `json:"overDraw"`
 	PoolSize     uint    `json:"poolSize"`
 	PopSize      uint    `json:"popSize"`
@@ -31,7 +31,7 @@ type Task struct {
 	BestFit     eaopt.Individual `json:"bestFit"`
 	Dimensions  util.Vector      `json:"dimensions"`
 	Generation  uint             `json:"generation"`
-	ID          int              `json:"ID"`
+	ID          uint32           `json:"ID"`
 	Job         Job              `json:"-"`
 	LastUpdate  time.Time        `json:"lastUpdate"`
 	Linked      []int            `json:"linked"`
@@ -40,17 +40,9 @@ type Task struct {
 	Population  eaopt.Population `json:"population"`
 	Status      string           `json:"status"`
 	TargetImage string           `json:"-"`
+	Thread      int              `json:"thread"`
 	Type        string           `json:"type"`
 	WorkerID    uint32           `json:"workerID"`
-}
-
-func GetTask(workerId uint32) (Task, error) {
-	args := GetTaskArgs{WorkerID: workerId}
-	var reply Task
-
-	err := Call("Master.GetTask", &args, &reply)
-
-	return reply, err
 }
 
 func Update(args Task) (Task, error) {
@@ -65,8 +57,7 @@ func Update(args Task) (Task, error) {
 // usually returns true.
 // returns false if something goes wrong.
 func Call(rpcname string, args interface{}, reply interface{}) error {
-	port := os.Getenv("MASTER_PORT")
-	c, err := rpc.DialHTTP("tcp", "master:"+port)
+	c, err := rpc.DialHTTP("tcp", os.Getenv("MASTER_URL"))
 	if err != nil {
 		return err
 	}
@@ -79,4 +70,40 @@ func Call(rpcname string, args interface{}, reply interface{}) error {
 	}
 
 	return nil
+}
+
+func (t Task) Key() string {
+	return fmt.Sprintf("task:%v", t.ID)
+}
+
+func (t Task) ToJson() (string, error) {
+	encoded, err := json.Marshal(t)
+	if err != nil {
+		return "", fmt.Errorf("error encoding task %v: %v", t.ID, err)
+	}
+
+	return string(encoded), nil
+}
+
+func ParseTaskJson(s string) (Task, error) {
+	bytes := []byte(s)
+	var task Task
+
+	err := json.Unmarshal(bytes, &task)
+	if err != nil {
+		return Task{}, fmt.Errorf("error parsing task: %v", err)
+	}
+
+	return task, nil
+}
+
+func (t Task) UpdateMaster(status string) (Task, error) {
+	return Update(Task{
+		ID:         t.ID,
+		Generation: t.Generation,
+		Job:        Job{ID: t.Job.ID},
+		Status:     status,
+		Thread:     t.Thread,
+		WorkerID:   t.ID,
+	})
 }

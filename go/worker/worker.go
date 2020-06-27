@@ -1,16 +1,17 @@
 package worker
 
 import (
-	"fmt"
 	"image"
 	"log"
+	"os"
+	"strconv"
 	"sync"
 	"time"
 
 	"github.com/MaxHalford/eaopt"
 	"github.com/google/uuid"
 	"github.com/rickyfitts/distributed-evolution/go/api"
-	"github.com/rickyfitts/distributed-evolution/go/cache"
+	"github.com/rickyfitts/distributed-evolution/go/db"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
@@ -30,38 +31,30 @@ type WorkerTask struct {
 type Worker struct {
 	ID           uint32
 	NGenerations uint
-	Tasks        map[int]*WorkerTask
+	Tasks        map[uint32]*WorkerTask
 
-	cache cache.Cache
-	ga    *eaopt.GA
-	mu    sync.Mutex
+	db db.DB
+	ga *eaopt.GA
+	mu sync.Mutex
 }
 
-func (w *Worker) recoverTask(id int) {
-	snapshot, err := w.GetTaskSnapshot(id)
-	if err != nil {
-		fmt.Print("error recovering task: ", err)
-		return
-	}
-
-	w.RunTask(snapshot)
-}
-
-func (w *Worker) recoverTasks(ids []int) {
-	w.mu.Lock()
-	for _, id := range ids {
-		if _, ok := w.Tasks[id]; !ok {
-			go w.recoverTask(id)
-		}
-	}
-	w.mu.Unlock()
+// saves a task snapshot as a serialized JSON string to the cache
+func (w *Worker) saveTaskSnapshot(state *WorkerTask) {
+	task := state.Task
+	task.Population = w.ga.Populations[0]
+	w.db.SaveTask(task)
 }
 
 // RunTask executes the genetic algorithm for a given task
-func (w *Worker) RunTask(task api.Task) {
+func (w *Worker) RunTask(task api.Task, thread int) {
 	population := task.Population
+
 	task.Population = eaopt.Population{}
+	task.WorkerID = w.ID
+	task.Thread = thread
+
 	t := WorkerTask{Task: task}
+
 	// decode and save target image
 	img := util.DecodeImage(task.TargetImage)
 	width, height := util.GetImageDimensions(img)
@@ -73,45 +66,56 @@ func (w *Worker) RunTask(task api.Task) {
 
 	w.ga = createGA(task.Job, w.NGenerations)
 
-	// create clsoure functions with context
-	w.ga.Callback = w.createCallback(task.ID)
+	// create closure functions with context
+	w.ga.Callback = w.createCallback(task.ID, thread)
 	w.ga.EarlyStop = w.createEarlyStop(task.ID, task.Job.ID)
 	factory := getShapesFactory(&t, population)
 
 	w.Tasks[task.ID] = &t
 
+	task.UpdateMaster("inprogress")
+
 	// evolve
 	err := w.ga.Minimize(factory)
 	if err != nil {
-		fmt.Println(err)
+		log.Print(err)
 	}
 }
 
 func Run() {
 	w := Worker{
 		ID:           uuid.New().ID(),
-		cache:        cache.NewConnection(),
+		db:           db.NewConnection(),
 		NGenerations: 1000000000000, // 1 trillion
-		Tasks:        map[int]*WorkerTask{},
+		Tasks:        map[uint32]*WorkerTask{},
+	}
+
+	nThreads, err := strconv.Atoi(os.Getenv("THREADS"))
+	if err != nil {
+		log.Fatalf("invalid THREADS value: %v", err)
 	}
 
 	// wait for master to initialize
 	time.Sleep(10 * time.Second)
 
-	for {
-		task, err := api.GetTask(w.ID)
+	for i := 0; i < nThreads; i++ {
+		go func(thread int) {
+			for {
+				task, err := w.db.PullTask()
 
-		if err == nil && task.Generation != 0 {
-			log.Print("assigned task ", task.ID)
-			w.RunTask(task)
-			log.Print("finished task ", task.ID)
-		} else if err != nil {
-			// TODO change to log.Print for fault tolerance
-			log.Fatal("error: ", err)
-		} else {
-			log.Print("empty task response, waiting for work")
-		}
+				if err == nil && task.Generation != 0 {
+					log.Print("assigned task ", task.ID)
+					w.RunTask(task, thread)
+					log.Print("finished task ", task.ID)
+				} else if err != nil {
+					// TODO change to log.Print for fault tolerance
+					log.Print("error: ", err)
+				} else {
+					log.Print("empty task response, waiting for work")
+				}
 
-		time.Sleep(time.Second)
+				time.Sleep(10 * time.Second)
+			}
+		}(i)
 	}
 }

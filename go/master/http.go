@@ -16,11 +16,12 @@ import (
 )
 
 type State struct {
-	Generation  uint       `json:"generation"`
-	NumWorkers  int        `json:"numWorkers"`
-	Output      string     `json:"output"`
-	TargetImage string     `json:"targetImage"`
-	Tasks       []api.Task `json:"tasks"`
+	Generation       uint                 `json:"generation"`
+	NumWorkers       int                  `json:"numWorkers"`
+	Output           string               `json:"output"`
+	TargetImage      string               `json:"targetImage"`
+	Tasks            map[uint32]*api.Task `json:"tasks"`
+	ThreadsPerWorker int                  `json:"threadsPerWorker"`
 }
 
 var upgrader = websocket.Upgrader{
@@ -56,21 +57,20 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode and save target image
-	m.TargetImage = util.Image{Image: util.DecodeImage(job.TargetImage)}
 	m.TargetImageBase64 = job.TargetImage
+	m.setTargetImage(util.DecodeImage(job.TargetImage))
 
 	// save the job with a new ID
 	m.Job = job
 	m.Job.ID = uuid.New().ID()
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
 
-	// reset state and generate tasks
-	m.Generations = Generations{}
 	m.generateTasks()
 
 	response := State{
-		NumWorkers: m.NumWorkers,
-		Tasks:      append([]api.Task{}, m.Tasks...),
+		NumWorkers:       m.NumWorkers,
+		Tasks:            m.Tasks,
+		ThreadsPerWorker: m.ThreadsPerWorker,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -147,7 +147,7 @@ func (m *Master) sendOutput(output *gg.Context, generation uint) {
 	state := State{
 		Generation: generation,
 		Output:     util.EncodeImage(img),
-		Tasks:      append([]api.Task{}, m.Tasks...),
+		Tasks:      m.Tasks,
 	}
 
 	if err := m.conn.WriteJSON(state); err != nil {
@@ -155,17 +155,6 @@ func (m *Master) sendOutput(output *gg.Context, generation uint) {
 	}
 
 	m.lastUpdate = time.Now()
-}
-
-// sends the given generation's output image to the UI
-func (m *Master) updateUICombined(generation Generation) {
-	m.sendOutput(generation.Output, generation.Generation)
-}
-
-// draws the latest generations to a single image
-func (m *Master) updateUILatest() {
-	latest := m.getLatestGeneration()
-	m.sendOutput(latest.Output, latest.Generation)
 }
 
 // handles requests from the ui and websocket communication

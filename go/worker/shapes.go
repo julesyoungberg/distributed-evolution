@@ -85,44 +85,32 @@ func (s Shapes) Draw(dc *gg.Context, offset util.Vector) {
 
 // evaluates the fitness of the shapes instance
 func (s Shapes) Evaluate() (float64, error) {
-	// draw shapes
-	var img image.Image
-	var out image.Image
+	// account for overdraw here
+	overDraw := s.Context.Task.Job.OverDraw
+	width := s.Context.TargetImage.Width + overDraw*2
+	height := s.Context.TargetImage.Height + overDraw*2
+	dc := gg.NewContext(width, height)
 
-	if s.Context.Task.Job.DrawOnce {
-		// if we are drawing once we need to account for overdraw here
-		overDraw := s.Context.Task.Job.OverDraw
-		width := s.Context.TargetImage.Width + overDraw*2
-		height := s.Context.TargetImage.Height + overDraw*2
-		dc := gg.NewContext(width, height)
+	s.Draw(dc, util.Vector{X: float64(overDraw), Y: float64(overDraw)})
+	img := dc.Image()
 
-		s.Draw(dc, util.Vector{X: float64(overDraw), Y: float64(overDraw)})
-		img = dc.Image()
-
-		rect := image.Rect(overDraw, overDraw, width-overDraw, height-overDraw)
-		out = util.GetSubImage(img, rect)
-	} else {
-		dc := gg.NewContext(s.Context.TargetImage.Width, s.Context.TargetImage.Height)
-		s.Draw(dc, util.Vector{X: 0, Y: 0})
-		out = dc.Image()
-	}
+	rect := image.Rect(overDraw, overDraw, width-overDraw, height-overDraw)
+	out := util.GetSubImage(img, rect)
 
 	// calculate fitness as the difference between the target and output images
 	fitness := imgDiff(rgbaImg(out), rgbaImg(s.Context.TargetImage.Image))
 
-	if s.Context.Task.Job.DrawOnce {
-		s.Context.mu.Lock()
+	s.Context.mu.Lock()
 
-		// if this is the best fit we've seen, save it
-		if fitness > s.Context.BestFit.Fitness {
-			s.Context.BestFit = Output{
-				Fitness: fitness,
-				Output:  img,
-			}
+	// if this is the best fit we've seen, save it
+	if fitness > s.Context.BestFit.Fitness {
+		s.Context.BestFit = Output{
+			Fitness: fitness,
+			Output:  img,
 		}
-
-		s.Context.mu.Unlock()
 	}
+
+	s.Context.mu.Unlock()
 
 	return fitness, nil
 }
