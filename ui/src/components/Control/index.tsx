@@ -87,7 +87,7 @@ export default function Control() {
         setLoading(true)
 
         const body = { ...config, targetImage: state.nextTargetImage }
-        console.log('body', body)
+        console.log('starting task body', body)
 
         const response = await fetch(`${publicRuntimeConfig.apiUrl}/job`, {
             method: 'POST',

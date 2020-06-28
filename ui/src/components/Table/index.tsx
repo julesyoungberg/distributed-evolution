@@ -65,10 +65,11 @@ export default function Table() {
 
         console.log('response', response)
 
-        dispatch({
-            type: 'update',
-            payload: await response.json().catch(() => response.text()),
-        })
+        const data = await response.json().catch(() => response.text())
+
+        console.log('data', data)
+
+        dispatch({ type: 'update', payload: data })
     }
 
     return (
