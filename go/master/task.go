@@ -76,6 +76,7 @@ func (m *Master) generateTasks() {
 					log.Fatal(err)
 				}
 
+				// TODO - set attempt 1
 				task := api.Task{
 					Connected:   true,
 					Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},

@@ -15,6 +15,7 @@ func (m *Master) recover(id int) {
 		return
 	}
 
+	// TODO incriment attempt and save to DB
 	m.Tasks[id].Status = "recovering"
 	m.Tasks[id].Connected = true
 	m.mu.Unlock()
@@ -31,12 +32,12 @@ func (m *Master) recover(id int) {
 }
 
 // check that each inprogress task is active by checking its last update
-// if a task timesout, mark it as failed and begin recovery process
+// if a task times out, mark it as failed and begin recovery process
 func (m *Master) detectFailures() {
-	timeout := 30 * time.Second
+	timeout := 10 * time.Second
 
 	for {
-		time.Sleep(timeout / 2)
+		time.Sleep(timeout / 4)
 
 		m.mu.Lock()
 

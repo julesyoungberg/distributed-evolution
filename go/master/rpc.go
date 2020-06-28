@@ -13,6 +13,7 @@ import (
 )
 
 // handles a progress update from a worker, updates the state, and updates the ui
+// TODO handle mismatching attempt numbers to handle incorrect duplicate task execution
 func (m *Master) Update(args, reply *api.Task) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
