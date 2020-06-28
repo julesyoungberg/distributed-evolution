@@ -23,6 +23,7 @@ type Master struct {
 
 	db                 db.DB
 	conn               *websocket.Conn
+	connMu             sync.Mutex
 	lastUpdate         time.Time
 	mu                 sync.Mutex
 	wsHeartbeatTimeout time.Duration

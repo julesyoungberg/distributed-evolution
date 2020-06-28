@@ -29,19 +29,19 @@ var upgrader = websocket.Upgrader{
 // by periodically sending a message
 func (m *Master) keepAlive(c *websocket.Conn) {
 	for {
-		m.mu.Lock()
+		m.connMu.Lock()
 
 		if time.Since(m.lastUpdate) > m.wsHeartbeatTimeout {
 			err := c.WriteMessage(websocket.PingMessage, []byte("keepalive"))
 			if err != nil {
-				m.mu.Unlock()
+				m.connMu.Unlock()
 				return
 			}
 
 			m.lastUpdate = time.Now()
 		}
 
-		m.mu.Unlock()
+		m.connMu.Unlock()
 
 		time.Sleep(200 * time.Millisecond)
 	}
@@ -60,7 +60,7 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.mu.Lock()
+	m.connMu.Lock()
 
 	log.Printf("new websocket connection request")
 
@@ -72,18 +72,24 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	m.mu.Unlock()
+	m.connMu.Unlock()
 
 	go m.keepAlive(conn)
 }
 
 func (m *Master) sendOutput(output *gg.Context, generation uint) {
-	m.lastUpdate = time.Now()
+	m.connMu.Lock()
+	defer m.connMu.Unlock()
 
 	if m.conn == nil {
 		// no open connections
 		return
 	}
+
+	m.mu.Lock()
+	m.lastUpdate = time.Now()
+	tasks := m.Tasks
+	m.mu.Unlock()
 
 	// get resulting image
 	img, err := util.EncodeImage(output.Image())
@@ -96,12 +102,10 @@ func (m *Master) sendOutput(output *gg.Context, generation uint) {
 	state := State{
 		Generation: generation,
 		Output:     img,
-		Tasks:      m.Tasks,
+		Tasks:      tasks,
 	}
 
 	if err := m.conn.WriteJSON(state); err != nil {
 		log.Println(err)
 	}
-
-	m.lastUpdate = time.Now()
 }
