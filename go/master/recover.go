@@ -29,7 +29,6 @@ func (m *Master) recover(id int) {
 // if a task timesout, mark it as failed and begin recovery process
 func (m *Master) detectFailures() {
 	timeout := 30 * time.Second
-	queueTimeout := timeout * 2
 
 	for {
 		time.Sleep(timeout / 2)
@@ -37,11 +36,7 @@ func (m *Master) detectFailures() {
 		m.mu.Lock()
 
 		for i, t := range m.Tasks {
-			since := time.Since(t.LastUpdate)
-			timedout := t.Status == "inprogress" && since > timeout
-			timedout = timedout || (t.Status == "queued" && since > queueTimeout)
-
-			if timedout {
+			if t.Status == "inprogress" && time.Since(t.LastUpdate) > timeout {
 				util.DPrintf("[failure detector] task %v timed out! recovering...", i)
 				m.Tasks[i].Status = "failed"
 				go m.recover(i)

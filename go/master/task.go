@@ -96,6 +96,8 @@ func (m *Master) generateTasks() {
 				if e != nil {
 					// let it timeout and try again
 					log.Fatalf("[task generator] error pushing task to task queue: %v", e)
+					// HACKY - set status to inprogress and let it timeout
+					m.Tasks[task.ID].Status = "inprogress"
 				}
 			}(x, y)
 		}

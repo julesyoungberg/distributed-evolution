@@ -46,8 +46,6 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.mu.Lock()
-
 	log.Printf("starting new job")
 
 	// decode request body as job config
@@ -56,20 +54,21 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("error decoding new job request body")
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		m.mu.Unlock()
 		return
 	}
 
 	// decode and save target image
-	m.TargetImageBase64 = job.TargetImage
+	base64 := job.TargetImage
 	img, err := util.DecodeImage(job.TargetImage)
 	if err != nil {
 		log.Printf("error decoding target image")
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		m.mu.Unlock()
 		return
 	}
 
+	m.mu.Lock()
+
+	m.TargetImageBase64 = base64
 	m.setTargetImage(img)
 
 	// save the job with a new ID
@@ -87,6 +86,12 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 
 func (m *Master) disconnectTask(w http.ResponseWriter, r *http.Request) {
 	cors(w)
+
+	// ignore preflight request
+	if r.Method == http.MethodOptions {
+		return
+	}
+
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	if err != nil {
