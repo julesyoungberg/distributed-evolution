@@ -10,6 +10,11 @@ import (
 // recovers a failed task by fetching the
 func (m *Master) recover(id int) {
 	m.mu.Lock()
+	if m.Tasks[id].Status != "failed" {
+		m.mu.Unlock()
+		return
+	}
+
 	m.Tasks[id].Status = "recovering"
 	m.Tasks[id].Connected = true
 	m.mu.Unlock()
