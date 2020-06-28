@@ -28,6 +28,9 @@ func (m *Master) getTaskRect(x, y, colWidth, rowWidth int) (image.Rectangle, uti
 
 // populates the task queue with tasks, where each is a slice of the target image
 func (m *Master) generateTasks() {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	log.Printf("[task generator] %v workers with %v threads each available, generating tasks...", m.NumWorkers, m.ThreadsPerWorker)
 
 	m.Tasks = map[int]*api.Task{}
@@ -49,6 +52,7 @@ func (m *Master) generateTasks() {
 	}
 
 	// create a task for each slice of the image
+	// TODO slice tasks concurrently
 	for y := 0; y < int(N); y++ {
 		for x := 0; x < int(M); x++ {
 			rect, offset := m.getTaskRect(x, y, colWidth, rowWidth)
@@ -73,11 +77,13 @@ func (m *Master) generateTasks() {
 				Type:        "polygons",
 			}
 
-			err = m.db.PushTask(task)
-			if err != nil {
-				// let it timeout and try again
-				log.Fatalf("[task generator] error pushing task to task queue: %v", err)
-			}
+			go func() {
+				e := m.db.PushTask(task)
+				if e != nil {
+					// let it timeout and try again
+					log.Fatalf("[task generator] error pushing task to task queue: %v", e)
+				}
+			}()
 
 			m.Tasks[task.ID] = &task
 		}
