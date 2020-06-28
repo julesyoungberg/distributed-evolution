@@ -18,6 +18,23 @@ func cors(w http.ResponseWriter) {
 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding")
 }
 
+func (m *Master) respondWithState(w http.ResponseWriter) {
+	m.mu.Lock()
+
+	response := State{
+		NumWorkers:       m.NumWorkers,
+		Tasks:            m.Tasks,
+		ThreadsPerWorker: m.ThreadsPerWorker,
+	}
+
+	m.mu.Unlock()
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 // handler for POST /job requests
 // abandons current job and start on the new one
 func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +47,6 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	}
 
 	m.mu.Lock()
-	defer m.mu.Unlock()
 
 	log.Printf("starting new job")
 
@@ -40,6 +56,7 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("error decoding new job request body")
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		m.mu.Unlock()
 		return
 	}
 
@@ -49,6 +66,7 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("error decoding target image")
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		m.mu.Unlock()
 		return
 	}
 
@@ -60,19 +78,11 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.Job.ID = newID
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
 
+	m.mu.Unlock()
+
 	m.generateTasks()
 
-	response := State{
-		NumWorkers:       m.NumWorkers,
-		Tasks:            m.Tasks,
-		ThreadsPerWorker: m.ThreadsPerWorker,
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	m.respondWithState(w)
 }
 
 func (m *Master) disconnectTask(w http.ResponseWriter, r *http.Request) {
@@ -90,6 +100,8 @@ func (m *Master) disconnectTask(w http.ResponseWriter, r *http.Request) {
 	m.mu.Lock()
 	m.Tasks[id].Connected = false
 	m.mu.Unlock()
+
+	m.respondWithState(w)
 }
 
 // handles requests from the ui and websocket communication

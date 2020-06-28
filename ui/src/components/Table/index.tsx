@@ -7,7 +7,6 @@ import DataTable from 'react-data-table-component'
 import { Button } from 'rebass'
 
 import useAppState from '../../hooks/useAppState'
-
 import { Theme } from '../../theme'
 
 const { publicRuntimeConfig } = getConfig()
@@ -53,7 +52,7 @@ const ConnectionButton = styled(Button)<{ disabled: boolean }, Theme>`
 `
 
 export default function Table() {
-    const { state } = useAppState()
+    const { dispatch, state } = useAppState()
 
     const now = new Date().getTime()
 
@@ -64,7 +63,12 @@ export default function Table() {
         
         const response = await fetch(`${publicRuntimeConfig.apiUrl}/${path}`)
 
-        console.log(response, response)
+        console.log('response', response)
+
+        dispatch({
+            type: 'update',
+            payload: await response.json().catch(() => response.text()),
+        })
     }
 
     return (
