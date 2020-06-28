@@ -4,6 +4,7 @@ import (
 	"image"
 	"log"
 	"math"
+	"sync"
 
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
@@ -28,8 +29,13 @@ func (m *Master) getTaskRect(x, y, colWidth, rowWidth int) (image.Rectangle, uti
 
 // populates the task queue with tasks, where each is a slice of the target image
 func (m *Master) generateTasks() {
+	err := m.db.Flush()
+	if err != nil {
+		log.Printf("[task generator] failed to flush db: %v", err)
+		return
+	}
+
 	m.mu.Lock()
-	defer m.mu.Unlock()
 
 	log.Printf("[task generator] %v workers with %v threads each available, generating tasks...", m.NumWorkers, m.ThreadsPerWorker)
 
@@ -45,49 +51,59 @@ func (m *Master) generateTasks() {
 
 	log.Printf("[task generator] splitting image into %v %vpx cols and %v %vpx rows", N, colWidth, M, rowWidth)
 
-	err := m.db.Flush()
-	if err != nil {
-		log.Printf("[task generator] failed to flush db: %v", err)
-		return
-	}
+	targetImage := m.TargetImage.Image
+	job := m.Job
+
+	m.mu.Unlock()
+
+	var wg sync.WaitGroup
 
 	// create a task for each slice of the image
-	// TODO slice tasks concurrently
 	for y := 0; y < int(N); y++ {
 		for x := 0; x < int(M); x++ {
-			rect, offset := m.getTaskRect(x, y, colWidth, rowWidth)
+			wg.Add(1)
 
-			subImg := util.GetSubImage(m.TargetImage.Image, rect)
-			bounds := subImg.Bounds()
+			go func(x, y int) {
+				defer wg.Done()
 
-			encoded, err := util.EncodeImage(subImg)
-			if err != nil {
-				log.Fatal(err)
-			}
+				rect, offset := m.getTaskRect(x, y, colWidth, rowWidth)
 
-			task := api.Task{
-				Connected:   true,
-				Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},
-				Generation:  1,
-				ID:          y*int(M) + x + 1,
-				Job:         m.Job,
-				Offset:      offset,
-				Status:      "queued",
-				TargetImage: encoded,
-				Type:        "polygons",
-			}
+				subImg := util.GetSubImage(targetImage, rect)
+				bounds := subImg.Bounds()
 
-			go func() {
+				encoded, err := util.EncodeImage(subImg)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				task := api.Task{
+					Connected:   true,
+					Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},
+					Generation:  1,
+					ID:          y*int(M) + x + 1,
+					Job:         job,
+					Offset:      offset,
+					Status:      "queued",
+					TargetImage: encoded,
+					Type:        "polygons",
+				}
+
+				m.mu.Lock()
+				m.Tasks[task.ID] = &task
+				m.mu.Unlock()
+
 				e := m.db.PushTask(task)
 				if e != nil {
 					// let it timeout and try again
 					log.Fatalf("[task generator] error pushing task to task queue: %v", e)
 				}
-			}()
-
-			m.Tasks[task.ID] = &task
+			}(x, y)
 		}
 	}
 
+	wg.Wait()
+
+	m.mu.Lock()
 	log.Printf("[task generator] %v tasks created", len(m.Tasks))
+	m.mu.Unlock()
 }
