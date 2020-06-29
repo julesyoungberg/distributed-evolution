@@ -7,11 +7,12 @@ services:
             context: .
             dockerfile: ./master.Dockerfile
         environment: 
-            DB_URL: db:6379
             HTTP_PORT: 9000
             WORKERS: 5
             WORKER_THREADS: 5
+            REDIS_MASTER_NAME: mymaster
             RPC_PORT: 8080
+            SENTINEL_ADDRESS: sentinel:26379
         ports:
             - 9000:9000
             - 8080
@@ -20,13 +21,12 @@ services:
             context: .
             dockerfile: ./worker.Dockerfile
         environment: 
-            DB_URL: db:6379
             MASTER_URL: master:8080
+            REDIS_MASTER_NAME: mymaster
+            SENTINEL_ADDRESS: sentinel:26379
             THREADS: 5
     ui:
-        build:
-            context: .
-            dockerfile: ./ui.Dockerfile
+        build: ui
         environment: 
             API_URL: http://localhost:9000
             CHANNEL_URL: ws://localhost:9000/subscribe
@@ -39,16 +39,27 @@ services:
             - ./ui/:/app
             - /app/node_modules/
             - /app/.next
-    db:
-        image: redis
+    redis-master:
+        image: redis:3
         ports:
-            - 6379:6379
-        volumes:
-            - ./redis.conf:/usr/local/etc/redis/redis.conf
-        command: redis-server /usr/local/etc/redis/redis.conf
-        # networks:
-        #     node_net:
-        #         ipv4_address: 172.28.1.4
+            - 6379
+    redis-slave:
+        image: redis:3
+        command: redis-server --slaveof redis-master 6379
+        links:
+            - redis-master
+        ports:
+            - 6379
+    sentinel:
+        build: sentinel
+        environment:
+            - SENTINEL_DOWN_AFTER=5000
+            - SENTINEL_FAILOVER=5000
+        links:
+            - redis-master
+            - redis-slave:slave
+        ports:
+            - 26379
 
 networks:
     default:

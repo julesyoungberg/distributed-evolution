@@ -24,6 +24,8 @@
     - precompute pieces
     - run line detection on target image - https://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html
 
+redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/
+
 ## Deployment
 https://kubernetes.io/docs/tutorials/configuration/configure-redis-using-configmap/
 https://www.callicoder.com/deploy-multi-container-go-redis-app-kubernetes/

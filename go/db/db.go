@@ -18,11 +18,13 @@ type DB struct {
 	Client *redis.Client
 }
 
+// TODO - set username and password!
 func NewConnection() DB {
-	client := redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("DB_URL"),
-		Password: "",
-		DB:       0,
+	client := redis.NewFailoverClient(&redis.FailoverOptions{
+		MasterName:    os.Getenv("REDIS_MASTER_NAME"),
+		SentinelAddrs: []string{os.Getenv("SENTINEL_ADDRESS")},
+		Password:      "",
+		DB:            0,
 	})
 
 	return DB{Client: client}
