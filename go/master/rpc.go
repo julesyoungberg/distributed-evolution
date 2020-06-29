@@ -13,7 +13,6 @@ import (
 )
 
 // handles a progress update from a worker, updates the state, and updates the ui
-// TODO handle mismatching attempt numbers to handle incorrect duplicate task execution
 func (m *Master) Update(args, reply *api.Task) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -27,8 +26,20 @@ func (m *Master) Update(args, reply *api.Task) error {
 	reply.Job.ID = m.Job.ID
 
 	if args.Job.ID != m.Job.ID {
-		log.Printf("worker %v is out of date", args.WorkerID)
+		log.Printf("error! worker %v is out of date", args.WorkerID)
 		return nil
+	}
+
+	if task.WorkerID == 0 {
+		task.WorkerID = args.WorkerID
+		reply.WorkerID = args.WorkerID
+	} else {
+		reply.WorkerID = task.WorkerID
+
+		if args.WorkerID != task.WorkerID {
+			log.Printf("error! worker %v claims to be working on task %v, but worker %v is working on it", args.WorkerID, task.ID, task.WorkerID)
+			return nil
+		}
 	}
 
 	task.Connected = true

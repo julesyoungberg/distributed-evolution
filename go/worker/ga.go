@@ -82,6 +82,11 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 			state.Task.Job.ID = task.Job.ID
 		}
 
+		if state.Task.WorkerID != task.WorkerID {
+			log.Printf("[thread %v] out of date - task %v is now being worked on by worker %v", thread, state.Task.ID, task.WorkerID)
+			state.Task.WorkerID = task.WorkerID
+		}
+
 		w.mu.Lock()
 		w.Tasks[id] = state
 		w.mu.Unlock()
@@ -92,9 +97,11 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 func (w *Worker) createEarlyStop(taskID int, jobID int) func(ga *eaopt.GA) bool {
 	return func(ga *eaopt.GA) bool {
 		w.mu.Lock()
-		id := w.Tasks[taskID].Task.Job.ID
+		id := w.ID
+		jID := w.Tasks[taskID].Task.Job.ID
+		workerID := w.Tasks[taskID].Task.WorkerID
 		defer w.mu.Unlock()
 
-		return id != jobID
+		return jID != jobID || workerID != id
 	}
 }

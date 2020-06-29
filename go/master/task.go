@@ -5,6 +5,7 @@ import (
 	"log"
 	"math"
 	"sync"
+	"time"
 
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
@@ -76,13 +77,13 @@ func (m *Master) generateTasks() {
 					log.Fatal(err)
 				}
 
-				// TODO - set attempt 1
 				task := api.Task{
 					Connected:   true,
 					Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},
 					Generation:  1,
 					ID:          y*int(M) + x + 1,
 					Job:         job,
+					LastUpdate:  time.Now(),
 					Offset:      offset,
 					Status:      "queued",
 					TargetImage: encoded,

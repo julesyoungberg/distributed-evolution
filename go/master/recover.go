@@ -15,9 +15,10 @@ func (m *Master) recover(id int) {
 		return
 	}
 
-	// TODO incriment attempt and save to DB
-	m.Tasks[id].Status = "recovering"
-	m.Tasks[id].Connected = true
+	task := m.Tasks[id]
+	task.Status = "recovering"
+	task.Connected = true
+	task.WorkerID = 0
 	m.mu.Unlock()
 
 	err := m.db.PushTaskID(m.Tasks[id].ID)

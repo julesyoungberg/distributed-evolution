@@ -48,7 +48,6 @@ func (m *Master) keepAlive(c *websocket.Conn) {
 }
 
 // subscribe handler creates a websocket connection with the client
-// TODO create connection mutex not to block other tasks
 // TODO handle multiple connections
 func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 	// TODO check
