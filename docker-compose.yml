@@ -57,7 +57,7 @@ services:
             - SENTINEL_FAILOVER=5000
         links:
             - redis-master
-            - redis-slave:slave
+            - redis-slave
         ports:
             - 26379
 
