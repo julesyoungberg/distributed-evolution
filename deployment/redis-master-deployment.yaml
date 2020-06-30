@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-kompose.yml
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: redis-master
+  name: redis-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: redis-master
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-kompose.yml
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/distributed-ga: "true"
+        io.kompose.service: redis-master
+    spec:
+      containers:
+      - image: redis:3
+        imagePullPolicy: ""
+        name: redis-master
+        ports:
+        - containerPort: 6379
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}

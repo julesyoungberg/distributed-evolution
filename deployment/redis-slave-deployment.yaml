@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-kompose.yml
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: redis-slave
+  name: redis-slave
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: redis-slave
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-kompose.yml
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/distributed-ga: "true"
+        io.kompose.service: redis-slave
+    spec:
+      containers:
+      - args:
+        - redis-server
+        - --slaveof
+        - redis-master
+        - "6379"
+        image: redis:3
+        imagePullPolicy: ""
+        name: redis-slave
+        ports:
+        - containerPort: 6379
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}

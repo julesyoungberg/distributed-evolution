@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-kompose.yml
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sentinel
+  name: sentinel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: sentinel
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-kompose.yml
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/distributed-ga: "true"
+        io.kompose.service: sentinel
+    spec:
+      containers:
+      - env:
+        - name: SENTINEL_DOWN_AFTER
+          value: "5000"
+        - name: SENTINEL_FAILOVER
+          value: "5000"
+        image: julesyoungberg/distributed-evolution-sentinel
+        imagePullPolicy: ""
+        name: sentinel
+        ports:
+        - containerPort: 26379
+        resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}
