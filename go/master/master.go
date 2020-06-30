@@ -48,7 +48,7 @@ func Run() {
 			CrossRate:    0.2,
 			MutationRate: 0.021,
 			NumShapes:    300,
-			OverDraw:     10,
+			OverDraw:     20,
 			PoolSize:     10,
 			PopSize:      50,
 			ShapeSize:    30,

@@ -38,7 +38,8 @@ func (m *Master) generateTasks() {
 
 	m.mu.Lock()
 
-	log.Printf("[task generator] %v workers with %v threads each available, generating tasks...", m.NumWorkers, m.ThreadsPerWorker)
+	log.Printf("[task generator] %v workers with %v threads each available", m.NumWorkers, m.ThreadsPerWorker)
+	log.Printf("[task generator] generating tasks for job %v", m.Job.ID)
 
 	m.Tasks = map[int]*api.Task{}
 

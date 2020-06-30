@@ -17,17 +17,21 @@ func (m *Master) Update(args, reply *api.Task) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	task := m.Tasks[args.ID]
-
-	if task.Status == "inprogress" && !task.Connected {
-		return fmt.Errorf("disconnected")
-	}
-
 	reply.Job.ID = m.Job.ID
 
 	if args.Job.ID != m.Job.ID {
 		log.Printf("error! worker %v is out of date", args.WorkerID)
+		log.Printf("args.Job.ID: %v, m.Job.ID: %v", args.Job.ID, m.Job.ID)
 		return nil
+	}
+
+	task := m.Tasks[args.ID]
+	if task == nil {
+		return nil
+	}
+
+	if task.Status == "inprogress" && !task.Connected {
+		return fmt.Errorf("disconnected")
 	}
 
 	if task.WorkerID == 0 {

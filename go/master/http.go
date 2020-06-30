@@ -38,7 +38,6 @@ func (m *Master) respondWithState(w http.ResponseWriter) {
 // handler for POST /job requests
 // abandons current job and start on the new one
 func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
-	log.Printf("##### New Job Request - %v #####", http.MethodOptions)
 	cors(w)
 
 	// ignore preflight request
@@ -46,7 +45,7 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("starting new job")
+	log.Print("##### new job request #####")
 
 	// decode request body as job config
 	var job api.Job

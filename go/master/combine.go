@@ -10,24 +10,34 @@ import (
 
 // periodically read all tasks from db, combine results, save and update ui
 func (m *Master) combine() {
+	m.mu.Lock()
+	jobId := m.Job.ID
+	m.mu.Unlock()
+
 	for {
 		time.Sleep(5 * time.Second)
 
-		// log.Printf("[combiner] getting task IDs")
-
 		m.mu.Lock()
+
+		if m.Job.ID != jobId {
+			jobId = m.Job.ID
+			m.mu.Unlock()
+			continue
+		}
+
+		// get task ids
 		ids := []int{}
 		for id := range m.Tasks {
 			ids = append(ids, id)
 		}
+
 		m.mu.Unlock()
 
 		dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
 
 		var latest uint = 0
 
-		// log.Printf("[combiner] combining outputs")
-
+		// combine outputs
 		for _, id := range ids {
 			task, err := m.db.GetTask(id)
 			if err != nil || task.ID == 0 {
@@ -48,8 +58,6 @@ func (m *Master) combine() {
 
 			dc.DrawImageAnchored(img, centerX, centerY, 0.5, 0.5)
 		}
-
-		// log.Printf("[combiner] sending output")
 
 		m.sendOutput(dc, latest)
 	}

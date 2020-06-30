@@ -5,7 +5,6 @@ import (
 
 	"github.com/MaxHalford/eaopt"
 	"github.com/rickyfitts/distributed-evolution/go/api"
-	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
 // initialize GA
@@ -41,55 +40,20 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 		state := w.Tasks[id]
 		w.mu.Unlock()
 
-		// get best fit
-		bestFit := ga.HallOfFame[0]
-
-		output := state.BestFit.Output
-
-		if output == nil {
-			log.Printf("[thread %v] error! best fit image is nil at generation %v - bestFit: %v", thread, ga.Generations, state.BestFit)
-			return
-		}
-
-		encoded, err := util.EncodeImage(output)
-		if err != nil {
-			log.Printf("[thread %v] error saving task: %v", thread, err)
-			return
-		}
-
-		state.Task.Output = encoded
-		bestFit.Genome = api.Shapes{}
-
-		// clear state
-		state.BestFit = api.Output{}
-
-		// add data to the task
-		state.Task.BestFit = bestFit
 		state.Task.Generation = state.GenOffset + ga.Generations
 
-		w.saveTaskSnapshot(state, thread)
-
-		task, err := state.Task.UpdateMaster("inprogress")
-		if err != nil {
-			log.Printf("[thread %v] failed to update master %v", thread, err)
-			state.Task.Job.ID = 0
+		success := w.updateMaster(state, thread)
+		if !success {
 			return
 		}
 
-		// if the master responded with a different job id we are out of date
-		if state.Task.Job.ID != task.Job.ID {
-			log.Printf("[thrad %v] out of date job of %v, updating to %v", thread, state.Task.Job.ID, task.Job.ID)
-			state.Task.Job.ID = task.Job.ID
-		}
+		go func() {
+			w.updateTask(state, ga, thread)
 
-		if state.Task.WorkerID != task.WorkerID {
-			log.Printf("[thread %v] out of date - task %v is now being worked on by worker %v", thread, state.Task.ID, task.WorkerID)
-			state.Task.WorkerID = task.WorkerID
-		}
-
-		w.mu.Lock()
-		w.Tasks[id] = state
-		w.mu.Unlock()
+			w.mu.Lock()
+			w.Tasks[id] = state
+			w.mu.Unlock()
+		}()
 	}
 }
 

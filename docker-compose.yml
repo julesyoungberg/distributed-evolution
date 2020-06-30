@@ -12,7 +12,7 @@ services:
             WORKER_THREADS: 5
             REDIS_MASTER_NAME: mymaster
             RPC_PORT: 8080
-            SENTINEL_ADDRESS: sentinel:26379
+            SENTINELS: distributed-evolution_sentinel_1:26379,distributed-evolution_sentinel_2:26379,distributed-evolution_sentinel_3:26379
         ports:
             - 9000:9000
             - 8080
@@ -23,7 +23,7 @@ services:
         environment: 
             MASTER_URL: master:8080
             REDIS_MASTER_NAME: mymaster
-            SENTINEL_ADDRESS: sentinel:26379
+            SENTINELS: distributed-evolution_sentinel_1:26379,distributed-evolution_sentinel_2:26379,distributed-evolution_sentinel_3:26379
             THREADS: 5
     ui:
         build: ui

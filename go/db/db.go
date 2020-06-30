@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/rickyfitts/distributed-evolution/go/api"
@@ -22,7 +23,7 @@ type DB struct {
 func NewConnection() DB {
 	client := redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:    os.Getenv("REDIS_MASTER_NAME"),
-		SentinelAddrs: []string{os.Getenv("SENTINEL_ADDRESS")},
+		SentinelAddrs: strings.Split(os.Getenv("SENTINELS"), ","),
 		Password:      "",
 		DB:            0,
 	})

@@ -8,19 +8,9 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
-// saves a task snapshot as a serialized JSON string to the cache
-func (w *Worker) saveTaskSnapshot(state *api.WorkerTask, thread int) {
-	task := state.Task
-	task.Population = w.ga.Populations[0].Individuals
-	err := w.db.SaveTask(task)
-	if err != nil {
-		log.Printf("[thread %v] error saving task %v snapshot: %v", thread, task.ID, err)
-	}
-}
-
 // RunTask executes the genetic algorithm for a given task
 func (w *Worker) RunTask(task api.Task, thread int) {
-	log.Printf("[thread %v] assigned task %v with population len: %v", thread, task.ID, len(task.Population))
+	log.Printf("[thread %v] assigned task %v of job %v with population len: %v", thread, task.ID, task.Job.ID, len(task.Population))
 
 	population := task.Population
 	task.WorkerID = w.ID
@@ -31,7 +21,7 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	// decode and save target image
 	img, err := util.DecodeImage(task.TargetImage)
 	if err != nil {
-		log.Printf("[thrad %v] error decoding task target image: %v", thread, err)
+		log.Printf("[thread %v] error decoding task target image: %v", thread, err)
 		return
 	}
 
@@ -60,4 +50,66 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	if err != nil {
 		log.Print(err)
 	}
+}
+
+func (w *Worker) updateMaster(state *api.WorkerTask, thread int) bool {
+	task, err := state.Task.UpdateMaster("inprogress")
+	if err != nil {
+		log.Printf("[thread %v] failed to update master %v", thread, err)
+		state.Task.Job.ID = 0
+		return false
+	}
+
+	// if the master responded with a different job id we are out of date
+	if state.Task.Job.ID != task.Job.ID {
+		log.Printf("[thrad %v] out of date job of %v, updating to %v", thread, state.Task.Job.ID, task.Job.ID)
+		state.Task.Job.ID = task.Job.ID
+		return false
+	}
+
+	if state.Task.WorkerID != task.WorkerID {
+		log.Printf("[thread %v] out of date - task %v is now being worked on by worker %v", thread, state.Task.ID, task.WorkerID)
+		state.Task.WorkerID = task.WorkerID
+		return false
+	}
+
+	return true
+}
+
+// saves a task snapshot as a serialized JSON string to the cache
+func (w *Worker) saveTaskSnapshot(state *api.WorkerTask, thread int) {
+	task := state.Task
+	task.Population = w.ga.Populations[0].Individuals
+	err := w.db.SaveTask(task)
+	if err != nil {
+		log.Printf("[thread %v] error saving task %v snapshot: %v", thread, task.ID, err)
+	}
+}
+
+func (w *Worker) updateTask(state *api.WorkerTask, ga *eaopt.GA, thread int) {
+	// get best fit
+	bestFit := ga.HallOfFame[0]
+
+	output := state.BestFit.Output
+	if output == nil {
+		log.Printf("[thread %v] error! best fit image is nil at generation %v - bestFit: %v", thread, ga.Generations, state.BestFit)
+		return
+	}
+
+	encoded, err := util.EncodeImage(output)
+	if err != nil {
+		log.Printf("[thread %v] error saving task: %v", thread, err)
+		return
+	}
+
+	state.Task.Output = encoded
+	bestFit.Genome = api.Shapes{}
+
+	// clear state
+	state.BestFit = api.Output{}
+
+	// add data to the task
+	state.Task.BestFit = bestFit
+
+	w.saveTaskSnapshot(state, thread)
 }
