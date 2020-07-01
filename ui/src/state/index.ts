@@ -4,6 +4,7 @@ export type Status = 'active' | 'disconnected' | 'editing' | 'error' | 'idle'
 
 export interface State {
     error?: any
+    fitness?: number
     generation: number
     nextTargetImage?: string
     numWorkers?: number

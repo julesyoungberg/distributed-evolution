@@ -22,7 +22,7 @@ function handleUpdate(state: State, payload: Record<string, any>): Partial<State
 
     const nextState: Partial<State> = { status: state.status === 'editing' ? 'editing' : 'active' }
     
-    const fields = ['generation', 'numWorkers', 'output', 'targetImage', 'tasks']
+    const fields = ['fitness', 'generation', 'numWorkers', 'output', 'targetImage', 'tasks']
 
     fields.forEach(field => {
         if (payload[field]) nextState[field] = payload[field]

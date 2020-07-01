@@ -12,6 +12,7 @@ import (
 )
 
 type State struct {
+	Fitness          float64           `json:"fitness"`
 	Generation       uint              `json:"generation"`
 	NumWorkers       int               `json:"numWorkers"`
 	Output           string            `json:"output"`
@@ -76,7 +77,7 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 	go m.keepAlive(conn)
 }
 
-func (m *Master) sendOutput(output *gg.Context, generation uint) {
+func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64) {
 	m.connMu.Lock()
 	defer m.connMu.Unlock()
 
@@ -99,6 +100,7 @@ func (m *Master) sendOutput(output *gg.Context, generation uint) {
 
 	// send encoded image and current generation
 	state := State{
+		Fitness:    fitness,
 		Generation: generation,
 		Output:     img,
 		Tasks:      tasks,

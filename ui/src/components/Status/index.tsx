@@ -8,7 +8,7 @@ import Image from './Image'
 
 export default function Status() {
     const { state } = useAppState()
-    const { error, generation, nextTargetImage, output, status, targetImage } = state
+    const { error, fitness, generation, nextTargetImage, output, status, targetImage } = state
 
     if (['active', 'editing', 'idle'].includes(status)) {
         let targetSrc = status === 'editing' ? nextTargetImage : targetImage
@@ -16,7 +16,7 @@ export default function Status() {
         return (
             <Flex css={{ paddingBottom: 20 }}>
                 <Box width={1 / 2}>
-                    <Text fontSize={[3, 4, 5]} fontWeight='bold'>
+                    <Text css={{ marginTop: '38px' }} fontSize={[3, 4, 5]} fontWeight='bold'>
                         Target Image
                     </Text>
                     <Image src={targetSrc ? `data:image/jpg;base64, ${targetSrc}` : undefined} />
@@ -25,7 +25,7 @@ export default function Status() {
                 {['active', 'editing'].includes(status) && (
                     <Box width={1 / 2}>
                         <Text fontSize={[3, 4, 5]} fontWeight='bold'>
-                            Output - Generation: {generation}
+                            Output - Generation: {generation} - Fitness: {fitness}
                         </Text>
                         <Image src={output ? `data:image/png;base64, ${output}` : undefined} />
                     </Box>
@@ -40,6 +40,7 @@ export default function Status() {
                 paddingBottom: 20,
                 width: '100%',
                 height: 0,
+                marginTop: '76px',
                 paddingTop: '50%',
                 position: 'relative',
             }}

@@ -36,6 +36,7 @@ func (m *Master) combine() {
 		dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
 
 		var latest uint = 0
+		var fitness float64 = 0.0
 
 		// combine outputs
 		for _, id := range ids {
@@ -48,6 +49,8 @@ func (m *Master) combine() {
 				latest = task.Generation
 			}
 
+			fitness += task.BestFit.Fitness
+
 			img, err := util.DecodeImage(task.Output)
 			if err != nil {
 				continue
@@ -59,6 +62,8 @@ func (m *Master) combine() {
 			dc.DrawImageAnchored(img, centerX, centerY, 0.5, 0.5)
 		}
 
-		m.sendOutput(dc, latest)
+		fitness /= float64(len(ids))
+
+		m.sendOutput(dc, latest, fitness)
 	}
 }
