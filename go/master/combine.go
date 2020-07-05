@@ -33,6 +33,10 @@ func (m *Master) combine() {
 
 		m.mu.Unlock()
 
+		if len(ids) == 0 {
+			continue
+		}
+
 		dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
 
 		var latest uint = 0

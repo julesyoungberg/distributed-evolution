@@ -13,37 +13,30 @@ import (
 )
 
 // handles a progress update from a worker, updates the state, and updates the ui
-func (m *Master) Update(args, reply *api.Task) error {
+func (m *Master) UpdateTask(args, reply *api.Task) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	reply.Job.ID = m.Job.ID
-
 	if args.Job.ID != m.Job.ID {
-		log.Printf("error! worker %v is out of date", args.WorkerID)
-		log.Printf("args.Job.ID: %v, m.Job.ID: %v", args.Job.ID, m.Job.ID)
-		return nil
+		return fmt.Errorf("incorrect job ID")
 	}
 
 	task := m.Tasks[args.ID]
 	if task == nil {
-		return nil
+		return fmt.Errorf("task %v not found", args.ID)
 	}
 
 	if task.Status == "inprogress" && !task.Connected {
 		return fmt.Errorf("disconnected")
 	}
 
-	if task.WorkerID == 0 {
+	if task.WorkerID == 0 && task.Thread == 0 {
 		task.WorkerID = args.WorkerID
-		reply.WorkerID = args.WorkerID
-	} else {
-		reply.WorkerID = task.WorkerID
+		task.Thread = args.Thread
+	}
 
-		if args.WorkerID != task.WorkerID {
-			log.Printf("error! worker %v claims to be working on task %v, but worker %v is working on it", args.WorkerID, task.ID, task.WorkerID)
-			return nil
-		}
+	if args.WorkerID != task.WorkerID || args.Thread != task.Thread {
+		return fmt.Errorf("task %v is being worked on by thread %v of worker %v", task.ID, task.Thread, task.WorkerID)
 	}
 
 	task.Connected = true

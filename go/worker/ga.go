@@ -61,11 +61,9 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 func (w *Worker) createEarlyStop(taskID int, jobID int) func(ga *eaopt.GA) bool {
 	return func(ga *eaopt.GA) bool {
 		w.mu.Lock()
-		id := w.ID
 		jID := w.Tasks[taskID].Task.Job.ID
-		workerID := w.Tasks[taskID].Task.WorkerID
-		defer w.mu.Unlock()
+		w.mu.Unlock()
 
-		return jID != jobID || workerID != id
+		return jID != jobID
 	}
 }

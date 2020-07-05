@@ -40,7 +40,7 @@ func Run() {
 
 	var wg sync.WaitGroup
 
-	for i := 0; i < nThreads; i++ {
+	for i := 1; i <= nThreads; i++ {
 		wg.Add(1)
 
 		go func(thread int) {

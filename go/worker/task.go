@@ -53,23 +53,10 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 }
 
 func (w *Worker) updateMaster(state *api.WorkerTask, thread int) bool {
-	task, err := state.Task.UpdateMaster("inprogress")
+	err := state.Task.UpdateMaster("inprogress")
 	if err != nil {
-		log.Printf("[thread %v] failed to update master %v", thread, err)
+		log.Printf("[thread %v] failed to update master: %v", thread, err)
 		state.Task.Job.ID = 0
-		return false
-	}
-
-	// if the master responded with a different job id we are out of date
-	if state.Task.Job.ID != task.Job.ID {
-		log.Printf("[thrad %v] out of date job of %v, updating to %v", thread, state.Task.Job.ID, task.Job.ID)
-		state.Task.Job.ID = task.Job.ID
-		return false
-	}
-
-	if state.Task.WorkerID != task.WorkerID {
-		log.Printf("[thread %v] out of date - task %v is now being worked on by worker %v", thread, state.Task.ID, task.WorkerID)
-		state.Task.WorkerID = task.WorkerID
 		return false
 	}
 
@@ -92,7 +79,8 @@ func (w *Worker) updateTask(state *api.WorkerTask, ga *eaopt.GA, thread int) {
 
 	output := state.BestFit.Output
 	if output == nil {
-		log.Printf("[thread %v] error! best fit image is nil at generation %v - bestFit: %v", thread, ga.Generations, state.BestFit)
+		// this happens A LOT - idk why
+		// log.Printf("[thread %v] error! best fit image is nil at generation %v - bestFit: %v", thread, ga.Generations, state.BestFit)
 		return
 	}
 

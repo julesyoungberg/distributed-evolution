@@ -73,15 +73,12 @@ func (t Task) Key() string {
 	return fmt.Sprintf("task:%v", t.ID)
 }
 
-func Update(args Task) (Task, error) {
+func Update(args Task) error {
 	var reply Task
-
-	err := Call("Master.Update", &args, &reply)
-
-	return reply, err
+	return Call("Master.UpdateTask", &args, &reply)
 }
 
-func (t Task) UpdateMaster(status string) (Task, error) {
+func (t Task) UpdateMaster(status string) error {
 	return Update(Task{
 		ID:         t.ID,
 		Generation: t.Generation,

@@ -19,6 +19,7 @@ func (m *Master) recover(id int) {
 	task.Status = "recovering"
 	task.Connected = true
 	task.WorkerID = 0
+	task.Thread = 0
 	m.mu.Unlock()
 
 	err := m.db.PushTaskID(m.Tasks[id].ID)
