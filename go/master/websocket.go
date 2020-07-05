@@ -56,7 +56,7 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		log.Print("error establishing websocket connection: ", err)
 		return
 	}
 
@@ -69,7 +69,7 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 
 	response := State{TargetImage: m.TargetImageBase64}
 	if err := conn.WriteJSON(response); err != nil {
-		log.Println(err)
+		log.Print("error sending initial state over websocket connection: ", err)
 	}
 
 	m.connMu.Unlock()
@@ -107,6 +107,6 @@ func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64
 	}
 
 	if err := m.conn.WriteJSON(state); err != nil {
-		log.Println(err)
+		log.Print("[combiner] error sending output: ", err)
 	}
 }

@@ -31,9 +31,10 @@ func (m *Master) getTaskRect(x, y, colWidth, rowWidth int) (image.Rectangle, uti
 // populates the task queue with tasks, where each is a slice of the target image
 func (m *Master) generateTasks() {
 	err := m.db.Flush()
-	if err != nil {
+	for err != nil {
 		log.Printf("[task generator] failed to flush db: %v", err)
-		return
+		time.Sleep(1 * time.Second)
+		err = m.db.Flush()
 	}
 
 	m.mu.Lock()

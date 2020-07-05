@@ -38,9 +38,6 @@ func Run() {
 
 	log.Print("threads: ", nThreads)
 
-	// wait for master to initialize
-	time.Sleep(10 * time.Second)
-
 	var wg sync.WaitGroup
 
 	for i := 0; i < nThreads; i++ {
@@ -48,20 +45,20 @@ func Run() {
 
 		go func(thread int) {
 			for {
+				time.Sleep(10 * time.Second)
+
 				log.Printf("[thread %v] getting task", thread)
 
 				task, err := w.db.PullTask()
-
-				if err == nil && task.Generation != 0 {
-					w.RunTask(task, thread)
-					log.Printf("[thread %v] finished task %v", thread, task.ID)
-				} else if err != nil {
+				if err != nil {
 					log.Printf("[thread %v] error: %v", thread, err)
-				} else {
-					log.Printf("[thread %v] empty task response, waiting for work", thread)
+					continue
 				}
 
-				time.Sleep(10 * time.Second)
+				if task.Generation != 0 {
+					w.RunTask(task, thread)
+					log.Printf("[thread %v] finished task %v", thread, task.ID)
+				}
 			}
 		}(i + 1)
 	}
