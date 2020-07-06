@@ -100,12 +100,21 @@ The containerized design of the system makes it easy to test fault tolerance. A 
 
 The system is stable and mostly fault-tolerant. It has run on a job for 8 hours, processing over 80,000 generations. While the output definitely seems to be approaching the target image, it is still too slow to see good results within a reasonable amount of time. The outputs from the 8 hour experiment are shown in **Figure 2**. 
 
-
-![](images/experiment1/target.png | width=100)
-![](images/experiment1/5000.png | width=100)
-![](images/experiment1/10000.png | width=100)
-![](images/experiment1/20000.png | width=100)
-![](images/experiment1/80000.png | width=100)
+<div style="display: inline;">
+    <img src="images/experiment1/target.png" width="190" style="display: inline" />
+</div>
+<div style="display: inline;">
+    <img src="images/experiment1/5000.png" width="190" style="display: inline" />
+</div>
+<div style="display: inline;">
+    <img src="images/experiment1/10000.png" width="190" style="display: inline" />
+</div>
+<div style="display: inline;">
+    <img src="images/experiment1/20000.png" width="190" style="display: inline" />
+</div>
+<div style="display: inline;">
+    <img src="images/experiment1/80000.png" width="190" style="display: inline" />
+</div>
 
 **Figure 2.** Screenshots of the UI from the 8 hour experiment.
 
