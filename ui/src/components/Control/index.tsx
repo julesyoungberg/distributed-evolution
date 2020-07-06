@@ -42,13 +42,13 @@ interface Config {
 
 const initialConfig: Config = Object.freeze({
     shapeType: 'polygons',
-    numShapes: 200,
-    shapeSize: 20,
+    numShapes: 300,
+    shapeSize: 30,
     popSize: 50,
     poolSize: 10,
     mutationRate: 0.02,
     crossRate: 0.2,
-    overDraw: 10,
+    overDraw: 20,
 })
 
 function getBase64Image(img: HTMLImageElement) {

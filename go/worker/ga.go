@@ -44,6 +44,9 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 
 		success := w.updateMaster(state, thread)
 		if !success {
+			w.mu.Lock()
+			w.Tasks[id] = state
+			w.mu.Unlock()
 			return
 		}
 

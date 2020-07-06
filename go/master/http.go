@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/rickyfitts/distributed-evolution/go/api"
@@ -65,6 +66,8 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	m.respondWithState(w)
+
 	m.mu.Lock()
 
 	m.TargetImageBase64 = base64
@@ -76,11 +79,16 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.Job.ID = newID
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
 
+	// wait for all the workers to stop
+	for !m.allStale() {
+		m.mu.Unlock()
+		time.Sleep(time.Second)
+		m.mu.Lock()
+	}
+
 	m.mu.Unlock()
 
 	m.generateTasks()
-
-	m.respondWithState(w)
 }
 
 func (m *Master) disconnectTask(w http.ResponseWriter, r *http.Request) {

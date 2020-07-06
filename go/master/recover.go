@@ -10,13 +10,27 @@ import (
 // recovers a failed task by fetching the
 func (m *Master) recover(id int) {
 	m.mu.Lock()
-	if m.Tasks[id].Status != "failed" {
+	task := m.Tasks[id]
+
+	// in case an update was received between
+	// this function being called and the lock being received
+	if task.Status != "failed" {
 		m.mu.Unlock()
 		return
 	}
 
-	task := m.Tasks[id]
-	task.Status = "recovering"
+	// check if this task is still up to date
+	if task.Job.ID != m.Job.ID {
+		// if this task is from a previous job,
+		// mark it as stale and forget about it
+		log.Printf("[failure detector] task %v is from job %v, the current job is %v", task.ID, task.Job.ID, m.Job.ID)
+		task.Status = "stale"
+		m.Tasks[id] = task
+		m.mu.Unlock()
+		return
+	}
+
+	task.Status = "queued"
 	task.Connected = true
 	task.WorkerID = 0
 	task.Thread = 0
@@ -36,7 +50,8 @@ func (m *Master) recover(id int) {
 // check that each inprogress task is active by checking its last update
 // if a task times out, mark it as failed and begin recovery process
 func (m *Master) detectFailures() {
-	timeout := 10 * time.Second
+	timeout := 5 * time.Second
+	queueTimeout := 30 * time.Second
 
 	for {
 		time.Sleep(timeout / 4)
@@ -44,8 +59,11 @@ func (m *Master) detectFailures() {
 		m.mu.Lock()
 
 		for i, t := range m.Tasks {
-			if t.Status == "inprogress" && time.Since(t.LastUpdate) > timeout {
-				util.DPrintf("[failure detector] task %v timed out! recovering...", i)
+			workerTimeout := t.Status == "inprogress" && time.Since(t.LastUpdate) > timeout
+			queueTimeout := t.Status == "queued" && time.Since(t.LastUpdate) > queueTimeout
+
+			if workerTimeout || queueTimeout {
+				util.DPrintf("[failure detector] task %v timed out!", i)
 				m.Tasks[i].Status = "failed"
 				go m.recover(i)
 			}

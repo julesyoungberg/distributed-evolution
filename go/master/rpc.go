@@ -18,7 +18,7 @@ func (m *Master) UpdateTask(args, reply *api.Task) error {
 	defer m.mu.Unlock()
 
 	if args.Job.ID != m.Job.ID {
-		return fmt.Errorf("incorrect job ID")
+		return fmt.Errorf("expected job ID %v, got %v", m.Job.ID, args.Job.ID)
 	}
 
 	task := m.Tasks[args.ID]

@@ -25,7 +25,7 @@ export default function Status() {
                 {['active', 'editing'].includes(status) && (
                     <Box width={1 / 2}>
                         <Text fontSize={[3, 4, 5]} fontWeight='bold'>
-                            Output - Generation: {generation} - Fitness: {fitness}
+                            Generation: {generation}<br/>Fitness: {fitness}
                         </Text>
                         <Image src={output ? `data:image/png;base64, ${output}` : undefined} />
                     </Box>

@@ -11,6 +11,16 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
+func (m *Master) allStale() bool {
+	for _, t := range m.Tasks {
+		if t.Status != "stale" {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (m *Master) setTargetImage(image image.Image) {
 	width, height := util.GetImageDimensions(image)
 	m.TargetImage = util.Image{
