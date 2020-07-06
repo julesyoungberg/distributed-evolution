@@ -37,7 +37,7 @@ func Run() {
 
 	workerThreads, err := strconv.Atoi(os.Getenv("WORKER_THREADS"))
 	if err != nil {
-		log.Fatal("error parsing WORKERS: ", err)
+		log.Fatal("error parsing WORKER_THREADS: ", err)
 	}
 
 	m := Master{
