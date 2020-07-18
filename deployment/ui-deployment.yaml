@@ -27,7 +27,12 @@ spec:
         io.kompose.service: ui
     spec:
       containers:
-      - env:
+      - name: ui
+        image: julesyoungberg/distributed-evolution-ui
+        imagePullPolicy: ""
+        ports:
+        - containerPort: 3000
+        env:
         - name: API_URL
           value: http://distributed.ga/api
         - name: CHANNEL_URL
@@ -38,11 +43,6 @@ spec:
           value: development
         - name: PORT
           value: "3000"
-        image: julesyoungberg/distributed-evolution-ui
-        imagePullPolicy: ""
-        name: ui
-        ports:
-        - containerPort: 3000
         resources: {}
       restartPolicy: Always
       serviceAccountName: ""
