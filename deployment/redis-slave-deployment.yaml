@@ -1,9 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert
-    kompose.version: 1.21.0 (992df58d8)
   creationTimestamp: null
   labels:
     io.kompose.service: redis-slave
@@ -16,27 +13,24 @@ spec:
   strategy: {}
   template:
     metadata:
-      annotations:
-        kompose.cmd: kompose convert
-        kompose.version: 1.21.0 (992df58d8)
       creationTimestamp: null
       labels:
         io.kompose.service: redis-slave
     spec:
       containers:
-      - args:
+      - name: redis-slave
+        image: redis:3
+        imagePullPolicy: ""
+        args:
         - redis-server
         - --slaveof
         - redis-master
         - "6379"
+        ports:
+        - containerPort: 6379
         env:
         - name: GET_HOSTS_FROM
           value: dns
-        image: redis:3
-        imagePullPolicy: ""
-        name: redis-slave
-        ports:
-        - containerPort: 6379
         resources: {}
       restartPolicy: Always
       serviceAccountName: ""
