@@ -4,18 +4,22 @@ Genetic algorithms are a problem solving technique based on Darwin’s theory of
 
 
 ## Development
+With `docker-compose`:
 ```
 docker network create distributed-ga
 sh ./run.sh
 ```
 
+Or with minikube:
+```
+minikube start --driver=hyperkit
+minikube addons enable ingress
+sh ./build_apply.sh
+```
+
 
 ## Deployment
-https://kubernetes.io/docs/tutorials/configuration/configure-redis-using-configmap/
-
-https://www.callicoder.com/deploy-multi-container-go-redis-app-kubernetes/
-
-https://cloud.google.com/memorystore/docs/redis/connect-redis-instance-gke
+https://spsarolkar.github.io/redis/high-availability/sentinel/kubernetes/2019/12/29/Configuring-Redis-High-Availability-Sentinel-Configuration.html
 
 
 ## TODO

@@ -6,7 +6,7 @@ metadata:
     io.kompose.service: worker
   name: worker
 spec:
-  replicas: 1
+  replicas: 6
   selector:
     matchLabels:
       io.kompose.service: worker
@@ -25,11 +25,11 @@ spec:
         - name: GET_HOSTS_FROM
           value: dns
         - name: MASTER_URL
-          value: http://master:8080
+          value: master:8080
         - name: REDIS_MASTER_NAME
           value: mymaster
         - name: SENTINELS
-          value: redis://sentinel:26379
+          value: sentinel-master:26379
         - name: THREADS
           value: "5"
         resources: {}

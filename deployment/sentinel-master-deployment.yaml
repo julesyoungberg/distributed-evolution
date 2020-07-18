@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentinel-master
+  labels:
+    app: sentinel-master
+spec:
+  selector:
+     matchLabels:
+        app: sentinel-master
+  replicas: 1
+  template:
+    metadata:
+      labels:
+         app: sentinel-master
+    spec:
+      containers:
+      - name: redis
+        image: julesyoungberg/distributed-evolution-sentinel-master
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        env:
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: MASTER_ANNOUNCE_PORT
+            value: "6379"
+          - name: SENTINEL_ANNOUNCE_PORT
+            value: "26379"
+        ports:
+        - name: redis-master
+          containerPort: 6379
+        - name: redis-sentinel
+          containerPort: 26379

@@ -21,13 +21,6 @@ spec:
       - name: master
         image: julesyoungberg/distributed-evolution-master
         imagePullPolicy: ""
-        # livenessProbe:
-        #   httpGet:
-        #     path: /healthz
-        #     port: 8080
-        #     scheme: HTTP
-        #   initialDelaySeconds: 30
-        #   timeoutSeconds: 5
         ports:
         - containerPort: 9000
         - containerPort: 8080
@@ -41,7 +34,7 @@ spec:
         - name: RPC_PORT
           value: "8080"
         - name: SENTINELS
-          value: redis://sentinel:26379
+          value: sentinel-master:26379
         - name: WORKERS
           value: "5"
         - name: WORKER_THREADS

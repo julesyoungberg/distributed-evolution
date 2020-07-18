@@ -1,3 +1,1 @@
-FILES=$( ls -dm ./deployment/*.yaml | tr -d ' \n' )
-
-kubectl apply -f $FILES
+kubectl delete --all deployments && kubectl apply -f deployment

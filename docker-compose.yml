@@ -51,7 +51,7 @@ services:
         ports:
             - 6379
     sentinel:
-        build: sentinel
+        build: sentinel/dev
         environment:
             - SENTINEL_DOWN_AFTER=5000
             - SENTINEL_FAILOVER=5000
