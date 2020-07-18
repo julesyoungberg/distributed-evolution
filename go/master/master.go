@@ -18,7 +18,7 @@ type Master struct {
 	NumWorkers        int
 	TargetImage       util.Image
 	TargetImageBase64 string
-	Tasks             map[int]*api.Task
+	Tasks             map[int]*api.TaskState
 	ThreadsPerWorker  int
 
 	db                 db.DB
@@ -55,30 +55,22 @@ func Run() {
 		},
 		lastUpdate:         time.Now(),
 		TargetImage:        util.Image{},
-		Tasks:              map[int]*api.Task{},
+		Tasks:              map[int]*api.TaskState{},
 		ThreadsPerWorker:   workerThreads,
 		wsHeartbeatTimeout: 2 * time.Second,
 	}
 
-	log.Print("fetching random image...")
-	image := util.GetRandomImage()
-
-	log.Print("encoding image...")
-	encodedImg, err := util.EncodeImage(image)
-	if err != nil {
-		log.Fatal(err)
+	if !m.restoreFromSnapshot() {
+		m.startRandomTask()
 	}
-
-	m.TargetImageBase64 = encodedImg
-	m.setTargetImage(image)
-
-	go m.generateTasks()
 
 	go m.httpServer()
 
 	go m.detectFailures()
 
 	go m.combine()
+
+	go m.saveSnapshots()
 
 	m.rpcServer()
 }

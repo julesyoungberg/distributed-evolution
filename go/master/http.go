@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/gorilla/handlers"
@@ -92,31 +91,6 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.generateTasks()
 }
 
-func (m *Master) disconnectTask(w http.ResponseWriter, r *http.Request) {
-	cors(w)
-
-	// ignore preflight request
-	if r.Method == http.MethodOptions {
-		return
-	}
-
-	params := mux.Vars(r)
-	id, err := strconv.Atoi(params["id"])
-	if err != nil {
-		log.Printf("error parsing task id")
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	log.Printf("disconnecting task %v", id)
-
-	m.mu.Lock()
-	m.Tasks[id].Connected = false
-	m.mu.Unlock()
-
-	m.respondWithState(w)
-}
-
 func healthCheck(w http.ResponseWriter, r *http.Request) {
 	log.Printf("health check")
 	cors(w)
@@ -126,11 +100,9 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 func (m *Master) httpServer() {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/api/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
-	r.HandleFunc("/api/tasks/{id:[0-9]+}/disconnect", m.disconnectTask).Methods(http.MethodGet, http.MethodOptions)
-	r.HandleFunc("/api/subscribe", m.subscribe)
-
 	r.HandleFunc("/api/healthz", healthCheck).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/api/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/api/subscribe", m.subscribe)
 
 	port := os.Getenv("HTTP_PORT")
 

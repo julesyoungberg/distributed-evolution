@@ -20,10 +20,10 @@ func (m *Master) recover(id int) {
 	}
 
 	// check if this task is still up to date
-	if task.Job.ID != m.Job.ID {
+	if task.JobID != m.Job.ID {
 		// if this task is from a previous job,
 		// mark it as stale and forget about it
-		log.Printf("[failure detector] task %v is from job %v, the current job is %v", task.ID, task.Job.ID, m.Job.ID)
+		log.Printf("[failure detector] task %v is from job %v, the current job is %v", task.ID, task.JobID, m.Job.ID)
 		task.Status = "stale"
 		m.Tasks[id] = task
 		m.mu.Unlock()
@@ -31,7 +31,6 @@ func (m *Master) recover(id int) {
 	}
 
 	task.Status = "queued"
-	task.Connected = true
 	task.WorkerID = 0
 	task.Thread = 0
 	m.mu.Unlock()

@@ -43,12 +43,10 @@ type Job struct {
 
 type Task struct {
 	BestFit     eaopt.Individual  `json:"-"`
-	Connected   bool              `json:"connected"`
 	Dimensions  util.Vector       `json:"dimensions"`
 	Generation  uint              `json:"generation"`
 	ID          int               `json:"ID"`
 	Job         Job               `json:"job"`
-	LastUpdate  time.Time         `json:"lastUpdate"`
 	Offset      util.Vector       `json:"offset"`
 	Output      string            `json:"output"`
 	Population  eaopt.Individuals `json:"-"`
@@ -57,6 +55,22 @@ type Task struct {
 	Thread      int               `json:"thread"`
 	Type        string            `json:"type"`
 	WorkerID    uint32            `json:"workerID"`
+}
+
+type TaskState struct {
+	ID         int       `json:"ID"`
+	JobID      int       `json:"jobID"`
+	LastUpdate time.Time `json:"lastUpdate"`
+	Generation uint      `json:"generation"`
+	Status     string    `json:"status"`
+	Thread     int       `json:"thread"`
+	WorkerID   uint32    `json:"workerID"`
+}
+
+type MasterSnapshot struct {
+	Job         Job               `json:"job"`
+	TargetImage string            `json:"targetImage"`
+	Tasks       map[int]TaskState `json:"tasks"`
 }
 
 func Register() {

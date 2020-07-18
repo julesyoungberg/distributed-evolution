@@ -1,15 +1,8 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
-import styled from '@emotion/styled'
-import fetch from 'isomorphic-fetch'
-import getConfig from 'next/config'
 import DataTable from 'react-data-table-component'
-import { Button } from 'rebass'
 
 import useAppState from '../../hooks/useAppState'
-import { Theme } from '../../theme'
-
-const { publicRuntimeConfig } = getConfig()
 
 const columns = [
     {
@@ -40,37 +33,12 @@ const columns = [
         name: 'Status',
         selector: 'status',
     },
-    {
-        name: 'Connection',
-        selector: 'connection',
-    },
 ]
 
-const ConnectionButton = styled(Button)<{ disabled: boolean }, Theme>`
-    background-color: ${({ disabled, theme }) => disabled ? theme.colors.lightgray : theme.colors.blue};
-    cursor: pointer;
-`
-
 export default function Table() {
-    const { dispatch, state } = useAppState()
+    const { state } = useAppState()
 
     const now = new Date().getTime()
-
-    const disconnect = (task) => async () => {
-        const path = `tasks/${task.ID}/disconnect`
-
-        console.log(`disconnecting task ${task.ID}`)
-        
-        const response = await fetch(`${publicRuntimeConfig.apiUrl}/${path}`)
-
-        console.log('response', response)
-
-        const data = await response.json().catch(() => response.text())
-
-        console.log('data', data)
-
-        dispatch({ type: 'update', payload: data })
-    }
 
     return (
         <DataTable
@@ -79,14 +47,6 @@ export default function Table() {
             data={Object.values(state.tasks || {}).map(task => ({
                 ...task,
                 lastUpdate: `${(now - (new Date(task.lastUpdate)).getTime()) / 1000} seconds ago`,
-                connection: (
-                    <ConnectionButton
-                        disabled={!(task.connected && task.status == 'inprogress')}
-                        onClick={disconnect(task)}
-                    >
-                        DISCONNECT
-                    </ConnectionButton>
-                )
             }))}
         />
     )

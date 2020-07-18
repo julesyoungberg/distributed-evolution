@@ -52,7 +52,7 @@ func (m *Master) generateTasks() {
 	log.Printf("[task generator] %v workers with %v threads each available", m.NumWorkers, m.ThreadsPerWorker)
 	log.Printf("[task generator] generating tasks for job %v", m.Job.ID)
 
-	m.Tasks = map[int]*api.Task{}
+	m.Tasks = map[int]*api.TaskState{}
 
 	totalThreads := m.NumWorkers * m.ThreadsPerWorker
 
@@ -90,20 +90,25 @@ func (m *Master) generateTasks() {
 				}
 
 				task := api.Task{
-					Connected:   true,
 					Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},
 					Generation:  1,
 					ID:          y*int(M) + x + 1,
 					Job:         job,
-					LastUpdate:  time.Now(),
 					Offset:      offset,
-					Status:      "queued",
 					TargetImage: encoded,
+					Status:      "quued",
 					Type:        "polygons",
 				}
 
+				taskState := api.TaskState{
+					ID:         task.ID,
+					JobID:      job.ID,
+					LastUpdate: time.Now(),
+					Status:     "quued",
+				}
+
 				m.mu.Lock()
-				m.Tasks[task.ID] = &task
+				m.Tasks[task.ID] = &taskState
 				m.mu.Unlock()
 
 				e := m.db.PushTask(task)
@@ -122,4 +127,20 @@ func (m *Master) generateTasks() {
 	m.mu.Lock()
 	log.Printf("[task generator] %v tasks created", len(m.Tasks))
 	m.mu.Unlock()
+}
+
+func (m *Master) startRandomTask() {
+	log.Print("fetching random image...")
+	image := util.GetRandomImage()
+
+	log.Print("encoding image...")
+	encodedImg, err := util.EncodeImage(image)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	m.TargetImageBase64 = encodedImg
+	m.setTargetImage(image)
+
+	go m.generateTasks()
 }

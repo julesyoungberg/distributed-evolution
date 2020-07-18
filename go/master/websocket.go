@@ -12,13 +12,13 @@ import (
 )
 
 type State struct {
-	Fitness          float64           `json:"fitness"`
-	Generation       uint              `json:"generation"`
-	NumWorkers       int               `json:"numWorkers"`
-	Output           string            `json:"output"`
-	TargetImage      string            `json:"targetImage"`
-	Tasks            map[int]*api.Task `json:"tasks"`
-	ThreadsPerWorker int               `json:"threadsPerWorker"`
+	Fitness          float64                `json:"fitness"`
+	Generation       uint                   `json:"generation"`
+	NumWorkers       int                    `json:"numWorkers"`
+	Output           string                 `json:"output"`
+	TargetImage      string                 `json:"targetImage"`
+	Tasks            map[int]*api.TaskState `json:"tasks"`
+	ThreadsPerWorker int                    `json:"threadsPerWorker"`
 }
 
 var upgrader = websocket.Upgrader{

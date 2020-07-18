@@ -26,10 +26,6 @@ func (m *Master) UpdateTask(args, reply *api.Task) error {
 		return fmt.Errorf("task %v not found", args.ID)
 	}
 
-	if task.Status == "inprogress" && !task.Connected {
-		return fmt.Errorf("disconnected")
-	}
-
 	if task.WorkerID == 0 && task.Thread == 0 {
 		task.WorkerID = args.WorkerID
 		task.Thread = args.Thread
@@ -39,7 +35,6 @@ func (m *Master) UpdateTask(args, reply *api.Task) error {
 		return fmt.Errorf("task %v is being worked on by thread %v of worker %v", task.ID, task.Thread, task.WorkerID)
 	}
 
-	task.Connected = true
 	task.Generation = args.Generation
 	task.Status = args.Status
 	task.Thread = args.Thread
