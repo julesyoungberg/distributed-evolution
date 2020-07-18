@@ -2,7 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f docker-kompose.yml
+    kompose.cmd: kompose convert
+    kompose.service.type: LoadBalancer
     kompose.version: 1.21.0 (992df58d8)
   creationTimestamp: null
   labels:
@@ -17,33 +18,42 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-kompose.yml
+        kompose.cmd: kompose convert
+        kompose.service.type: LoadBalancer
         kompose.version: 1.21.0 (992df58d8)
       creationTimestamp: null
       labels:
-        io.kompose.network/distributed-ga: "true"
         io.kompose.service: master
     spec:
       containers:
-      - env:
+      - name: master
+        image: julesyoungberg/distributed-evolution-master
+        imagePullPolicy: ""
+        # livenessProbe:
+        #   httpGet:
+        #     path: /healthz
+        #     port: 8080
+        #     scheme: HTTP
+        #   initialDelaySeconds: 30
+        #   timeoutSeconds: 5
+        ports:
+        - containerPort: 9000
+        - containerPort: 8080
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
         - name: HTTP_PORT
           value: "9000"
         - name: REDIS_MASTER_NAME
           value: mymaster
         - name: RPC_PORT
           value: "8080"
-        - name: SENTINEL_ADDRESS
-          value: sentinel:26379
+        - name: SENTINELS
+          value: redis://sentinel:26379
         - name: WORKERS
           value: "5"
         - name: WORKER_THREADS
           value: "5"
-        image: julesyoungberg/distributed-evolution-master
-        imagePullPolicy: ""
-        name: master
-        ports:
-        - containerPort: 9000
-        - containerPort: 8080
         resources: {}
       restartPolicy: Always
       serviceAccountName: ""

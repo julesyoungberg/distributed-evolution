@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f docker-kompose.yml
+    kompose.cmd: kompose convert
     kompose.version: 1.21.0 (992df58d8)
   creationTimestamp: null
   labels:
@@ -17,26 +17,27 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-kompose.yml
+        kompose.cmd: kompose convert
         kompose.version: 1.21.0 (992df58d8)
       creationTimestamp: null
       labels:
-        io.kompose.network/distributed-ga: "true"
         io.kompose.service: worker
     spec:
       containers:
-      - env:
-        - name: MASTER_URL
-          value: master:8080
-        - name: REDIS_MASTER_NAME
-          value: mymaster
-        - name: SENTINEL_ADDRESS
-          value: sentinel:26379
-        - name: THREADS
-          value: "5"
+      - name: worker
         image: julesyoungberg/distributed-evolution-worker
         imagePullPolicy: ""
-        name: worker
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        - name: MASTER_URL
+          value: http://master:8080
+        - name: REDIS_MASTER_NAME
+          value: mymaster
+        - name: SENTINELS
+          value: redis://sentinel:26379
+        - name: THREADS
+          value: "5"
         resources: {}
       restartPolicy: Always
       serviceAccountName: ""

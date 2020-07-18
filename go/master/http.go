@@ -116,6 +116,10 @@ func (m *Master) disconnectTask(w http.ResponseWriter, r *http.Request) {
 	m.respondWithState(w)
 }
 
+func healthCheck(w http.ResponseWriter, r *http.Request) {
+	cors(w)
+}
+
 // handles requests from the ui and websocket communication
 func (m *Master) httpServer() {
 	r := mux.NewRouter()
@@ -123,6 +127,8 @@ func (m *Master) httpServer() {
 	r.HandleFunc("/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/tasks/{id:[0-9]+}/disconnect", m.disconnectTask).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/subscribe", m.subscribe)
+
+	r.HandleFunc("/healthz", healthCheck).Methods(http.MethodGet, http.MethodOptions)
 
 	port := os.Getenv("HTTP_PORT")
 

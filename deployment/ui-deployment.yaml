@@ -2,7 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert -f docker-kompose.yml
+    kompose.cmd: kompose convert
+    kompose.service.type: LoadBalancer
     kompose.version: 1.21.0 (992df58d8)
   creationTimestamp: null
   labels:
@@ -18,11 +19,11 @@ spec:
   template:
     metadata:
       annotations:
-        kompose.cmd: kompose convert -f docker-kompose.yml
+        kompose.cmd: kompose convert
+        kompose.service.type: LoadBalancer
         kompose.version: 1.21.0 (992df58d8)
       creationTimestamp: null
       labels:
-        io.kompose.network/distributed-ga: "true"
         io.kompose.service: ui
     spec:
       containers:
@@ -31,6 +32,8 @@ spec:
           value: http://localhost:9000
         - name: CHANNEL_URL
           value: ws://localhost:9000/subscribe
+        - name: GET_HOSTS_FROM
+          value: dns
         - name: NODE_ENV
           value: development
         - name: PORT
@@ -41,23 +44,6 @@ spec:
         ports:
         - containerPort: 3000
         resources: {}
-        volumeMounts:
-        - mountPath: /app
-          name: ui-claim0
-        - mountPath: /app/node_modules/
-          name: ui-claim1
-        - mountPath: /app/.next
-          name: ui-claim2
       restartPolicy: Always
       serviceAccountName: ""
-      volumes:
-      - name: ui-claim0
-        persistentVolumeClaim:
-          claimName: ui-claim0
-      - name: ui-claim1
-        persistentVolumeClaim:
-          claimName: ui-claim1
-      - name: ui-claim2
-        persistentVolumeClaim:
-          claimName: ui-claim2
 status: {}
