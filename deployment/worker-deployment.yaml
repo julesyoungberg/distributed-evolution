@@ -6,7 +6,7 @@ metadata:
     io.kompose.service: worker
   name: worker
 spec:
-  replicas: 6
+  replicas: 5
   selector:
     matchLabels:
       io.kompose.service: worker
