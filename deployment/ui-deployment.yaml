@@ -29,9 +29,9 @@ spec:
       containers:
       - env:
         - name: API_URL
-          value: http://localhost:9000
+          value: http://distributed.ga/api
         - name: CHANNEL_URL
-          value: ws://localhost:9000/subscribe
+          value: ws://distributed.ga/api/subscribe
         - name: GET_HOSTS_FROM
           value: dns
         - name: NODE_ENV

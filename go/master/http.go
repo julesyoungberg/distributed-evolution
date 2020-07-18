@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
@@ -117,6 +118,7 @@ func (m *Master) disconnectTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
+	log.Printf("health check")
 	cors(w)
 }
 
@@ -124,11 +126,11 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 func (m *Master) httpServer() {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
-	r.HandleFunc("/tasks/{id:[0-9]+}/disconnect", m.disconnectTask).Methods(http.MethodGet, http.MethodOptions)
-	r.HandleFunc("/subscribe", m.subscribe)
+	r.HandleFunc("/api/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
+	r.HandleFunc("/api/tasks/{id:[0-9]+}/disconnect", m.disconnectTask).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/api/subscribe", m.subscribe)
 
-	r.HandleFunc("/healthz", healthCheck).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/api/healthz", healthCheck).Methods(http.MethodGet, http.MethodOptions)
 
 	port := os.Getenv("HTTP_PORT")
 
@@ -136,5 +138,7 @@ func (m *Master) httpServer() {
 
 	r.Use(mux.CORSMethodMiddleware(r))
 
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	loggedRouter := handlers.LoggingHandler(os.Stdout, r)
+
+	log.Fatal(http.ListenAndServe(":"+port, loggedRouter))
 }

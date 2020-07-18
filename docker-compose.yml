@@ -28,8 +28,8 @@ services:
     ui:
         build: ui
         environment: 
-            API_URL: http://localhost:9000
-            CHANNEL_URL: ws://localhost:9000/subscribe
+            API_URL: http://localhost:9000/api
+            CHANNEL_URL: ws://localhost:9000/api/subscribe
             NODE_ENV: development
             PORT: 3000
         ports:
