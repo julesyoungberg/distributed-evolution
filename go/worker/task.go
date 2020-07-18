@@ -13,8 +13,6 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	log.Printf("[thread %v] assigned task %v of job %v with population len: %v", thread, task.ID, task.Job.ID, len(task.Population))
 
 	population := task.Population
-	task.WorkerID = w.ID
-	task.Thread = thread
 
 	t := api.WorkerTask{GenOffset: task.Generation, Task: task}
 
@@ -36,7 +34,7 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 
 	// create closure functions with context
 	w.ga.Callback = w.createCallback(task.ID, thread)
-	w.ga.EarlyStop = w.createEarlyStop(task.ID, task.Job.ID)
+	w.ga.EarlyStop = w.createEarlyStop(task.ID)
 	factory := api.GetShapesFactory(&t, population)
 
 	task.Population = eaopt.Individuals{}
@@ -53,10 +51,10 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 }
 
 func (w *Worker) updateMaster(state *api.WorkerTask, thread int) bool {
-	err := state.Task.UpdateMaster("inprogress")
+	err := state.Task.UpdateMaster(w.ID, thread, "inprogress")
 	if err != nil {
 		log.Printf("[thread %v] failed to update master: %v", thread, err)
-		state.Task.Job.ID = 0
+		state.Task.ID = -1
 		return false
 	}
 

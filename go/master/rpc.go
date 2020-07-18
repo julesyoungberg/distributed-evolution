@@ -13,12 +13,12 @@ import (
 )
 
 // handles a progress update from a worker, updates the state, and updates the ui
-func (m *Master) UpdateTask(args, reply *api.Task) error {
+func (m *Master) UpdateTask(args, reply *api.TaskState) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	if args.Job.ID != m.Job.ID {
-		return fmt.Errorf("expected job ID %v, got %v", m.Job.ID, args.Job.ID)
+	if args.JobID != m.Job.ID {
+		return fmt.Errorf("expected job ID %v, got %v", m.Job.ID, args.JobID)
 	}
 
 	task := m.Tasks[args.ID]

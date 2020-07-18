@@ -62,7 +62,7 @@ func (m *Master) detectFailures() {
 			queueTimeout := t.Status == "queued" && time.Since(t.LastUpdate) > queueTimeout
 
 			if workerTimeout || queueTimeout {
-				util.DPrintf("[failure detector] task %v timed out!", i)
+				util.DPrintf("[failure detector] %v task %v timed out!", t.Status, i)
 				m.Tasks[i].Status = "failed"
 				go m.recover(i)
 			}

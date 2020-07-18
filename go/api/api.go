@@ -5,16 +5,12 @@ import (
 	"fmt"
 	"image"
 	"image/color"
-	"net/rpc"
-	"os"
 	"sync"
 	"time"
 
 	"github.com/MaxHalford/eaopt"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
-
-const RPC_TIMEOUT = 1
 
 type Output struct {
 	Fitness float64
@@ -50,18 +46,15 @@ type Task struct {
 	Offset      util.Vector       `json:"offset"`
 	Output      string            `json:"output"`
 	Population  eaopt.Individuals `json:"-"`
-	Status      string            `json:"status"`
 	TargetImage string            `json:"targetImage"`
-	Thread      int               `json:"thread"`
 	Type        string            `json:"type"`
-	WorkerID    uint32            `json:"workerID"`
 }
 
 type TaskState struct {
 	ID         int       `json:"ID"`
+	Generation uint      `json:"generation"`
 	JobID      int       `json:"jobID"`
 	LastUpdate time.Time `json:"lastUpdate"`
-	Generation uint      `json:"generation"`
 	Status     string    `json:"status"`
 	Thread     int       `json:"thread"`
 	WorkerID   uint32    `json:"workerID"`
@@ -87,58 +80,13 @@ func (t Task) Key() string {
 	return fmt.Sprintf("task:%v", t.ID)
 }
 
-func Update(args Task) error {
-	var reply Task
-	return Call("Master.UpdateTask", &args, &reply)
-}
-
-func (t Task) UpdateMaster(status string) error {
-	return Update(Task{
+func (t Task) UpdateMaster(worker uint32, thread int, status string) error {
+	return Update(TaskState{
 		ID:         t.ID,
 		Generation: t.Generation,
-		Job:        Job{ID: t.Job.ID},
+		JobID:      t.Job.ID,
 		Status:     status,
-		Thread:     t.Thread,
-		WorkerID:   t.WorkerID,
+		Thread:     thread,
+		WorkerID:   worker,
 	})
-}
-
-// send an RPC request to the master, wait for the response.
-// usually returns true.
-// returns false if something goes wrong.
-func Call(rpcname string, args interface{}, reply interface{}) error {
-	c, err := rpc.DialHTTP("tcp", os.Getenv("MASTER_URL"))
-	if err != nil {
-		return err
-	}
-
-	defer c.Close()
-
-	_, timeout := handleRPC(func() bool {
-		err = c.Call(rpcname, args, reply)
-		return true
-	})
-
-	if timeout {
-		return fmt.Errorf("rpc call timed out")
-	}
-
-	return err
-}
-
-func handleRPC(rpcCall func() bool) (bool, bool) {
-	timeout := false
-	success := false
-	c := make(chan bool, 1)
-
-	go func() { c <- rpcCall() }()
-
-	select {
-	case s := <-c:
-		success = s
-	case <-time.After(time.Second):
-		timeout = true
-	}
-
-	return success, timeout
 }

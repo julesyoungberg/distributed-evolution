@@ -61,12 +61,12 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 }
 
 // returns a closure to check if the algorithm should stop (ie the job has changed)
-func (w *Worker) createEarlyStop(taskID int, jobID int) func(ga *eaopt.GA) bool {
+func (w *Worker) createEarlyStop(taskID int) func(ga *eaopt.GA) bool {
 	return func(ga *eaopt.GA) bool {
 		w.mu.Lock()
-		jID := w.Tasks[taskID].Task.Job.ID
+		id := w.Tasks[taskID].Task.ID
 		w.mu.Unlock()
 
-		return jID != jobID
+		return id == -1
 	}
 }

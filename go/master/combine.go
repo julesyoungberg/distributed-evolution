@@ -1,12 +1,75 @@
 package master
 
 import (
+	"image"
 	"math"
+	"sync"
 	"time"
 
 	"github.com/fogleman/gg"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
+
+type Result struct {
+	ID         int
+	Fitness    float64
+	Generation uint
+	Output     image.Image
+	Position   util.Vector
+}
+
+// retrieves and decodes the output of a task from the database
+func (m *Master) getTaskResult(id int) Result {
+	task, err := m.db.GetTask(id)
+	if err != nil || task.ID == 0 {
+		util.DPrintf("[combiner] error getting task %v", id)
+		return Result{ID: -1}
+	}
+
+	img, err := util.DecodeImage(task.Output)
+	if err != nil {
+		util.DPrintf("[combiner] error decoding task %v output", id)
+		return Result{ID: -1}
+	}
+
+	centerX := math.Round(task.Offset.X + task.Dimensions.X/2.0)
+	centerY := math.Round(task.Offset.Y + task.Dimensions.Y/2.0)
+
+	return Result{
+		ID:         task.ID,
+		Fitness:    task.BestFit.Fitness,
+		Generation: task.Generation,
+		Output:     img,
+		Position:   util.Vector{X: centerX, Y: centerY},
+	}
+}
+
+// listens to the results channel, combining results and sends the final result to the ui
+func (m *Master) combineResults(ids []int, results chan Result) {
+	total := 0
+	var latest uint = 0
+	var fitness float64 = 0.0
+	dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
+
+	for result := range results {
+		if result.ID < 1 {
+			continue
+		}
+
+		total++
+		fitness += result.Fitness
+
+		if result.Generation > latest {
+			latest = result.Generation
+		}
+
+		dc.DrawImageAnchored(result.Output, int(result.Position.X), int(result.Position.Y), 0.5, 0.5)
+	}
+
+	fitness /= float64(total)
+
+	m.sendOutput(dc, latest, fitness)
+}
 
 // periodically read all tasks from db, combine results, save and update ui
 func (m *Master) combine() {
@@ -37,37 +100,21 @@ func (m *Master) combine() {
 			continue
 		}
 
-		dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
+		var wg sync.WaitGroup
+		results := make(chan Result, len(ids))
 
-		var latest uint = 0
-		var fitness float64 = 0.0
+		wg.Add(len(ids))
 
-		// combine outputs
 		for _, id := range ids {
-			task, err := m.db.GetTask(id)
-			if err != nil || task.ID == 0 {
-				continue
-			}
-
-			if task.Generation > latest {
-				latest = task.Generation
-			}
-
-			fitness += task.BestFit.Fitness
-
-			img, err := util.DecodeImage(task.Output)
-			if err != nil {
-				continue
-			}
-
-			centerX := int(math.Round(task.Offset.X + task.Dimensions.X/2.0))
-			centerY := int(math.Round(task.Offset.Y + task.Dimensions.Y/2.0))
-
-			dc.DrawImageAnchored(img, centerX, centerY, 0.5, 0.5)
+			go func(id int) {
+				results <- m.getTaskResult(id)
+				wg.Done()
+			}(id)
 		}
 
-		fitness /= float64(len(ids))
+		go m.combineResults(ids, results)
 
-		m.sendOutput(dc, latest, fitness)
+		wg.Wait()
+		close(results)
 	}
 }
