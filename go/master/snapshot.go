@@ -11,6 +11,8 @@ func (m *Master) saveSnapshots() {
 	for {
 		time.Sleep(30 * time.Second)
 
+		m.mu.Lock()
+
 		snapshot := api.MasterSnapshot{
 			Job:         m.Job,
 			TargetImage: m.TargetImageBase64,
@@ -20,6 +22,8 @@ func (m *Master) saveSnapshots() {
 		for id, task := range m.Tasks {
 			snapshot.Tasks[id] = *task
 		}
+
+		m.mu.Unlock()
 
 		err := m.db.SaveSnapshot(snapshot)
 		if err != nil {
@@ -35,11 +39,13 @@ func (m *Master) restoreFromSnapshot() bool {
 		return false
 	}
 
-	image, err := util.DecodeImage(m.TargetImageBase64)
+	image, err := util.DecodeImage(snapshot.TargetImage)
 	if err != nil {
 		util.DPrintf("error decoding target image from snapshot: %v", err)
 		return false
 	}
+
+	m.mu.Lock()
 
 	m.Job = snapshot.Job
 	m.TargetImageBase64 = snapshot.TargetImage
@@ -49,6 +55,8 @@ func (m *Master) restoreFromSnapshot() bool {
 	for id, task := range snapshot.Tasks {
 		m.Tasks[id] = &task
 	}
+
+	m.mu.Unlock()
 
 	return true
 }

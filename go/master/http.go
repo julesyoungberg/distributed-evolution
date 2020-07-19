@@ -2,6 +2,7 @@ package master
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -92,17 +93,21 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
-	log.Printf("health check")
-	cors(w)
+	w.WriteHeader(http.StatusOK)
+
+	if _, err := io.WriteString(w, `{"alive": true}`); err != nil {
+		util.DPrintf("health check error: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
 }
 
 // handles requests from the ui and websocket communication
 func (m *Master) httpServer() {
 	r := mux.NewRouter()
 
-	r.HandleFunc("/api/healthz", healthCheck).Methods(http.MethodGet, http.MethodOptions)
 	r.HandleFunc("/api/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/api/subscribe", m.subscribe)
+	r.HandleFunc("/api/healthz", healthCheck).Methods(http.MethodGet, http.MethodOptions)
 
 	port := os.Getenv("HTTP_PORT")
 
