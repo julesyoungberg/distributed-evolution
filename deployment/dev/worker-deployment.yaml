@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: worker
+  name: worker
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      io.kompose.service: worker
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: worker
+    spec:
+      containers:
+      - name: worker
+        image: julesyoungberg/distributed-evolution-worker
+        imagePullPolicy: ""
+        env:
+        - name: MASTER_URL
+          value: master:8080
+        - name: REDIS_MASTER_NAME
+          value: mymaster
+        - name: SENTINELS
+          value: sentinel-master:26379
+        - name: THREADS
+          value: "5"
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}

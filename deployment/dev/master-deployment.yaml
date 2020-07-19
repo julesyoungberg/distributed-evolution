@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    io.kompose.service: master
+  name: master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: master
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: master
+    spec:
+      containers:
+      - name: master
+        image: julesyoungberg/distributed-evolution-master
+        imagePullPolicy: ""
+        ports:
+        - containerPort: 9000
+        - containerPort: 8080
+        env:
+        - name: HTTP_PORT
+          value: "9000"
+        - name: REDIS_MASTER_NAME
+          value: mymaster
+        - name: RPC_PORT
+          value: "8080"
+        - name: SENTINELS
+          value: sentinel-master:26379
+        - name: WORKERS
+          value: "5"
+        - name: WORKER_THREADS
+          value: "5"
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}
