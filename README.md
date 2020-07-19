@@ -19,13 +19,20 @@ sh ./build_apply.sh
 
 
 ## Deployment
-https://spsarolkar.github.io/redis/high-availability/sentinel/kubernetes/2019/12/29/Configuring-Redis-High-Availability-Sentinel-Configuration.html
-
+https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html
 
 ## TODO
 
 1. Kubernetes
-1. Shrink solution space - https://github.com/hybridgroup/gocv
+    - Working locally with minikube
+    - Deploy to GCP
+    - figure out what to do with the front end
+        - run in development in production :grimace: :yikes:
+        - run next in production in the cluster - https://itnext.io/frontend-dockerized-build-artifacts-with-nextjs-9463f3da3362
+        - build to static files and deploy with now.sh
+            - this makes the most sense and is the most efficient
+            - once the rest of the application is working on GCP with a static url, this would be easy
+2. Shrink solution space - https://github.com/hybridgroup/gocv
     - get colors from original image
         - https://stackoverflow.com/questions/35479344/how-to-get-color-palette-from-image-using-opencv
         - https://stackoverflow.com/questions/34734379/is-there-a-formula-to-determine-overall-color-given-bgr-values-opencv-and-c/34734939#34734939
@@ -34,8 +41,6 @@ https://spsarolkar.github.io/redis/high-availability/sentinel/kubernetes/2019/12
     - run line detection on target image - https://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html
 
 redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/
-
-
 
 
 # Design
