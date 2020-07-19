@@ -17,10 +17,9 @@ spec:
       containers:
       - name: replica
         image: julesyoungberg/distributed-evolution-sentinel-replica
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
+        ports:
+          - name: redis-sentinel
+            containerPort: 26379
         env:
         - name: REDIS_MASTER_SERVICE_HOST
           value: sentinel-master
@@ -32,6 +31,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
-        ports:
-        - name: redis-sentinel
-          containerPort: 26379
+        resources:
+          requests:
+            cpu: 500m
+            memory: 300Mi
+          limits:
+            cpu: 1000m
+            memory: 600Mi

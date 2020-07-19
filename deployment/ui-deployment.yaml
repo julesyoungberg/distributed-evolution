@@ -33,7 +33,13 @@ spec:
           value: development
         - name: PORT
           value: "3000"
-        resources: {}
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            cpu: 100m
+            memory: 100Mi
       restartPolicy: Always
       serviceAccountName: ""
 status: {}

@@ -37,7 +37,13 @@ spec:
           value: "5"
         - name: WORKER_THREADS
           value: "5"
-        resources: {}
+        resources:
+          requests:
+            cpu: 1
+            memory: 100Mi
+          limits:
+            cpu: 2
+            memory: 500Mi
       restartPolicy: Always
       serviceAccountName: ""
       volumes: null
