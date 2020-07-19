@@ -53,7 +53,8 @@ func (m *Master) restoreFromSnapshot() bool {
 	m.Tasks = make(map[int]*api.TaskState, len(snapshot.Tasks))
 
 	for id, task := range snapshot.Tasks {
-		m.Tasks[id] = &task
+		t := task
+		m.Tasks[id] = &t
 	}
 
 	m.mu.Unlock()

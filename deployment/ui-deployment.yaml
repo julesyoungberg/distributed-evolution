@@ -29,8 +29,6 @@ spec:
           value: http://distributed.ga/api
         - name: CHANNEL_URL
           value: ws://distributed.ga/api/subscribe
-        - name: GET_HOSTS_FROM
-          value: dns
         - name: NODE_ENV
           value: development
         - name: PORT

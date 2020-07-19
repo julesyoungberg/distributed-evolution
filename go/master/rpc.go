@@ -21,26 +21,17 @@ func (m *Master) UpdateTask(args, reply *api.TaskState) error {
 		return fmt.Errorf("expected job ID %v, got %v", m.Job.ID, args.JobID)
 	}
 
-	task := m.Tasks[args.ID]
-	if task == nil {
+	task, ok := m.Tasks[args.ID]
+	if !ok || task == nil {
 		return fmt.Errorf("task %v not found", args.ID)
 	}
 
-	if task.WorkerID == 0 && task.Thread == 0 {
-		task.WorkerID = args.WorkerID
-		task.Thread = args.Thread
-	}
-
-	if args.WorkerID != task.WorkerID || args.Thread != task.Thread {
+	if !(task.WorkerID == 0 && task.Thread == 0) && (args.WorkerID != task.WorkerID || args.Thread != task.Thread) {
 		return fmt.Errorf("task %v is being worked on by thread %v of worker %v", task.ID, task.Thread, task.WorkerID)
 	}
 
-	task.Generation = args.Generation
-	task.Status = args.Status
-	task.Thread = args.Thread
-	task.WorkerID = args.WorkerID
-	task.LastUpdate = time.Now()
-	m.Tasks[args.ID] = task
+	m.Tasks[args.ID] = args
+	m.Tasks[args.ID].LastUpdate = time.Now()
 
 	return nil
 }

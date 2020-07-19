@@ -22,8 +22,6 @@ spec:
         image: julesyoungberg/distributed-evolution-worker
         imagePullPolicy: ""
         env:
-        - name: GET_HOSTS_FROM
-          value: dns
         - name: MASTER_URL
           value: master:8080
         - name: REDIS_MASTER_NAME

@@ -64,7 +64,7 @@ func (m *Master) generateTask(x, y, colWidth, rowWidth int, M float64, targetIma
 		ID:         task.ID,
 		JobID:      job.ID,
 		LastUpdate: time.Now(),
-		Status:     "quued",
+		Status:     "queued",
 	}
 
 	m.mu.Lock()
