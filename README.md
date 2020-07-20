@@ -17,6 +17,8 @@ minikube addons enable ingress
 sh ./build_apply.sh
 ```
 
+redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/
+
 
 ## Deployment
 The system can be deployed to any cloud provider that supports Kubernetes, such as GCP.
@@ -34,9 +36,6 @@ gcloud compute addresses describe distributed-evolution-ip
 ```
 
 Alternatively, configure `ui/docker-compose.yml` and run `docker-compose up` from `./ui`
-
-TODO: Setup TLS
-https://medium.com/@johnclarke_82232/tls-configuration-in-gke-the-really-simple-way-5af7abb0e8e1
 
 ### Deploy
 ```shell
@@ -57,15 +56,16 @@ gcloud compute addresses delete distributed-evolution-ip --global
 
 ## TODO
 
-1. Shrink solution space - https://github.com/hybridgroup/gocv
-    - get colors from original image
-        - https://stackoverflow.com/questions/35479344/how-to-get-color-palette-from-image-using-opencv
-        - https://stackoverflow.com/questions/34734379/is-there-a-formula-to-determine-overall-color-given-bgr-values-opencv-and-c/34734939#34734939
-    - quanitze values like position and rotation
-    - precompute pieces
-    - run line detection on target image - https://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html
+Shrink the solution space - https://github.com/hybridgroup/gocv
+- get colors from original image
+    - https://stackoverflow.com/questions/35479344/how-to-get-color-palette-from-image-using-opencv
+    - https://stackoverflow.com/questions/34734379/is-there-a-formula-to-determine-overall-color-given-bgr-values-opencv-and-c/34734939#34734939
+- quanitze values like position and rotation
+- precompute pieces
+- run line detection on target image - https://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html
 
-redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/
+TODO: Setup TLS
+https://medium.com/@johnclarke_82232/tls-configuration-in-gke-the-really-simple-way-5af7abb0e8e1
 
 
 # Design

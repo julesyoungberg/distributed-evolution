@@ -32,11 +32,11 @@ spec:
           value: "5"
         resources:
           requests:
-            cpu: 0.5
-            memory: 400Mi
+            cpu: 0.75
+            memory: 100Mi
           limits:
-            cpu: 1.0
-            memory: 800Mi
+            cpu: 1.5
+            memory: 500Mi
       restartPolicy: Always
       serviceAccountName: ""
       volumes: null
