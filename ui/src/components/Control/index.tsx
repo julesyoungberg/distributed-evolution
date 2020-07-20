@@ -43,7 +43,7 @@ interface Config {
 const initialConfig: Config = Object.freeze({
     shapeType: 'polygons',
     numShapes: 300,
-    shapeSize: 30,
+    shapeSize: 20,
     popSize: 50,
     poolSize: 10,
     mutationRate: 0.02,

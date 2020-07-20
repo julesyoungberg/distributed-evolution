@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const RPC_TIMEOUT = 1
+const TIMEOUT = 2
 
 func Update(args TaskState) error {
 	var reply Task
@@ -47,7 +47,7 @@ func handleRPC(rpcCall func() bool) (bool, bool) {
 	select {
 	case s := <-c:
 		success = s
-	case <-time.After(time.Second):
+	case <-time.After(TIMEOUT * time.Second):
 		timeout = true
 	}
 

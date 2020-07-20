@@ -26,7 +26,7 @@ The system can be deployed to any cloud provider that supports Kubernetes, such 
 ### Setup
 ```shell
 gcloud compute addresses create distributed-evolution-ip --global
-gcloud container clusters create distributed-evolution --num-nodes=8
+gcloud container clusters create distributed-evolution --num-nodes=6 --machine-type n1-highcpu-4
 gcloud container clusters get-credentials distributed-evolution
 ```
 
@@ -44,7 +44,7 @@ kubectl apply -f deployment/prod
 
 ### Scale
 ```shell
-gcloud container clusters resize distributed-evolution --num-nodes 16
+gcloud container clusters resize distributed-evolution --num-nodes 8
 ```
 
 ### Cleanup

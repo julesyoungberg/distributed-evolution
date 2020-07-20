@@ -36,19 +36,19 @@ spec:
         - name: START_RANDOM_JOB
           value: "false"
         - name: WORKERS
-          value: "5"
+          value: "6"
         - name: WORKER_THREADS
-          value: "5"
+          value: "6"
         readinessProbe:
           httpGet:
             path: /api/healthz
             port: 9000
         resources:
           requests:
-            cpu: 0.4
+            cpu: 0.8
             memory: 100Mi
           limits:
-            cpu: 0.8
+            cpu: 1
             memory: 500Mi
       restartPolicy: Always
       serviceAccountName: ""
