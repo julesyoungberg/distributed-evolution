@@ -9,11 +9,6 @@ spec:
   - http:
       paths:
       - path: /api
-        pathType: Prefix
         backend:
           serviceName: master
-          servicePort: 80
-      - path: /
-        backend:
-          serviceName: ui
           servicePort: 80
