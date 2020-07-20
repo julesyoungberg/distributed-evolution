@@ -23,23 +23,25 @@ The system can be deployed to any cloud provider that supports Kubernetes, such 
 
 ### Setup
 ```shell
+gcloud compute addresses create distributed-evolution-ip --global
 gcloud container clusters create distributed-evolution --num-nodes=8
 gcloud container clusters get-credentials distributed-evolution
 ```
 
+Configure `API_URL` and `CHANNEL_URL` in `deployment/prod/ui-deployment.yaml` based on the output of
+```shell
+gcloud compute addresses describe distributed-evolution-ip
+```
+
+Alternatively, configure `ui/docker-compose.yml` and run `docker-compose up` from `./ui`
+
 TODO: Setup TLS
 https://medium.com/@johnclarke_82232/tls-configuration-in-gke-the-really-simple-way-5af7abb0e8e1
-https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs
-https://cloud.google.com/run/docs/gke/auto-tls
 
 ### Deploy
 ```shell
 kubectl apply -f deployment/prod
 ```
-
-The best way to deploy the UI is with [Vercel](https://vercel.com/), but TLS on the cluster must be setup.
-Alternatively, configure `ui/docker-compose.yml` to point at the cluster and run it locally.
-OR: https://itnext.io/frontend-dockerized-build-artifacts-with-nextjs-9463f3da3362
 
 ### Scale
 ```shell
@@ -49,6 +51,7 @@ gcloud container clusters resize distributed-evolution --num-nodes 16
 ### Cleanup
 ```shell
 gcloud container clusters delete distributed-evolution
+gcloud compute addresses delete distributed-evolution-ip --global
 ```
 
 

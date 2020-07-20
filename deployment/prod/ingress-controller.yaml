@@ -3,12 +3,18 @@ kind: Ingress
 metadata:
   name: ingress-controller
   annotations:
+    kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.global-static-ip-name: "distributed-evolution-ip"
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
 spec:
   rules:
   - http:
       paths:
-      - path: /api
+      - path: /api/*
         backend:
           serviceName: master
           servicePort: 80
+      # - path: /
+      #   backend:
+      #     serviceName: ui
+      #     servicePort: 80

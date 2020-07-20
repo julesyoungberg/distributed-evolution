@@ -5,7 +5,7 @@ services:
     master:
         build:
             context: .
-            dockerfile: ./master.Dockerfile
+            dockerfile: master.Dockerfile
         environment: 
             HTTP_PORT: 9000
             REDIS_MASTER_NAME: mymaster
@@ -20,14 +20,16 @@ services:
     worker:
         build:
             context: .
-            dockerfile: ./worker.Dockerfile
+            dockerfile: worker.Dockerfile
         environment: 
             MASTER_URL: master:8080
             REDIS_MASTER_NAME: mymaster
             SENTINELS: distributed-evolution_sentinel_1:26379,distributed-evolution_sentinel_2:26379,distributed-evolution_sentinel_3:26379
             THREADS: 5
     ui:
-        build: ui
+        build:
+            context: ui
+            dockerfile: dev.Dockerfile
         environment: 
             API_URL: http://localhost:9000/api
             CHANNEL_URL: ws://localhost:9000/api/subscribe

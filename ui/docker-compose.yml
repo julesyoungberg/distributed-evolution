@@ -3,10 +3,12 @@ version: '3'
 
 services:
     ui:
-        build: .
+        build:
+            context: .
+            dockerfile: dev.dockerfile
         environment: 
-            API_URL: http://35.203.130.216/api
-            CHANNEL_URL: ws://35.203.130.216/api/subscribe
+            API_URL: http://34.107.198.190/api
+            CHANNEL_URL: ws://34.107.198.190/api/subscribe
             NODE_ENV: development
             PORT: 3000
         ports:

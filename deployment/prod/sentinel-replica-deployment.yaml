@@ -33,8 +33,8 @@ spec:
               fieldPath: status.podIP
         resources:
           requests:
-            cpu: 0.25
+            cpu: 0.1
             memory: 300Mi
           limits:
-            cpu: 0.5
+            cpu: 0.2
             memory: 600Mi
