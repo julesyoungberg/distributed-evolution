@@ -3,12 +3,12 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: master
+    app: master
   name: master
 spec:
   type: LoadBalancer
   selector:
-    io.kompose.service: master
+    app: master
   ports:
   - name: http
     port: 80

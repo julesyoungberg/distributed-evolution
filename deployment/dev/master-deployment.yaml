@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: master
+    app: master
   name: master
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: master
+      app: master
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: master
+        app: master
     spec:
       containers:
       - name: master

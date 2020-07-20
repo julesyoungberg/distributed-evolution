@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: worker
+    app: worker
   name: worker
 spec:
   replicas: 5
   selector:
     matchLabels:
-      io.kompose.service: worker
+      app: worker
   strategy: {}
   template:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: worker
+        app: worker
     spec:
       containers:
       - name: worker

@@ -3,12 +3,12 @@ kind: Service
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: ui
+    app: ui
   name: ui
 spec:
   type: LoadBalancer
   selector:
-    io.kompose.service: ui
+    app: ui
   ports:
   - port: 80
     targetPort: 3000

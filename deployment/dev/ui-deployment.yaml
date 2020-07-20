@@ -3,20 +3,20 @@ kind: Deployment
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: ui
+    app: ui
   name: ui
 spec:
   replicas: 1
   selector:
     matchLabels:
-      io.kompose.service: ui
+      app: ui
   strategy:
     type: Recreate
   template:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: ui
+        app: ui
     spec:
       containers:
       - name: ui
