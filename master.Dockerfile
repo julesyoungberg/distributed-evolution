@@ -18,4 +18,4 @@ EXPOSE 8080
 
 # ENTRYPOINT CompileDaemon --build="go build go/main/master.go" --command=./master
 
-ENTRYPOINT go run go/main/master.go
+ENTRYPOINT go run go/main/master/master.go

@@ -12,4 +12,4 @@ RUN go mod download
 
 # ENTRYPOINT CompileDaemon --build="go build go/main/worker.go" --command=./worker
 
-ENTRYPOINT go run go/main/worker.go
+ENTRYPOINT go run go/main/worker/worker.go

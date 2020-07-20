@@ -30,8 +30,8 @@ func (m *Master) UpdateTask(args, reply *api.TaskState) error {
 		return fmt.Errorf("task %v is being worked on by thread %v of worker %v", task.ID, task.Thread, task.WorkerID)
 	}
 
+	args.LastUpdate = time.Now()
 	m.Tasks[args.ID] = args
-	m.Tasks[args.ID].LastUpdate = time.Now()
 
 	return nil
 }

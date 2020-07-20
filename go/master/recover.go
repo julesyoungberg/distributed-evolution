@@ -25,7 +25,6 @@ func (m *Master) recover(id int) {
 		// mark it as stale and forget about it
 		log.Printf("[failure detector] task %v is from job %v, the current job is %v", task.ID, task.JobID, m.Job.ID)
 		task.Status = "stale"
-		m.Tasks[id] = task
 		m.mu.Unlock()
 		return
 	}
@@ -33,16 +32,19 @@ func (m *Master) recover(id int) {
 	task.Status = "queued"
 	task.WorkerID = 0
 	task.Thread = 0
+	task.LastUpdate = time.Now()
 	m.mu.Unlock()
 
-	err := m.db.PushTaskID(m.Tasks[id].ID)
+	err := m.db.PushTaskID(task.ID)
 	if err != nil {
-		log.Printf("[failure detector] error %v", err)
+		log.Printf("[failure detector] error pushing task: %v", err)
 
 		// try again next round
 		m.mu.Lock()
-		m.Tasks[id].Status = "inprogress"
+		task.Status = "inprogress"
 		m.mu.Unlock()
+	} else {
+		log.Printf("[failure detector] requeued task %v", task.ID)
 	}
 }
 
@@ -57,14 +59,14 @@ func (m *Master) detectFailures() {
 
 		m.mu.Lock()
 
-		for i, t := range m.Tasks {
-			workerTimeout := t.Status == "inprogress" && time.Since(t.LastUpdate) > timeout
-			queueTimeout := t.Status == "queued" && time.Since(t.LastUpdate) > queueTimeout
+		for id, task := range m.Tasks {
+			workerTimeout := task.Status == "inprogress" && time.Since(task.LastUpdate) > timeout
+			queueTimeout := task.Status == "queued" && time.Since(task.LastUpdate) > queueTimeout
 
 			if workerTimeout || queueTimeout {
-				util.DPrintf("[failure detector] %v task %v timed out!", t.Status, i)
-				m.Tasks[i].Status = "failed"
-				go m.recover(i)
+				util.DPrintf("[failure detector] %v task %v timed out, recovering", task.Status, id)
+				task.Status = "failed"
+				go m.recover(id)
 			}
 		}
 
