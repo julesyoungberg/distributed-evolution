@@ -4,7 +4,7 @@ Genetic algorithms are a problem solving technique based on Darwin’s theory of
 
 
 ## Development
-With `docker-compose`:
+With `docker-compose`
 ```
 docker network create distributed-ga
 sh ./start.sh
