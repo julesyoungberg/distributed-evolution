@@ -7,7 +7,7 @@ Genetic algorithms are a problem solving technique based on Darwin’s theory of
 With `docker-compose`:
 ```
 docker network create distributed-ga
-sh ./run.sh
+sh ./start.sh
 ```
 
 Or with minikube:
@@ -20,6 +20,8 @@ sh ./build_apply.sh
 
 ## Deployment
 https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html
+https://www.replex.io/blogkubernetes-in-production-readiness-checklist-and-best-practices-for-resource-management
+
 
 ## TODO
 

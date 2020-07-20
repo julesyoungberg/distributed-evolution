@@ -26,28 +26,6 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// keep websocket connection alive for as long as possible
-// by periodically sending a message
-func (m *Master) keepAlive(c *websocket.Conn) {
-	for {
-		m.connMu.Lock()
-
-		if time.Since(m.lastUpdate) > m.wsHeartbeatTimeout {
-			err := c.WriteMessage(websocket.PingMessage, []byte("keepalive"))
-			if err != nil {
-				m.connMu.Unlock()
-				return
-			}
-
-			m.lastUpdate = time.Now()
-		}
-
-		m.connMu.Unlock()
-
-		time.Sleep(200 * time.Millisecond)
-	}
-}
-
 // subscribe handler creates a websocket connection with the client
 // TODO handle multiple connections
 func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
@@ -73,8 +51,6 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	m.connMu.Unlock()
-
-	go m.keepAlive(conn)
 }
 
 func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64) {

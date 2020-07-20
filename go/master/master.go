@@ -60,7 +60,7 @@ func Run() {
 		wsHeartbeatTimeout: 2 * time.Second,
 	}
 
-	if !m.restoreFromSnapshot() {
+	if !m.restoreFromSnapshot() && os.Getenv("START_RANDOM_JOB") == "true" {
 		m.startRandomTask()
 	}
 

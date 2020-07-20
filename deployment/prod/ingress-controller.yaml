@@ -4,12 +4,9 @@ metadata:
   name: ingress-controller
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    # kubernetes.io/ingress.class: nginx
-    # ingress.kubernetes.io/ssl-redirect: 'true'
 spec:
   rules:
-  - host: distributed.ga
-    http:
+  - http:
       paths:
       - path: /api
         pathType: Prefix

@@ -33,6 +33,8 @@ spec:
           value: "8080"
         - name: SENTINELS
           value: sentinel-master:26379
+        - name: START_RANDOM_JOB
+          value: "true"
         - name: WORKERS
           value: "5"
         - name: WORKER_THREADS
