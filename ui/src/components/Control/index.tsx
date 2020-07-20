@@ -114,10 +114,11 @@ export default function Control() {
         name: name,
         value: config[name],
         onChange: (e: InputEvent) => {
-            console.log(Object.keys(e.target))
+            const target = e.target as HTMLInputElement
+            console.log(Object.keys(target))
             setConfig({
                 ...config,
-                [e.target.name!]: e.target.value!,
+                [target.name]: target.value,
             })
         },
     })

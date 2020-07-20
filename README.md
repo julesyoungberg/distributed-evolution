@@ -19,8 +19,11 @@ sh ./build_apply.sh
 
 
 ## Deployment
+The system can be deployed to any cloud provider that supports Kubernetes. 
 https://matthewpalmer.net/kubernetes-app-developer/articles/kubernetes-ingress-guide-nginx-example.html
 https://www.replex.io/blogkubernetes-in-production-readiness-checklist-and-best-practices-for-resource-management
+
+The best way to deploy the UI is with [Vercel](https://vercel.com/).
 
 
 ## TODO
