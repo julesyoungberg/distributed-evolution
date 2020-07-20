@@ -8,12 +8,12 @@ services:
             dockerfile: ./master.Dockerfile
         environment: 
             HTTP_PORT: 9000
-            WORKERS: 5
-            WORKER_THREADS: 5
             REDIS_MASTER_NAME: mymaster
             RPC_PORT: 8080
             SENTINELS: distributed-evolution_sentinel_1:26379,distributed-evolution_sentinel_2:26379,distributed-evolution_sentinel_3:26379
             START_RANDOM_JOB: "true"
+            WORKERS: 5
+            WORKER_THREADS: 5
         ports:
             - 9000:9000
             - 8080

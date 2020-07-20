@@ -74,7 +74,7 @@ export default function Control() {
 
         const img = new Image()
         img.crossOrigin = 'anonymous'
-        img.src = 'https://picsum.photos/900'
+        img.src = `https://picsum.photos/900?now=${Date.now()}`
 
         img.onload = () => {
             dispatch({ type: 'setTarget', payload: { target: getBase64Image(img) } })
