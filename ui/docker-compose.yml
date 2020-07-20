@@ -1,0 +1,18 @@
+---
+version: '3'
+
+services:
+    ui:
+        build: .
+        environment: 
+            API_URL: http://35.203.130.216/api
+            CHANNEL_URL: ws://35.203.130.216/api/subscribe
+            NODE_ENV: development
+            PORT: 3000
+        ports:
+            - 3000:3000
+        restart: unless-stopped
+        volumes:
+            - ./:/app
+            - /app/node_modules/
+            - /app/.next

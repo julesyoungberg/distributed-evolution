@@ -19,32 +19,42 @@ sh ./build_apply.sh
 
 
 ## Deployment
-The system can be deployed to any cloud provider that supports Kubernetes, such as GCP:
-```
-gcloud container clusters create distributed-evolution --num-nodes=1
+The system can be deployed to any cloud provider that supports Kubernetes, such as GCP.
+
+### Setup
+```shell
+gcloud container clusters create distributed-evolution --num-nodes=8
 gcloud container clusters get-credentials distributed-evolution
 ```
 
-To scale
-```
-gcloud container clusters resize distributed-evolution --num-nodes NUM_NODES
+TODO: Setup TLS
+https://medium.com/@johnclarke_82232/tls-configuration-in-gke-the-really-simple-way-5af7abb0e8e1
+https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs
+https://cloud.google.com/run/docs/gke/auto-tls
+
+### Deploy
+```shell
+kubectl apply -f deployment/prod
 ```
 
-The best way to deploy the UI is with [Vercel](https://vercel.com/).
+The best way to deploy the UI is with [Vercel](https://vercel.com/), but TLS on the cluster must be setup.
+Alternatively, configure `ui/docker-compose.yml` to point at the cluster and run it locally.
+OR: https://itnext.io/frontend-dockerized-build-artifacts-with-nextjs-9463f3da3362
+
+### Scale
+```shell
+gcloud container clusters resize distributed-evolution --num-nodes 16
+```
+
+### Cleanup
+```shell
+gcloud container clusters delete distributed-evolution
+```
 
 
 ## TODO
 
-1. Kubernetes
-    - Working locally with minikube
-    - Deploy to GCP
-    - figure out what to do with the front end
-        - run in development in production :grimace: :yikes:
-        - run next in production in the cluster - https://itnext.io/frontend-dockerized-build-artifacts-with-nextjs-9463f3da3362
-        - build to static files and deploy with now.sh
-            - this makes the most sense and is the most efficient
-            - once the rest of the application is working on GCP with a static url, this would be easy
-2. Shrink solution space - https://github.com/hybridgroup/gocv
+1. Shrink solution space - https://github.com/hybridgroup/gocv
     - get colors from original image
         - https://stackoverflow.com/questions/35479344/how-to-get-color-palette-from-image-using-opencv
         - https://stackoverflow.com/questions/34734379/is-there-a-formula-to-determine-overall-color-given-bgr-values-opencv-and-c/34734939#34734939
