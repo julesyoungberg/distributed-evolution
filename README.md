@@ -56,22 +56,25 @@ gcloud compute addresses delete distributed-evolution-ip --global
 
 ## TODO
 
-Fix body stream is locked error
+Class:
+- Switch from num shapes per slice to total number of shapes for all slices combined.
+- Fix body stream is locked error for `response.text()`.
+- Debug production environment.
+- Performance tracking - track time and fitness.
+- Add ability to select image from computer.
+- Process Flow (Follow?) Diagram.
 
-Production logs -> save them to the equivalent of cloudwatch log groups
-
-Process Flow or Follow Diagram
-
-Shrink the solution space - https://github.com/hybridgroup/gocv
-- get colors from original image
-    - https://stackoverflow.com/questions/35479344/how-to-get-color-palette-from-image-using-opencv
-    - https://stackoverflow.com/questions/34734379/is-there-a-formula-to-determine-overall-color-given-bgr-values-opencv-and-c/34734939#34734939
-- quanitze values like position and rotation
-- precompute pieces
-- run line detection on target image - https://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html
-
-TODO: Setup TLS
-https://medium.com/@johnclarke_82232/tls-configuration-in-gke-the-really-simple-way-5af7abb0e8e1
+Fun:
+- Create line shape. 
+- Shrink the solution space - https://github.com/hybridgroup/gocv
+    - get colors from original image
+        - https://stackoverflow.com/questions/35479344/how-to-get-color-palette-from-image-using-opencv
+        - https://stackoverflow.com/questions/34734379/is-there-a-formula-to-determine-overall-color-given-bgr-values-opencv-and-c/34734939#34734939
+    - quanitze values like position and rotation (scale down grid for computation and scale up for drawing)
+    - precompute pieces (store all possible shapes in redis)
+    - run line detection on target image - https://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html
+        - emphasize errors on lines
+        - adjust shape type
 
 
 # Design
