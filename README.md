@@ -56,6 +56,8 @@ gcloud compute addresses delete distributed-evolution-ip --global
 
 ## TODO
 
+Fix body stream is locked error
+
 Production logs -> save them to the equivalent of cloudwatch log groups
 
 Process Flow or Follow Diagram
