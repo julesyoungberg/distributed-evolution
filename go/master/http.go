@@ -2,6 +2,7 @@ package master
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -108,12 +109,34 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-
 	if _, err := io.WriteString(w, `{"alive": true}`); err != nil {
 		util.DPrintf("health check error: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (m *Master) getKeyFromRedis(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	data, err := m.db.Get(params["key"])
+	if err != nil {
+		e := fmt.Sprintf("error getting key %v from redis: %v", params["key"], err)
+		util.DPrintf(e)
+		w.WriteHeader(http.StatusInternalServerError)
+
+		if _, err := io.WriteString(w, e); err != nil {
+			util.DPrintf("error writing error to response: %v", err)
+		}
+	}
+
+	if _, err := io.WriteString(w, data); err != nil {
+		util.DPrintf("error writing value from redis key %v to response: %v", params["key"], err)
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // handles requests from the ui and websocket communication
@@ -122,7 +145,8 @@ func (m *Master) httpServer() {
 
 	r.HandleFunc("/api/job", m.newJob).Methods(http.MethodPost, http.MethodOptions)
 	r.HandleFunc("/api/subscribe", m.subscribe)
-	r.HandleFunc("/api/healthz", healthCheck).Methods(http.MethodGet, http.MethodOptions)
+	r.HandleFunc("/api/healthz", healthCheck).Methods(http.MethodGet)
+	r.HandleFunc("/api/redis/{key:[0-9A-Za-z:]+}", m.getKeyFromRedis).Methods(http.MethodGet)
 
 	port := os.Getenv("HTTP_PORT")
 
