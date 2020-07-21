@@ -7,14 +7,14 @@ Genetic algorithms are a problem solving technique based on Darwin’s theory of
 With `docker-compose`
 ```
 docker network create distributed-ga
-sh ./start.sh
+sh ./scripts/start.sh
 ```
 
 Or with minikube:
 ```
 minikube start --driver=hyperkit
 minikube addons enable ingress
-sh ./build_apply.sh
+sh ./scripts/build_apply.sh
 ```
 
 redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/
