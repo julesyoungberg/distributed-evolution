@@ -38,11 +38,11 @@ func CreateShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
 		shapes := Shapes{
 			Bounds:  bounds,
 			Context: ctx,
-			Members: make([]Shape, ctx.Task.Job.NumShapes),
+			Members: make([]Shape, ctx.Task.Job.ShapesPerSlice),
 			Type:    ctx.Task.Type,
 		}
 
-		for i := 0; i < int(ctx.Task.Job.NumShapes); i++ {
+		for i := 0; i < int(ctx.Task.Job.ShapesPerSlice); i++ {
 			shapes.Members[i] = createShape(float64(ctx.Task.Job.ShapeSize), bounds, rng)
 		}
 

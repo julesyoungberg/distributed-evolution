@@ -26,15 +26,16 @@ type WorkerTask struct {
 }
 
 type Job struct {
-	CrossRate    float64 `json:"crossRate"`
-	ID           int     `json:"ID"`
-	MutationRate float64 `json:"mutationRate"`
-	NumShapes    uint    `json:"numShapes"`
-	OverDraw     int     `json:"overDraw"`
-	PoolSize     uint    `json:"poolSize"`
-	PopSize      uint    `json:"popSize"`
-	ShapeSize    uint    `json:"shapeSize"`
-	TargetImage  string  `json:"targetImage"`
+	CrossRate      float64 `json:"crossRate"`
+	ID             int     `json:"ID"`
+	MutationRate   float64 `json:"mutationRate"`
+	NumShapes      int     `json:"numShapes"`
+	OverDraw       int     `json:"overDraw"`
+	PoolSize       uint    `json:"poolSize"`
+	PopSize        uint    `json:"popSize"`
+	ShapeSize      uint    `json:"shapeSize"`
+	ShapesPerSlice int     `json:"shapesPerSlice"`
+	TargetImage    string  `json:"targetImage"`
 }
 
 type Task struct {

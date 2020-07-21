@@ -105,6 +105,7 @@ func (m *Master) generateTasks() {
 
 	N := math.Floor(math.Sqrt(float64(totalThreads)))
 	M := math.Floor(float64(totalThreads) / N)
+	m.Job.ShapesPerSlice = m.Job.NumShapes / (int(N) * int(M))
 
 	colWidth := int(math.Ceil(float64(m.TargetImage.Width) / N))
 	rowWidth := int(math.Ceil(float64(m.TargetImage.Height) / M))
