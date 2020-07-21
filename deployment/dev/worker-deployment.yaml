@@ -6,7 +6,7 @@ metadata:
     app: worker
   name: worker
 spec:
-  replicas: 5
+  replicas: 6
   selector:
     matchLabels:
       app: worker
@@ -29,7 +29,7 @@ spec:
         - name: SENTINELS
           value: sentinel-master:26379
         - name: THREADS
-          value: "5"
+          value: "6"
       restartPolicy: Always
       serviceAccountName: ""
       volumes: null

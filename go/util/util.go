@@ -91,7 +91,7 @@ func RandomColor(rng *rand.Rand) color.RGBA {
 		return uint8(rng.Intn(4) * 64)
 	}
 
-	return color.RGBA{f(), f(), f(), f()}
+	return color.RGBA{f(), f(), f(), uint8(rng.Intn(4)*32 + 128)}
 }
 
 func RandomVector(rng *rand.Rand, bounds Vector) Vector {

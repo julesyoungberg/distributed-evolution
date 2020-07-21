@@ -12,6 +12,9 @@ import (
 )
 
 func (m *Master) allStale() bool {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
 	for _, t := range m.Tasks {
 		if t.Status != "stale" {
 			return false
@@ -130,8 +133,10 @@ func (m *Master) generateTasks() {
 	wg.Wait()
 
 	m.mu.Lock()
-	log.Printf("[task generator] %v tasks created", len(m.Tasks))
+	nTasks := len(m.Tasks)
 	m.mu.Unlock()
+
+	log.Printf("[task generator] %v tasks created", nTasks)
 }
 
 func (m *Master) startRandomTask() {

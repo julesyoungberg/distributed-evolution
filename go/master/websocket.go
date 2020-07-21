@@ -38,9 +38,9 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.connMu.Lock()
-
 	log.Printf("new websocket connection request")
+
+	m.connMu.Lock()
 
 	// save the connection for updates
 	m.conn = conn

@@ -10,22 +10,26 @@ import (
 // recovers a failed task by fetching the
 func (m *Master) recover(id int) {
 	m.mu.Lock()
-	task := m.Tasks[id]
+	task := *m.Tasks[id]
+	jobID := m.Job.ID
+	m.mu.Unlock()
 
 	// in case an update was received between
 	// this function being called and the lock being received
 	if task.Status != "failed" {
-		m.mu.Unlock()
 		return
 	}
 
 	// check if this task is still up to date
-	if task.JobID != m.Job.ID {
+	if task.JobID != jobID {
 		// if this task is from a previous job,
 		// mark it as stale and forget about it
 		log.Printf("[failure detector] task %v is from job %v, the current job is %v", task.ID, task.JobID, m.Job.ID)
+
+		m.mu.Lock()
 		task.Status = "stale"
 		m.mu.Unlock()
+
 		return
 	}
 
@@ -33,6 +37,9 @@ func (m *Master) recover(id int) {
 	task.WorkerID = 0
 	task.Thread = 0
 	task.LastUpdate = time.Now()
+
+	m.mu.Lock()
+	m.Tasks[id] = &task
 	m.mu.Unlock()
 
 	err := m.db.PushTaskID(task.ID)
@@ -51,8 +58,8 @@ func (m *Master) recover(id int) {
 // check that each inprogress task is active by checking its last update
 // if a task times out, mark it as failed and begin recovery process
 func (m *Master) detectFailures() {
-	timeout := 5 * time.Second
-	queueTimeout := 30 * time.Second
+	timeout := 20 * time.Second
+	queueTimeout := 60 * time.Second
 
 	for {
 		time.Sleep(timeout / 4)

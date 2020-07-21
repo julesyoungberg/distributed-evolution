@@ -36,9 +36,9 @@ spec:
         - name: START_RANDOM_JOB
           value: "true"
         - name: WORKERS
-          value: "5"
+          value: "6"
         - name: WORKER_THREADS
-          value: "5"
+          value: "6"
       restartPolicy: Always
       serviceAccountName: ""
       volumes: null

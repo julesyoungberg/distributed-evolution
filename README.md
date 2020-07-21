@@ -56,6 +56,8 @@ gcloud compute addresses delete distributed-evolution-ip --global
 
 ## TODO
 
+Production logs -> save them to the equivalent of cloudwatch log groups
+
 Process Flow or Follow Diagram
 
 Shrink the solution space - https://github.com/hybridgroup/gocv

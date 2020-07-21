@@ -1,1 +1,1 @@
-sh build.sh && sh apply.sh
+sh scripts/build.sh && sh scripts/apply.sh

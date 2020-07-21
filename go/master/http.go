@@ -81,6 +81,8 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.Job.ID = newID
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
 
+	m.mu.Unlock()
+
 	// clear the queue of all tasks
 	for {
 		_, err := m.db.PullTask()
@@ -89,6 +91,8 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	m.mu.Lock()
+
 	// mark any qeued tasks as stale
 	for _, task := range m.Tasks {
 		if task.Status == "queued" {
@@ -96,14 +100,12 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	m.mu.Unlock()
+
 	// wait for all the workers to stop
 	for !m.allStale() {
-		m.mu.Unlock()
 		time.Sleep(time.Second)
-		m.mu.Lock()
 	}
-
-	m.mu.Unlock()
 
 	m.generateTasks()
 }
