@@ -110,7 +110,7 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
 	if _, err := io.WriteString(w, `{"alive": true}`); err != nil {
-		util.DPrintf("health check error: %v", err)
+		log.Printf("health check error: %v", err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
@@ -123,16 +123,16 @@ func (m *Master) getKeyFromRedis(w http.ResponseWriter, r *http.Request) {
 	data, err := m.db.Get(params["key"])
 	if err != nil {
 		e := fmt.Sprintf("error getting key %v from redis: %v", params["key"], err)
-		util.DPrintf(e)
+		log.Printf(e)
 		w.WriteHeader(http.StatusInternalServerError)
 
 		if _, err := io.WriteString(w, e); err != nil {
-			util.DPrintf("error writing error to response: %v", err)
+			log.Printf("error writing error to response: %v", err)
 		}
 	}
 
 	if _, err := io.WriteString(w, data); err != nil {
-		util.DPrintf("error writing value from redis key %v to response: %v", params["key"], err)
+		log.Printf("error writing value from redis key %v to response: %v", params["key"], err)
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
