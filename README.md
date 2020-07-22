@@ -57,7 +57,6 @@ gcloud compute addresses delete distributed-evolution-ip --global
 ## TODO
 
 Class:
-- Switch from num shapes per slice to total number of shapes for all slices combined.
 - Fix body stream is locked error for `response.text()`.
 - Debug production environment.
 - Performance tracking - track time and fitness.

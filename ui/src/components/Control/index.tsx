@@ -97,7 +97,17 @@ export default function Control() {
 
         console.log('response', response)
 
-        const data = await response.json().catch(() => response.text())
+        let data: any
+
+        try {
+            if (response.status === 200) {
+                data = await response.json()
+            } else {
+                data = await response.text()
+            }
+        } catch(e) {
+            data = e
+        }
 
         console.log('data', data)
 
