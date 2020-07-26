@@ -8,9 +8,9 @@ import Image from './Image'
 
 export default function Status() {
     const { state } = useAppState()
-    const { error, fitness, generation, nextTargetImage, output, status, targetImage } = state
+    const { error, fitness, generation, jobID, nextTargetImage, output, status, targetImage } = state
 
-    if (['active', 'editing', 'idle'].includes(status)) {
+    if (['active', 'editing'].includes(status) && jobID > 0) {
         let targetSrc = status === 'editing' ? nextTargetImage : targetImage
    
         return (
@@ -34,6 +34,18 @@ export default function Status() {
         )
     }
 
+    let msg = ''
+
+    if (jobID === 0) {
+        msg = 'No active job'
+    } else if (status === 'error' && error) {
+        msg = 'Error: ' + error
+    } else {
+        msg = 'Disconnected from cluster'
+    }
+
+    console.log(state)
+
     return (
         <Box
             css={{
@@ -56,7 +68,7 @@ export default function Status() {
                 alignItems='center'
                 justifyContent='center'
             >
-                <Box>{status == 'error' && error ? 'Error: ' + error : 'Disconnected from cluster'}</Box>
+                <Box>{msg}</Box>
             </Flex>
         </Box>
     )

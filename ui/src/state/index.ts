@@ -1,11 +1,12 @@
 import React from 'react'
 
-export type Status = 'active' | 'disconnected' | 'editing' | 'error' | 'idle'
+export type Status = 'active' | 'disconnected' | 'editing' | 'error'
 
 export interface State {
     error?: any
     fitness?: number
     generation: number
+    jobID?: number
     nextTargetImage?: string
     numWorkers?: number
     output?: string

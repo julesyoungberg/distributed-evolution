@@ -1,7 +1,7 @@
 import { Action, State } from '.'
 
 function handleStatus(payload: Record<string, any>): Partial<State> {
-    if (['active', 'idle'].includes(payload.state)) {
+    if (payload.state === 'active') {
         return { status: payload.state }
     }
 
@@ -22,10 +22,10 @@ function handleUpdate(state: State, payload: Record<string, any>): Partial<State
 
     const nextState: Partial<State> = { status: state.status === 'editing' ? 'editing' : 'active' }
     
-    const fields = ['fitness', 'generation', 'numWorkers', 'output', 'targetImage', 'tasks']
+    const fields = ['fitness', 'generation', 'jobID', 'numWorkers', 'output', 'targetImage', 'tasks']
 
     fields.forEach(field => {
-        if (payload[field]) nextState[field] = payload[field]
+        if (payload[field] !== undefined) nextState[field] = payload[field]
     })
 
     return nextState
