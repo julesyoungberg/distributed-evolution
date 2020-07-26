@@ -57,7 +57,6 @@ gcloud compute addresses delete distributed-evolution-ip --global
 ## TODO
 
 Class:
-- Fix body stream is locked error for `response.text()`.
 - Debug production environment.
 - Performance tracking - track time and fitness.
 - Add ability to select image from computer.

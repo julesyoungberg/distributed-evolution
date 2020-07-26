@@ -25,6 +25,7 @@ func (m *Master) respondWithState(w http.ResponseWriter) {
 	m.mu.Lock()
 
 	response := State{
+		JobID:            m.Job.ID,
 		NumWorkers:       m.NumWorkers,
 		Tasks:            m.Tasks,
 		ThreadsPerWorker: m.ThreadsPerWorker,

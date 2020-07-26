@@ -14,6 +14,7 @@ import (
 type State struct {
 	Fitness          float64                `json:"fitness"`
 	Generation       uint                   `json:"generation"`
+	JobID            int                    `json:"jobID"`
 	NumWorkers       int                    `json:"numWorkers"`
 	Output           string                 `json:"output"`
 	TargetImage      string                 `json:"targetImage"`
@@ -65,6 +66,7 @@ func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64
 	m.mu.Lock()
 	m.lastUpdate = time.Now()
 	tasks := m.Tasks
+	jobID := m.Job.ID
 	m.mu.Unlock()
 
 	// get resulting image
@@ -78,6 +80,7 @@ func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64
 	state := State{
 		Fitness:    fitness,
 		Generation: generation,
+		JobID:      jobID,
 		Output:     img,
 		Tasks:      tasks,
 	}
