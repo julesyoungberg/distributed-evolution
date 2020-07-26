@@ -29,6 +29,7 @@ func (m *Master) respondWithState(w http.ResponseWriter) {
 		NumWorkers:       m.NumWorkers,
 		Tasks:            m.Tasks,
 		ThreadsPerWorker: m.ThreadsPerWorker,
+		StartedAt:        m.Job.StartedAt,
 	}
 
 	m.mu.Unlock()
@@ -76,6 +77,7 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.Job = job
 	m.Job.ID = newID
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
+	m.Job.StartedAt = time.Now()
 
 	go m.respondWithState(w)
 

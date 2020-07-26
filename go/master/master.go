@@ -61,7 +61,7 @@ func Run() {
 	}
 
 	if !m.restoreFromSnapshot() && os.Getenv("START_RANDOM_JOB") == "true" {
-		m.startRandomTask()
+		m.startRandomJob()
 	}
 
 	go m.httpServer()

@@ -7,8 +7,9 @@ import { useReducer } from 'react'
 import { Heading } from 'rebass'
 
 import Control from '../components/Control'
-import Table from '../components/Table'
+import Performance from '../components/Performance'
 import Status from '../components/Status'
+import Table from '../components/Table'
 
 import useChannel from '../hooks/useChannel'
 import { initialState, StateContext } from '../state'
@@ -48,6 +49,8 @@ export default function Home() {
                         <Status />
 
                         <Control />
+
+                        <Performance />
 
                         <Table />
                     </Main>

@@ -17,6 +17,7 @@ type State struct {
 	JobID            int                    `json:"jobID"`
 	NumWorkers       int                    `json:"numWorkers"`
 	Output           string                 `json:"output"`
+	StartedAt        time.Time              `json:"startedAt"`
 	TargetImage      string                 `json:"targetImage"`
 	Tasks            map[int]*api.TaskState `json:"tasks"`
 	ThreadsPerWorker int                    `json:"threadsPerWorker"`
@@ -82,6 +83,7 @@ func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64
 		Generation: generation,
 		JobID:      jobID,
 		Output:     img,
+		StartedAt:  m.Job.StartedAt,
 		Tasks:      tasks,
 	}
 

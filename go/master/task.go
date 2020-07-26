@@ -140,7 +140,7 @@ func (m *Master) generateTasks() {
 	log.Printf("[task generator] %v tasks created", nTasks)
 }
 
-func (m *Master) startRandomTask() {
+func (m *Master) startRandomJob() {
 	log.Print("fetching random image...")
 	image := util.GetRandomImage()
 
@@ -152,6 +152,7 @@ func (m *Master) startRandomTask() {
 
 	m.TargetImageBase64 = encodedImg
 	m.setTargetImage(image)
+	m.Job.StartedAt = time.Now()
 
 	go m.generateTasks()
 }

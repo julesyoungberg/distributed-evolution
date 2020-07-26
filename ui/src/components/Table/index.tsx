@@ -44,6 +44,13 @@ export default function Table() {
         <DataTable
             title='Workers'
             columns={columns}
+            customStyles={{
+                header: {
+                    style: {
+                        paddingLeft: 0,
+                    }
+                },
+            }}
             data={Object.values(state.tasks || {}).map((task) => ({
                 ...task,
                 lastUpdate: `${(now - new Date(task.lastUpdate).getTime()) / 1000} seconds ago`,
