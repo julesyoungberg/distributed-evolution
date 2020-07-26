@@ -42,11 +42,11 @@ export default function Table() {
 
     return (
         <DataTable
-            title="Workers"
+            title='Workers'
             columns={columns}
-            data={Object.values(state.tasks || {}).map(task => ({
+            data={Object.values(state.tasks || {}).map((task) => ({
                 ...task,
-                lastUpdate: `${(now - (new Date(task.lastUpdate)).getTime()) / 1000} seconds ago`,
+                lastUpdate: `${(now - new Date(task.lastUpdate).getTime()) / 1000} seconds ago`,
             }))}
         />
     )

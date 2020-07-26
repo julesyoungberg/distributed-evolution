@@ -69,18 +69,18 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.respondWithState(w)
-
 	m.mu.Lock()
-
-	m.TargetImageBase64 = base64
-	m.setTargetImage(img)
 
 	// save the job with a new ID
 	newID := m.Job.ID + 1
 	m.Job = job
 	m.Job.ID = newID
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
+
+	go m.respondWithState(w)
+
+	m.TargetImageBase64 = base64
+	m.setTargetImage(img)
 
 	m.mu.Unlock()
 

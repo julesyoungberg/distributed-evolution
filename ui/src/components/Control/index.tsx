@@ -4,7 +4,7 @@ import styled from '@emotion/styled'
 import { Input, Label, Select } from '@rebass/forms'
 import fetch from 'isomorphic-fetch'
 import getConfig from 'next/config'
-import { useState, FormEvent } from 'react'
+import { FormEvent, useRef, useState } from 'react'
 import { Box, Button, Flex } from 'rebass'
 
 import useAppState from '../../hooks/useAppState'
@@ -60,13 +60,41 @@ function getBase64Image(img: HTMLImageElement) {
     ctx.drawImage(img, 0, 0)
 
     const dataURL = canvas.toDataURL('image/png')
-    return dataURL.replace(/^data:image\/(png|jpg);base64,/, '')
+    return dataURL.replace(/^data:image\/(png|jpg|jpeg);base64,/, '')
 }
 
 export default function Control() {
     const { dispatch, state } = useAppState()
+    const fileInputRef = useRef<HTMLInputElement | undefined>(undefined)
     const [loading, setLoading] = useState<boolean>(false)
     const [config, setConfig] = useState<Config>(initialConfig)
+
+    const onFileInputChange = () => {
+        setLoading(true)
+        dispatch({ type: 'clearTarget' })
+
+        if (!fileInputRef.current) throw new Error('File input ref has no current value')
+
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+
+        img.onload = () => {
+            dispatch({ type: 'setTarget', payload: { target: getBase64Image(img) } })
+            setLoading(false)
+        }
+
+        const file = fileInputRef.current.files[0]
+        const reader = new FileReader()
+        reader.addEventListener('load', () => { img.src = (reader.result as string) }, false)
+
+        reader.readAsDataURL(file)
+    }
+
+    const uploadTargetImage = (event: MouseEvent) => {
+        event.preventDefault()
+        if (!fileInputRef.current) throw new Error('File input ref has no current value')
+        fileInputRef.current.click()
+    }
 
     const getRangomTargetImage = () => {
         setLoading(true)
@@ -105,14 +133,12 @@ export default function Control() {
             } else {
                 data = await response.text()
             }
-        } catch(e) {
+        } catch (e) {
             data = e
         }
 
-        console.log('data', data)
-
         dispatch({
-            type: 'start', 
+            type: 'start',
             payload: { data, statusCode: response.status },
         })
 
@@ -139,17 +165,16 @@ export default function Control() {
         <form css={{ marginBottom: 20 }}>
             <Flex css={{ textAlign: 'center' }} justifyContent='space-around'>
                 <Box width={1 / 2}>
-                    <StyledButton disabled={disableButtons} onClick={disableButtons ? undefined : getRangomTargetImage}>
-                        Random Target Image
+                    <Input css={{ display: 'none ' }} onChange={onFileInputChange} ref={fileInputRef} type='file' />
+                    <StyledButton css={{ marginRight: 10 }} diabled={disableButtons} onClick={uploadTargetImage}>
+                        Upload Target
+                    </StyledButton>
+                    <StyledButton disabled={disableButtons} onClick={getRangomTargetImage}>
+                        Random Target
                     </StyledButton>
                 </Box>
                 <Box width={1 / 2}>
-                    <StyledButton
-                        disabled={disableButtons}
-                        color='secondary'
-                        onClick={disableButtons ? undefined : onStart}
-                        type='submit'
-                    >
+                    <StyledButton disabled={disableButtons} color='secondary' onClick={onStart} type='submit'>
                         Start
                     </StyledButton>
                 </Box>
@@ -165,7 +190,7 @@ export default function Control() {
                 </Field>
                 <Field>
                     <Label htmlFor='numShapes'>Number of Shapes per slice</Label>
-                    <Input type='number' step='10' min='10' max='1000' {...fieldProps('numShapes')} />
+                    <Input type='number' step='10' min='10' max='10000' {...fieldProps('numShapes')} />
                 </Field>
                 <Field>
                     <Label htmlFor='shapeSize'>Shape Size</Label>

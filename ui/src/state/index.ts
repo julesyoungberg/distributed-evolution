@@ -1,6 +1,6 @@
 import React from 'react'
 
-export type Status = 'active' | 'disconnected' | 'editing' | 'error'
+export type Status = 'active' | 'disconnected' | 'editing' | 'error' | 'idle'
 
 export interface State {
     error?: any
@@ -10,21 +10,17 @@ export interface State {
     nextTargetImage?: string
     numWorkers?: number
     output?: string
-    status?: Status
+    status: Status
     targetImage?: string
     tasks?: Record<string, any>[]
 }
 
 export const initialState: State = {
     generation: 0,
+    status: 'idle',
 }
 
-export type ActionType = 
-    | 'clearTarget' 
-    | 'setTarget'
-    | 'start'
-    | 'status'
-    | 'update'
+export type ActionType = 'clearTarget' | 'setTarget' | 'start' | 'status' | 'update'
 
 export interface Action {
     type: ActionType

@@ -11,6 +11,11 @@ interface ImageProps {
     src?: string
 }
 
+const StyledImage = styled(Image)`
+    max-width: 100%;
+    max-height: 100%;
+`
+
 const Container = styled.div`
     width: 100%;
     height: 0;
@@ -32,20 +37,20 @@ export default function Img({ src }: ImageProps) {
     let content: ReactElement | undefined
 
     if (src) {
-        content = <Image src={src} />
+        content = <StyledImage src={src} />
     } else {
-        content = (
-            <Flex css={{ height: '100%' }} alignItems='center' justifyContent='center'>
-                <Box>
-                    <BeatLoader color={theme.colors?.primary} />
-                </Box>
-            </Flex>
-        )
+        content = <BeatLoader color={theme.colors?.primary} />
     }
 
     return (
         <Container>
-            <Wrapper>{content}</Wrapper>
+            <Wrapper>
+                <Flex css={{ height: '100%' }} alignItems='center' justifyContent='center'>
+                    <Box>
+                        {content}
+                    </Box>
+                </Flex>
+            </Wrapper>
         </Container>
     )
 }

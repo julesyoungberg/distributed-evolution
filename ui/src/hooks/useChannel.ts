@@ -16,7 +16,7 @@ export default function useChannel(dispatch: (action: Action) => void) {
             // ping pong
             if (event.data == 'keepalive') {
                 socket?.send('keepalive')
-                return 
+                return
             }
 
             let payload: Record<string, any>

@@ -59,7 +59,6 @@ gcloud compute addresses delete distributed-evolution-ip --global
 Class:
 - Debug production environment.
 - Performance tracking - track time and fitness.
-- Add ability to select image from computer.
 - Process Flow (Follow?) Diagram.
 
 Fun:
