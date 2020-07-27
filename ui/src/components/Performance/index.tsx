@@ -3,7 +3,7 @@ import { jsx } from '@emotion/core'
 import styled from '@emotion/styled'
 import { useEffect, useState } from 'react'
 import { Box, Flex, Text } from 'rebass'
-import { Label, LineChart, Line, XAxis, YAxis } from 'recharts'
+import { LineChart, Line, XAxis, YAxis } from 'recharts'
 
 import useAppState from '../../hooks/useAppState'
 import useTheme from '../../hooks/useTheme'
@@ -61,33 +61,26 @@ interface ChartProps {
 
 function Chart({ color, data, dataKey, label }: ChartProps) {
     return (
-        <LineChart data={data} width={600} height={400}>
-            <XAxis 
-                dataKey='time' 
-                height={40}
-                interval='preserveStartEnd'
-                minTickGap={20}
-                tickCount={5}
-            >
-                <Label
-                    value='Time'
-                    position='insideBottom'
+        <Box>
+            <Text css={{ textAlign: 'center' }} fontSize={[2, 3, 4]}>{label}</Text>
+            
+            <LineChart data={data} width={600} height={400}>
+                <XAxis 
+                    dataKey='time' 
+                    height={40}
+                    interval='preserveStartEnd'
+                    minTickGap={20}
+                    tickCount={5}
                 />
-            </XAxis>
-            <YAxis width={80}>
-                <Label
-                    angle={-90}
-                    value={label}
-                    position='insideLeft'
+                <YAxis width={80} />
+                <Line 
+                    dataKey={dataKey}
+                    dot={false}
+                    type='monotone'
+                    stroke={color} 
                 />
-            </YAxis>
-            <Line 
-                dataKey={dataKey}
-                dot={false}
-                type='monotone'
-                stroke={color} 
-            />
-        </LineChart>
+            </LineChart>
+        </Box>
     )
 }
 
