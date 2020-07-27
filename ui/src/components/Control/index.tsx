@@ -3,12 +3,14 @@ import { jsx } from '@emotion/core'
 import styled from '@emotion/styled'
 import { Input, Label, Select } from '@rebass/forms'
 import fetch from 'isomorphic-fetch'
+import download from 'downloadjs'
 import getConfig from 'next/config'
 import { FormEvent, useRef, useState } from 'react'
 import { Box, Button, Flex } from 'rebass'
 
 import useAppState from '../../hooks/useAppState'
 import { Theme } from '../../theme'
+import { twoDecimals } from '../../util'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -68,6 +70,8 @@ export default function Control() {
     const fileInputRef = useRef<HTMLInputElement | undefined>(undefined)
     const [loading, setLoading] = useState<boolean>(false)
     const [config, setConfig] = useState<Config>(initialConfig)
+
+    const { fitness, generation, jobID, output, status } = state
 
     const onFileInputChange = () => {
         setLoading(true)
@@ -145,6 +149,11 @@ export default function Control() {
         setLoading(false)
     }
 
+    const onSave = (event: MouseEvent) => {
+        event.preventDefault()
+        download(`data:image/png;base64,${output}`, `${jobID}-${generation}-${twoDecimals(fitness)}.png`, 'image/png')
+    }
+
     const fieldProps = (name: string) => ({
         id: name,
         name: name,
@@ -159,14 +168,14 @@ export default function Control() {
         },
     })
 
-    const disableButtons = loading || ['disconnected', 'error'].includes(state.status)
+    const disableButtons = loading || ['disconnected', 'error'].includes(status)
 
     return (
         <form css={{ marginBottom: 20 }}>
             <Flex css={{ textAlign: 'center' }} justifyContent='space-around'>
                 <Box width={1 / 2}>
                     <Input css={{ display: 'none ' }} onChange={onFileInputChange} ref={fileInputRef} type='file' />
-                    <StyledButton css={{ marginRight: 10 }} diabled={disableButtons} onClick={uploadTargetImage}>
+                    <StyledButton css={{ marginRight: 10 }} disabled={disableButtons} onClick={uploadTargetImage}>
                         Upload Target
                     </StyledButton>
                     <StyledButton disabled={disableButtons} onClick={getRangomTargetImage}>
@@ -174,8 +183,11 @@ export default function Control() {
                     </StyledButton>
                 </Box>
                 <Box width={1 / 2}>
-                    <StyledButton disabled={disableButtons} color='secondary' onClick={onStart} type='submit'>
+                    <StyledButton css={{ marginRight: 10 }} disabled={status !== 'editing'} onClick={onStart} type='submit'>
                         Start
+                    </StyledButton>
+                    <StyledButton disabled={status !== 'active' || !output} onClick={onSave}>
+                        Save
                     </StyledButton>
                 </Box>
             </Flex>

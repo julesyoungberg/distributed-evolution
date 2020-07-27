@@ -37,7 +37,7 @@ export default function Img({ src }: ImageProps) {
     let content: ReactElement | undefined
 
     if (src) {
-        content = <StyledImage src={src} />
+        content = <StyledImage src={`data:image/png;base64,${src}`} />
     } else {
         content = <BeatLoader color={theme.colors?.primary} />
     }

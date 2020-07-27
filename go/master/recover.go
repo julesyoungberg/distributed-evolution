@@ -27,7 +27,7 @@ func (m *Master) recover(id int) {
 		log.Printf("[failure detector] task %v is from job %v, the current job is %v", task.ID, task.JobID, m.Job.ID)
 
 		m.mu.Lock()
-		task.Status = "stale"
+		m.Tasks[id].Status = "stale"
 		m.mu.Unlock()
 
 		return

@@ -12,15 +12,15 @@ import (
 )
 
 type State struct {
-	Fitness          float64                `json:"fitness"`
-	Generation       uint                   `json:"generation"`
-	JobID            int                    `json:"jobID"`
-	NumWorkers       int                    `json:"numWorkers"`
-	Output           string                 `json:"output"`
-	StartedAt        time.Time              `json:"startedAt"`
-	TargetImage      string                 `json:"targetImage"`
-	Tasks            map[int]*api.TaskState `json:"tasks"`
-	ThreadsPerWorker int                    `json:"threadsPerWorker"`
+	Fitness          float64               `json:"fitness"`
+	Generation       uint                  `json:"generation"`
+	JobID            int                   `json:"jobID"`
+	NumWorkers       int                   `json:"numWorkers"`
+	Output           string                `json:"output"`
+	StartedAt        time.Time             `json:"startedAt"`
+	TargetImage      string                `json:"targetImage"`
+	Tasks            map[int]api.TaskState `json:"tasks"`
+	ThreadsPerWorker int                   `json:"threadsPerWorker"`
 }
 
 var upgrader = websocket.Upgrader{
@@ -65,9 +65,15 @@ func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64
 	}
 
 	m.mu.Lock()
+
 	m.lastUpdate = time.Now()
-	tasks := m.Tasks
 	jobID := m.Job.ID
+	tasks := make(map[int]api.TaskState, len(m.Tasks))
+
+	for id, task := range m.Tasks {
+		tasks[id] = *task
+	}
+
 	m.mu.Unlock()
 
 	// get resulting image
@@ -79,7 +85,7 @@ func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64
 
 	// send encoded image and current generation
 	state := State{
-		Fitness:    fitness,
+		Fitness:    1.0 / fitness,
 		Generation: generation,
 		JobID:      jobID,
 		Output:     img,

@@ -27,9 +27,13 @@ func (m *Master) respondWithState(w http.ResponseWriter) {
 	response := State{
 		JobID:            m.Job.ID,
 		NumWorkers:       m.NumWorkers,
-		Tasks:            m.Tasks,
+		Tasks:            make(map[int]api.TaskState, len(m.Tasks)),
 		ThreadsPerWorker: m.ThreadsPerWorker,
 		StartedAt:        m.Job.StartedAt,
+	}
+
+	for id, task := range m.Tasks {
+		response.Tasks[id] = *task
 	}
 
 	m.mu.Unlock()

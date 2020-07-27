@@ -11,6 +11,11 @@ const columns = [
         sortable: true,
     },
     {
+        name: 'Job ID',
+        selector: 'jobID',
+        sortable: true,
+    },
+    {
         name: 'Worker ID',
         selector: 'workerID',
         sortable: true,

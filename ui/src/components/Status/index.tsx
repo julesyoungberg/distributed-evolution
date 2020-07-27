@@ -21,7 +21,7 @@ export default function Status() {
                     <Text fontSize={[3, 4, 5]} fontWeight='bold'>
                         Target
                     </Text>
-                    <Image src={targetSrc ? `data:image/jpg;base64, ${targetSrc}` : undefined} />
+                    <Image src={targetSrc} />
                 </Box>
 
                 {['active', 'editing'].includes(status) && jobID > 0 ? (
@@ -29,7 +29,7 @@ export default function Status() {
                         <Text fontSize={[3, 4, 5]} fontWeight='bold'>
                             Output - Generation: {generation}
                         </Text>
-                        <Image src={output ? `data:image/png;base64, ${output}` : undefined} />
+                        <Image src={output} />
                     </Box>
                 ) : (typeof error === 'string' && (
                     <Box width={1 / 2}>
