@@ -12,9 +12,11 @@ import (
 func (w *Worker) RunTask(task api.Task, thread int) {
 	log.Printf("[thread %v] assigned task %v of job %v with population len: %v", thread, task.ID, task.Job.ID, len(task.Population))
 
-	population := task.Population
-
-	t := api.WorkerTask{GenOffset: task.Generation, Task: task}
+	t := api.WorkerTask{
+		GenOffset: task.Generation,
+		Palette:   w.Palette,
+		Task:      task,
+	}
 
 	// decode and save target image
 	img, err := util.DecodeImage(task.TargetImage)
@@ -35,9 +37,9 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	// create closure functions with context
 	w.ga.Callback = w.createCallback(task.ID, thread)
 	w.ga.EarlyStop = w.createEarlyStop(task.ID)
-	factory := api.GetShapesFactory(&t, population)
+	factory := api.GetShapesFactory(&t, task.Population)
 
-	task.Population = eaopt.Individuals{}
+	t.Task.Population = eaopt.Individuals{}
 
 	w.mu.Lock()
 	w.Tasks[task.ID] = &t

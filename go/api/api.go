@@ -21,6 +21,7 @@ type WorkerTask struct {
 	BestFit     Output
 	GenOffset   uint
 	Mu          sync.Mutex
+	Palette     []color.RGBA
 	TargetImage util.Image
 	Task        Task
 }

@@ -2,6 +2,7 @@ package api
 
 import (
 	"image"
+	"image/color"
 	"math/rand"
 
 	"github.com/MaxHalford/eaopt"
@@ -17,7 +18,12 @@ type Shapes struct {
 }
 
 // get the correct creation function based on the given shape type
-func GetCreateShapeFunc(shapeType string) func(radius float64, bounds util.Vector, rng *rand.Rand) Shape {
+func GetCreateShapeFunc(shapeType string) func(
+	radius float64,
+	bounds util.Vector,
+	rng *rand.Rand,
+	palette []color.RGBA,
+) Shape {
 	switch shapeType {
 	case "triangles":
 		return CreateTriangle
@@ -45,14 +51,17 @@ func CreateShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
 		}
 
 		for i := 0; i < int(ctx.Task.Job.ShapesPerSlice); i++ {
-			shapes.Members[i] = createShape(float64(ctx.Task.Job.ShapeSize), bounds, rng)
+			shapes.Members[i] = createShape(float64(ctx.Task.Job.ShapeSize), bounds, rng, ctx.Palette)
 		}
 
 		return shapes
 	}
 }
 
-func CreateShapesFactoryFromPopulation(ctx *WorkerTask, initialPopulation eaopt.Individuals) func(rng *rand.Rand) eaopt.Genome {
+func CreateShapesFactoryFromPopulation(
+	ctx *WorkerTask,
+	initialPopulation eaopt.Individuals,
+) func(rng *rand.Rand) eaopt.Genome {
 	population := initialPopulation
 
 	return func(rng *rand.Rand) eaopt.Genome {
@@ -70,7 +79,10 @@ func CreateShapesFactoryFromPopulation(ctx *WorkerTask, initialPopulation eaopt.
 	}
 }
 
-func GetShapesFactory(ctx *WorkerTask, initialPopulation eaopt.Individuals) func(rng *rand.Rand) eaopt.Genome {
+func GetShapesFactory(
+	ctx *WorkerTask,
+	initialPopulation eaopt.Individuals,
+) func(rng *rand.Rand) eaopt.Genome {
 	if len(initialPopulation) > 0 {
 		return CreateShapesFactoryFromPopulation(ctx, initialPopulation)
 	}
@@ -123,7 +135,7 @@ func (s Shapes) Mutate(rng *rand.Rand) {
 
 	for i := range s.Members {
 		if rng.Float64() < s.Context.Task.Job.MutationRate {
-			s.Members[i] = createShape(float64(s.Context.Task.Job.ShapeSize), s.Bounds, rng)
+			s.Members[i] = createShape(float64(s.Context.Task.Job.ShapeSize), s.Bounds, rng, s.Context.Palette)
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"image/color"
 	"log"
 	"os"
 	"strconv"
@@ -16,11 +17,44 @@ import (
 type Worker struct {
 	ID           uint32
 	NGenerations uint
+	Palette      []color.RGBA
 	Tasks        map[int]*api.WorkerTask
 
 	db db.DB
 	ga *eaopt.GA
 	mu sync.Mutex
+}
+
+func (w *Worker) thread(thread int) {
+	for {
+		time.Sleep(10 * time.Second)
+
+		if len(w.Palette) == 0 {
+			palette, err := w.db.GetPalette()
+			if err != nil {
+				log.Printf("[thread %v] error getting palette: %v", thread, err)
+				continue
+			}
+
+			w.mu.Lock()
+			w.Palette = palette
+			w.mu.Unlock()
+		}
+
+		log.Printf("[thread %v] getting task", thread)
+
+		task, err := w.db.PullTask()
+		if err != nil {
+			log.Printf("[thread %v] error: %v", thread, err)
+			continue
+		}
+
+		if task.Generation != 0 {
+			w.RunTask(task, thread)
+			log.Printf("[thread %v] finished task %v", thread, task.ID)
+			w.Palette = []color.RGBA{} // clear the palette
+		}
+	}
 }
 
 func Run() {
@@ -42,25 +76,8 @@ func Run() {
 
 	for i := 1; i <= nThreads; i++ {
 		wg.Add(1)
-
-		go func(thread int) {
-			for {
-				time.Sleep(10 * time.Second)
-
-				log.Printf("[thread %v] getting task", thread)
-
-				task, err := w.db.PullTask()
-				if err != nil {
-					log.Printf("[thread %v] error: %v", thread, err)
-					continue
-				}
-
-				if task.Generation != 0 {
-					w.RunTask(task, thread)
-					log.Printf("[thread %v] finished task %v", thread, task.ID)
-				}
-			}
-		}(i + 1)
+		go w.thread(i + 1)
+		time.Sleep(time.Second) // stagger threads to stagger requests to db
 	}
 
 	wg.Wait()
