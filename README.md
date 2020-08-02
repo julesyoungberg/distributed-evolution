@@ -5,17 +5,17 @@ Genetic algorithms are a problem solving technique based on Darwin’s theory of
 
 ## Development
 With `docker-compose`
-```
+```shell
 docker network create distributed-ga
-sh scripts/build_gocv.sh
-sh scripts/start.sh
+make gocv # base image for running gocv in docker
+make start
 ```
 
 Or with minikube:
-```
+```shell
 minikube start --driver=hyperkit
 minikube addons enable ingress
-sh scripts/build_apply.sh
+make build_apply
 ```
 
 redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/
@@ -26,7 +26,8 @@ The system can be deployed to any cloud provider that supports Kubernetes, such 
 
 ### Build Images
 ```shell
-sh scripts/build_gocv.sh && sh scripts/build.sh
+make gocv # base image for running gocv in docker
+make # application service images
 ```
 
 ### Setup
