@@ -23,6 +23,8 @@ func GetCreateShapeFunc(shapeType string) func(radius float64, bounds util.Vecto
 		return CreateTriangle
 	case "polygons":
 		return CreatePolygon
+	case "lines":
+		return CreateLine
 	default:
 		return CreateCircle
 	}

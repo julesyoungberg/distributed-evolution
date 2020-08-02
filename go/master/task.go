@@ -60,7 +60,7 @@ func (m *Master) generateTask(x, y, colWidth, rowWidth int, M float64, targetIma
 		Job:         job,
 		Offset:      offset,
 		TargetImage: encoded,
-		Type:        "polygons",
+		Type:        m.Job.Type,
 	}
 
 	taskState := api.TaskState{

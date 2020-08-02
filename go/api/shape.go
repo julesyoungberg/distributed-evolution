@@ -37,6 +37,33 @@ func (c Circle) Draw(dc *gg.Context, offset util.Vector) {
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// LINE
+//////////////////////////////////////////////////////////////////////////////
+type Line struct {
+	Color    color.RGBA
+	Position []util.Vector
+	Width    float64
+}
+
+func CreateLine(length float64, bounds util.Vector, rng *rand.Rand) Shape {
+	p1 := util.RandomVector(rng, bounds)
+	p2 := util.Vector{X: p1.X + rng.Float64()*length*2, Y: p1.Y + rng.Float64()*length*2}
+
+	return Line{
+		Color:    util.RandomColor(rng),
+		Position: []util.Vector{p1, p2},
+		Width:    rng.Float64() * 20,
+	}
+}
+
+func (l Line) Draw(dc *gg.Context, offset util.Vector) {
+	dc.DrawLine(l.Position[0].X, l.Position[0].Y, l.Position[1].X, l.Position[1].Y)
+	dc.SetColor(l.Color)
+	dc.SetLineWidth(l.Width)
+	dc.Stroke()
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // POLYGON
 //////////////////////////////////////////////////////////////////////////////
 type Polygon struct {

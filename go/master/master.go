@@ -52,6 +52,7 @@ func Run() {
 			PoolSize:     10,
 			PopSize:      50,
 			ShapeSize:    30,
+			Type:         "lines",
 		},
 		lastUpdate:         time.Now(),
 		TargetImage:        util.Image{},

@@ -61,7 +61,6 @@ Class:
 - Process Flow (Follow?) Diagram.
 
 Fun:
-- Create line shape. 
 - Shrink the solution space - https://github.com/hybridgroup/gocv
     - get colors from original image
         - https://stackoverflow.com/questions/35479344/how-to-get-color-palette-from-image-using-opencv

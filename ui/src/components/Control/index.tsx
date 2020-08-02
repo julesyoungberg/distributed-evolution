@@ -32,7 +32,7 @@ const Field = styled(Box)`
 `
 
 interface Config {
-    shapeType: 'circles' | 'polygons' | 'triangles'
+    shapeType: 'circles' | 'lines' | 'polygons' | 'triangles'
     numShapes: number
     shapeSize: number
     popSize: number
@@ -195,7 +195,7 @@ export default function Control() {
                 <Field>
                     <Label htmlFor='shapeType'>Shape Type</Label>
                     <Select {...fieldProps('shapeType')}>
-                        {['circles', 'polygons', 'triangles'].map((type) => (
+                        {['circles', 'lines', 'polygons', 'triangles'].map((type) => (
                             <option key={type}>{type}</option>
                         ))}
                     </Select>

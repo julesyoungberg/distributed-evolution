@@ -37,6 +37,7 @@ type Job struct {
 	ShapesPerSlice int       `json:"shapesPerSlice"`
 	StartedAt      time.Time `json:"startedAt"`
 	TargetImage    string    `json:"targetImage"`
+	Type           string    `json:"type"`
 }
 
 type Task struct {
