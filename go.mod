@@ -13,6 +13,7 @@ require (
 	github.com/gorilla/handlers v1.4.2
 	github.com/gorilla/mux v1.7.4
 	github.com/gorilla/websocket v1.4.2
+	gocv.io/x/gocv v0.24.0
 	golang.org/x/image v0.0.0-20200609002522-3f4726a040e8 // indirect
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a // indirect

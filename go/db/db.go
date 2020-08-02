@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"strings"
 
@@ -14,7 +15,6 @@ type DB struct {
 	Client *redis.Client
 }
 
-// TODO - set username and password!
 func NewConnection() DB {
 	client := redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:    os.Getenv("REDIS_MASTER_NAME"),
@@ -36,4 +36,27 @@ func (db *DB) Set(key string, value string) error {
 
 func (db *DB) Get(key string) (string, error) {
 	return db.Client.Get(ctx, key).Result()
+}
+
+func (db *DB) SetData(key string, data interface{}) error {
+	encoded, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	err = db.Set(key, string(encoded))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (db *DB) GetData(key string, data interface{}) error {
+	encoded, err := db.Get(key)
+	if err != nil {
+		return err
+	}
+
+	return json.Unmarshal([]byte(encoded), data)
 }

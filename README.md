@@ -58,7 +58,6 @@ gcloud compute addresses delete distributed-evolution-ip --global
 
 Class:
 - Debug production environment.
-- Process Flow (Follow?) Diagram.
 
 Fun:
 - Shrink the solution space - https://github.com/hybridgroup/gocv

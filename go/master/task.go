@@ -119,6 +119,12 @@ func (m *Master) generateTasks() {
 
 	var wg sync.WaitGroup
 
+	wg.Add(1)
+	go func() {
+		go m.preparePalette()
+		wg.Done()
+	}()
+
 	// create a task for each slice of the image
 	for y := 0; y < int(N); y++ {
 		for x := 0; x < int(M); x++ {
