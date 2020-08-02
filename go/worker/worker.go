@@ -25,20 +25,29 @@ type Worker struct {
 	mu sync.Mutex
 }
 
+func (w *Worker) getPalette() error {
+	palette, err := w.db.GetPalette()
+	if err != nil {
+		return err
+	}
+
+	w.mu.Lock()
+	w.Palette = palette
+	w.mu.Unlock()
+
+	return nil
+}
+
 func (w *Worker) thread(thread int) {
 	for {
 		time.Sleep(10 * time.Second)
 
 		if len(w.Palette) == 0 {
-			palette, err := w.db.GetPalette()
+			err := w.getPalette()
 			if err != nil {
 				log.Printf("[thread %v] error getting palette: %v", thread, err)
 				continue
 			}
-
-			w.mu.Lock()
-			w.Palette = palette
-			w.mu.Unlock()
 		}
 
 		log.Printf("[thread %v] getting task", thread)
@@ -68,6 +77,13 @@ func Run() {
 	nThreads, err := strconv.Atoi(os.Getenv("THREADS"))
 	if err != nil {
 		log.Fatalf("invalid THREADS value: %v", err)
+	}
+
+	// wait for a palette to be set
+	for len(w.Palette) == 0 {
+		if err = w.getPalette(); err != nil {
+			time.Sleep(time.Second)
+		}
 	}
 
 	log.Print("threads: ", nThreads)

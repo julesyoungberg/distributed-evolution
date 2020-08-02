@@ -7,14 +7,15 @@ Genetic algorithms are a problem solving technique based on Darwin’s theory of
 With `docker-compose`
 ```
 docker network create distributed-ga
-sh ./scripts/start.sh
+sh scripts/build_gocv.sh
+sh scripts/start.sh
 ```
 
 Or with minikube:
 ```
 minikube start --driver=hyperkit
 minikube addons enable ingress
-sh ./scripts/build_apply.sh
+sh scripts/build_apply.sh
 ```
 
 redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/
@@ -22,6 +23,11 @@ redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/
 
 ## Deployment
 The system can be deployed to any cloud provider that supports Kubernetes, such as GCP.
+
+### Build Images
+```shell
+sh scripts/build_gocv.sh && sh scripts/build.sh
+```
 
 ### Setup
 ```shell
@@ -61,9 +67,6 @@ Class:
 
 Fun:
 - Shrink the solution space - https://github.com/hybridgroup/gocv
-    - get colors from original image
-        - https://stackoverflow.com/questions/35479344/how-to-get-color-palette-from-image-using-opencv
-        - https://stackoverflow.com/questions/34734379/is-there-a-formula-to-determine-overall-color-given-bgr-values-opencv-and-c/34734939#34734939
     - quanitze values like position and rotation (scale down grid for computation and scale up for drawing)
     - precompute pieces (store all possible shapes in redis)
     - run line detection on target image - https://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html
