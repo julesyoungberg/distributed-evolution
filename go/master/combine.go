@@ -2,7 +2,6 @@ package master
 
 import (
 	"image"
-	"math"
 	"sync"
 	"time"
 
@@ -32,15 +31,12 @@ func (m *Master) getTaskResult(id int) Result {
 		return Result{ID: -1}
 	}
 
-	centerX := math.Round(task.Offset.X + task.Dimensions.X/2.0)
-	centerY := math.Round(task.Offset.Y + task.Dimensions.Y/2.0)
-
 	return Result{
 		ID:         task.ID,
 		Fitness:    task.BestFit.Fitness,
 		Generation: task.Generation,
 		Output:     img,
-		Position:   util.Vector{X: centerX, Y: centerY},
+		Position:   task.Position,
 	}
 }
 

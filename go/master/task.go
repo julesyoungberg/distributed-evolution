@@ -34,19 +34,41 @@ func (m *Master) setTargetImage(image image.Image) {
 }
 
 func (m *Master) getTaskRect(x, y, colWidth, rowWidth int) (image.Rectangle, util.Vector) {
+	m.mu.Lock()
+	targetImage := m.TargetImage
+	overDraw := m.Job.OverDraw
+	m.mu.Unlock()
+
 	x0 := x * colWidth
+	if x0 > 0 {
+		x0 -= overDraw
+	}
+
 	y0 := y * rowWidth
-	x1 := int(math.Min(float64(x0+colWidth), float64(m.TargetImage.Width)))
-	y1 := int(math.Min(float64(y0+rowWidth), float64(m.TargetImage.Height)))
-	return image.Rect(x0, y0, x1, y1), util.Vector{X: float64(x0), Y: float64(y0)}
+	if y0 > 0 {
+		y0 -= overDraw
+	}
+
+	x1 := int(math.Min(float64(x0+colWidth), float64(targetImage.Width)))
+	if x1 < targetImage.Width {
+		x1 += overDraw
+	}
+
+	y1 := int(math.Min(float64(y0+rowWidth), float64(targetImage.Height)))
+	if y1 < targetImage.Height {
+		y1 += overDraw
+	}
+
+	center := util.Vector{X: float64(x0 + (x1-x0)/2), Y: float64(y0 + (y1-y0)/2)}
+
+	return image.Rect(x0, y0, x1, y1), center
 }
 
 // generate a task given configuration, save it in local state and push to task queue
 func (m *Master) generateTask(x, y, colWidth, rowWidth int, M float64, targetImage image.Image, job api.Job) {
-	rect, offset := m.getTaskRect(x, y, colWidth, rowWidth)
+	rect, pos := m.getTaskRect(x, y, colWidth, rowWidth)
 
 	subImg := util.GetSubImage(targetImage, rect)
-	bounds := subImg.Bounds()
 
 	encoded, err := util.EncodeImage(subImg)
 	if err != nil {
@@ -54,11 +76,11 @@ func (m *Master) generateTask(x, y, colWidth, rowWidth int, M float64, targetIma
 	}
 
 	task := api.Task{
-		Dimensions:  util.Vector{X: float64(bounds.Dx()), Y: float64(bounds.Dy())},
+		Dimensions:  util.Vector{X: float64(colWidth), Y: float64(rowWidth)},
 		Generation:  1,
 		ID:          y*int(M) + x + 1,
 		Job:         job,
-		Offset:      offset,
+		Position:    pos,
 		TargetImage: encoded,
 		Type:        m.Job.Type,
 	}

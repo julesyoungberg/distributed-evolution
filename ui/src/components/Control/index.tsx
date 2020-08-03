@@ -45,7 +45,7 @@ interface Config {
 
 const initialConfig: Config = Object.freeze({
     shapeType: 'polygons',
-    numColors: 128,
+    numColors: 256,
     numShapes: 7000,
     shapeSize: 30,
     popSize: 50,
@@ -204,7 +204,7 @@ export default function Control() {
                 </Field>
                 <Field>
                     <Label htmlFor='numShapes'>Number of Colors</Label>
-                    <Input type='number' step='8' min='8' max='1024' {...fieldProps('numShapes')} />
+                    <Input type='number' step='8' min='8' max='1024' {...fieldProps('numColors')} />
                 </Field>
                 <Field>
                     <Label htmlFor='numShapes'>Number of Shapes per slice</Label>

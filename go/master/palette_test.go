@@ -9,9 +9,10 @@ import (
 
 func TestGetPalette(t *testing.T) {
 	img := util.GetRandomImage()
+
 	palette, err := getPalette(img, 8)
 	if err != nil {
-		t.Errorf("Error: %v", err)
+		t.Error(err)
 	}
 
 	for _, c := range palette {

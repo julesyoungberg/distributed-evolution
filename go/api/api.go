@@ -48,9 +48,9 @@ type Task struct {
 	Generation  uint              `json:"generation"`
 	ID          int               `json:"ID"`
 	Job         Job               `json:"job"`
-	Offset      util.Vector       `json:"offset"`
 	Output      string            `json:"output"`
 	Population  eaopt.Individuals `json:"-"`
+	Position    util.Vector       `json:"position"`
 	TargetImage string            `json:"targetImage"`
 	Type        string            `json:"type"`
 }

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"image"
 	"image/color"
 	"math/rand"
 
@@ -38,7 +37,7 @@ func GetCreateShapeFunc(shapeType string) func(
 
 // returns a closure with a reference to the context that can be used to generate a random shapes object
 func CreateShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
-	bounds := util.Vector{X: float64(ctx.TargetImage.Width), Y: float64(ctx.TargetImage.Height)}
+	bounds := ctx.Task.Dimensions
 
 	createShape := GetCreateShapeFunc(ctx.Task.Type)
 
@@ -100,19 +99,20 @@ func (s Shapes) Draw(dc *gg.Context, offset util.Vector) {
 // evaluates the fitness of the shapes instance
 func (s Shapes) Evaluate() (float64, error) {
 	// account for overdraw here
+	s.Context.Mu.Lock()
 	overDraw := s.Context.Task.Job.OverDraw
-	width := s.Context.TargetImage.Width + overDraw*2
-	height := s.Context.TargetImage.Height + overDraw*2
+	width := s.Context.TargetImage.Width
+	height := s.Context.TargetImage.Height
+	targetImage := s.Context.TargetImage.Image
+	s.Context.Mu.Unlock()
+
 	dc := gg.NewContext(width, height)
 
 	s.Draw(dc, util.Vector{X: float64(overDraw), Y: float64(overDraw)})
 	img := dc.Image()
 
-	rect := image.Rect(overDraw, overDraw, width-overDraw, height-overDraw)
-	out := util.GetSubImage(img, rect)
-
 	// calculate fitness as the difference between the target and output images
-	fitness := util.ImgDiff(out, s.Context.TargetImage.Image)
+	fitness := util.ImgDiff(img, targetImage)
 
 	s.Context.Mu.Lock()
 

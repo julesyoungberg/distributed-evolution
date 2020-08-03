@@ -95,7 +95,9 @@ func RandomColor(rng *rand.Rand) color.RGBA {
 }
 
 func RandomColorFromPalette(rng *rand.Rand, palette []color.RGBA) color.RGBA {
-	return palette[rng.Intn(len(palette))]
+	color := palette[rng.Intn(len(palette))]
+	color.A = uint8((rng.Intn(3) + 1) * 64)
+	return color
 }
 
 func RandomVector(rng *rand.Rand, bounds Vector) Vector {
