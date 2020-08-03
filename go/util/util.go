@@ -138,12 +138,28 @@ func RgbaImg(img image.Image) *image.RGBA {
 	return rgba
 }
 
-func ImgDiff(ai, bi image.Image) float64 {
+func GrayImg(img image.Image) *image.Gray {
+	bounds := img.Bounds()
+	gray := image.NewGray(image.Rect(0, 0, bounds.Dx(), bounds.Dy()))
+	draw.Draw(gray, gray.Bounds(), img, bounds.Min, draw.Src)
+	return gray
+}
+
+func ImgDiff(ai, bi, e image.Image) float64 {
 	a := RgbaImg(ai)
 	b := RgbaImg(bi)
+	edges := GrayImg(e)
 	var d float64
+
 	for i := 0; i < len(a.Pix); i++ {
-		d += SquareDifference(float64(a.Pix[i]), float64(b.Pix[i]))
+		err := SquareDifference(float64(a.Pix[i]), float64(b.Pix[i]))
+
+		// if on a line, square the difference
+		if i < len(edges.Pix) && edges.Pix[i] > 200 {
+			err = math.Pow(err, 2.0)
+		}
+
+		d += err
 	}
 
 	return math.Sqrt(d)

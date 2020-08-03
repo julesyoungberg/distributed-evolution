@@ -112,12 +112,12 @@ func (s Shapes) Evaluate() (float64, error) {
 	img := dc.Image()
 
 	// calculate fitness as the difference between the target and output images
-	fitness := util.ImgDiff(img, targetImage)
+	fitness := util.ImgDiff(img, targetImage, s.Context.Edges)
 
 	s.Context.Mu.Lock()
 
 	// if this is the best fit we've seen, save it
-	if fitness > s.Context.BestFit.Fitness {
+	if s.Context.BestFit.Fitness == 0 || fitness < s.Context.BestFit.Fitness {
 		s.Context.BestFit = Output{
 			Fitness: fitness,
 			Output:  img,
