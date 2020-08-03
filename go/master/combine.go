@@ -62,7 +62,9 @@ func (m *Master) combineResults(ids []int, results chan Result) {
 		dc.DrawImageAnchored(result.Output, int(result.Position.X), int(result.Position.Y), 0.5, 0.5)
 	}
 
-	fitness /= float64(total)
+	if total > 0 {
+		fitness /= float64(total)
+	}
 
 	m.sendOutput(dc, latest, fitness)
 }
