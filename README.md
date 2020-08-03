@@ -64,6 +64,8 @@ gcloud compute addresses delete distributed-evolution-ip --global
 ## TODO
 
 Class:
+- fix palette extractor
+- newJob endpoint is using circles when config says polygons. 
 - Debug production environment.
 
 Fun:
