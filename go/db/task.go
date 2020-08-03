@@ -10,13 +10,32 @@ import (
 const TaskQueueKey = "task_queue"
 
 func (db *DB) SaveTask(task api.Task) error {
-	return db.SetData(task.Key(), task)
+	encoded, err := task.MarshalJSON()
+	if err != nil {
+		return fmt.Errorf("saving task: %v", err)
+	}
+
+	err = db.Set(task.Key(), string(encoded))
+	if err != nil {
+		return fmt.Errorf("saving task: %v", err)
+	}
+
+	return nil
 }
 
 func (db *DB) GetTask(id int) (api.Task, error) {
 	task := api.Task{ID: id}
-	err := db.GetData(task.Key(), &task)
-	return task, err
+	encoded, err := db.Get(task.Key())
+	if err != nil {
+		return api.Task{}, fmt.Errorf("getting task: %v", err)
+	}
+
+	err = task.UnmarshalJSON([]byte(encoded))
+	if err != nil {
+		return api.Task{}, fmt.Errorf("getting task: %v", err)
+	}
+
+	return task, nil
 }
 
 func (db *DB) PushTaskID(id int) error {
