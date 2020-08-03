@@ -37,10 +37,10 @@ type Job struct {
 	PoolSize       uint      `json:"poolSize"`
 	PopSize        uint      `json:"popSize"`
 	ShapeSize      uint      `json:"shapeSize"`
+	ShapeType      string    `json:"shapeType"`
 	ShapesPerSlice int       `json:"shapesPerSlice"`
 	StartedAt      time.Time `json:"startedAt"`
 	TargetImage    string    `json:"targetImage"`
-	Type           string    `json:"type"`
 }
 
 type Task struct {
@@ -53,8 +53,8 @@ type Task struct {
 	Output      string            `json:"output"`
 	Population  eaopt.Individuals `json:"-"`
 	Position    util.Vector       `json:"position"`
+	ShapeType   string            `json:"shapeType"`
 	TargetImage string            `json:"targetImage"`
-	Type        string            `json:"type"`
 }
 
 type TaskState struct {

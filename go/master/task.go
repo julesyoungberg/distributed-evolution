@@ -96,7 +96,7 @@ func (m *Master) generateTask(
 		Job:         job,
 		Position:    pos,
 		TargetImage: encoded,
-		Type:        m.Job.Type,
+		ShapeType:   m.Job.ShapeType,
 	}
 
 	taskState := api.TaskState{

@@ -39,14 +39,14 @@ func GetCreateShapeFunc(shapeType string) func(
 func CreateShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
 	bounds := ctx.Task.Dimensions
 
-	createShape := GetCreateShapeFunc(ctx.Task.Type)
+	createShape := GetCreateShapeFunc(ctx.Task.ShapeType)
 
 	return func(rng *rand.Rand) eaopt.Genome {
 		shapes := Shapes{
 			Bounds:  bounds,
 			Context: ctx,
 			Members: make([]Shape, ctx.Task.Job.ShapesPerSlice),
-			Type:    ctx.Task.Type,
+			Type:    ctx.Task.ShapeType,
 		}
 
 		for i := 0; i < int(ctx.Task.Job.ShapesPerSlice); i++ {
