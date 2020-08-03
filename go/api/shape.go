@@ -2,7 +2,6 @@ package api
 
 import (
 	"image/color"
-	"math"
 	"math/rand"
 
 	"github.com/fogleman/gg"
@@ -26,7 +25,7 @@ func CreateCircle(radius float64, bounds util.Vector, rng *rand.Rand, palette []
 	return Circle{
 		Color:    util.RandomColorFromPalette(rng, palette),
 		Position: util.RandomVector(rng, bounds),
-		Radius:   (rng.Float64()*radius)/2.0 + radius/2.0, // from radius/2 to radius
+		Radius:   util.RandomRadius(rng, radius),
 	}
 }
 
@@ -52,7 +51,7 @@ func CreateLine(length float64, bounds util.Vector, rng *rand.Rand, palette []co
 	return Line{
 		Color:    util.RandomColorFromPalette(rng, palette),
 		Position: []util.Vector{p1, p2},
-		Width:    rng.Float64() * 20,
+		Width:    float64(rng.Intn(8)) * 3.0,
 	}
 }
 
@@ -78,9 +77,9 @@ func CreatePolygon(radius float64, bounds util.Vector, rng *rand.Rand, palette [
 	return Polygon{
 		Color:    util.RandomColorFromPalette(rng, palette),
 		Position: util.RandomVector(rng, bounds),
-		Radius:   (rng.Float64()*radius)/2.0 + radius/2.0,
-		Rotation: (rng.Float64() * 2 * math.Pi),
-		Sides:    rng.Intn(8) + 1,
+		Radius:   util.RandomRadius(rng, radius),
+		Rotation: util.RandomRotation(rng),
+		Sides:    rng.Intn(5) + 3,
 	}
 }
 

@@ -99,7 +99,29 @@ func RandomColorFromPalette(rng *rand.Rand, palette []color.RGBA) color.RGBA {
 }
 
 func RandomVector(rng *rand.Rand, bounds Vector) Vector {
-	return Vector{X: rng.Float64() * bounds.X, Y: rng.Float64() * bounds.Y}
+	scale := 8
+
+	f := func(b float64) float64 {
+		return float64(rng.Intn(scale)) * b / float64(scale)
+	}
+
+	return Vector{X: f(bounds.X), Y: f(bounds.Y)}
+}
+
+func RandomRadius(rng *rand.Rand, radius float64) float64 {
+	scale := 8
+
+	a := 0.25
+	min := radius * (1 - a)
+	max := radius * (1 + a)
+
+	return float64(rng.Intn(scale))*(max-min)/float64(scale) + min
+}
+
+func RandomRotation(rng *rand.Rand) float64 {
+	scale := 8
+
+	return float64(rng.Intn(scale)) * 2 * math.Pi / float64(scale)
 }
 
 func SquareDifference(x, y float64) float64 {

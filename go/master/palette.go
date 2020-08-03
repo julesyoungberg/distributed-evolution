@@ -9,47 +9,49 @@ import (
 	"gocv.io/x/gocv"
 )
 
-func getPalette(src image.Image, k int) ([]color.RGBA, error) {
-	n := src.Bounds().Dx() * src.Bounds().Dy()
+// gets the color palette of an image with opencv k means clustering
+func getPalette(img image.Image, k int) ([]color.RGBA, error) {
+	log.Printf("[task-generator] getting palette from image")
 
-	data, err := gocv.ImageToMatRGBA(src)
+	// convert input image to opencv matrix
+	src, err := gocv.ImageToMatRGB(img)
 	if err != nil {
 		return []color.RGBA{}, fmt.Errorf("getting palette: %v", err)
 	}
-	defer data.Close()
+	defer src.Close()
 
-	data.Reshape(1, n)
+	data := src.Reshape(1, src.Total())
 	data.ConvertTo(&data, gocv.MatTypeCV32F)
 
 	labels := gocv.NewMat()
 	criteria := gocv.NewTermCriteria(gocv.MaxIter+gocv.EPS, 10, 1.0)
-	colors := gocv.NewMat()
+	centers := gocv.NewMat()
 
-	gocv.KMeans(data, k, &labels, criteria, 1, gocv.KMeansPPCenters, &colors)
+	gocv.KMeans(data, k, &labels, criteria, 1, gocv.KMeansPPCenters, &centers)
 
-	out, err := colors.ToImage()
-	if err != nil {
-		return []color.RGBA{}, fmt.Errorf("getting palette: %v", err)
-	}
+	centers.ConvertTo(&centers, gocv.MatTypeCV8U)
 
-	b := out.Bounds()
-	dx := b.Dx()
-	dy := b.Dy()
-
-	palette := make([]color.RGBA, dx*dy)
+	// collect palette colors
+	palette := make([]color.RGBA, centers.Rows())
 	for i := range palette {
-		x := i % dy
-		y := i / dy
-
-		r, g, b, a := out.At(x, y).RGBA()
-		palette[i] = color.RGBA{R: uint8(r), G: uint8(g), B: uint8(b), A: uint8(a)}
+		palette[i] = color.RGBA{
+			R: uint8(centers.GetIntAt(i, 0)),
+			G: uint8(centers.GetIntAt(i, 1)),
+			B: uint8(centers.GetIntAt(i, 2)),
+			A: 255,
+		}
 	}
 
-	return palette, nil
+	return palette, err
 }
 
 func (m *Master) preparePalette() {
-	palette, err := getPalette(m.TargetImage.Image, 8)
+	m.mu.Lock()
+	img := m.TargetImage.Image
+	nColors := m.Job.NumColors
+	m.mu.Unlock()
+
+	palette, err := getPalette(img, nColors)
 	if err != nil {
 		log.Fatal(err)
 	}

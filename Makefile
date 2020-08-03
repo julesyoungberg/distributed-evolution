@@ -16,7 +16,7 @@ sentinel-master:
 	docker build -t julesyoungberg/distributed-evolution-sentinel-master ./sentinel/master && \
 	docker push julesyoungberg/distributed-evolution-sentinel-master
 
-sentinel-worker:
+sentinel-replica:
 	docker build -t julesyoungberg/distributed-evolution-sentinel-replica ./sentinel/replica && \
 	docker push julesyoungberg/distributed-evolution-sentinel-replica
 
@@ -24,7 +24,7 @@ ui:
 	docker build -f prod.Dockerfile -t julesyoungberg/distributed-evolution-ui ./ui && \
 	docker push julesyoungberg/distributed-evolution-ui
 
-build: master worker sentinel-master sentinel-worker ui
+build: master worker sentinel-master sentinel-replica ui
 
 apply:
 	kubectl delete --all deployments && kubectl apply -f deployment/dev

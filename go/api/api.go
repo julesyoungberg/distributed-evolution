@@ -30,6 +30,7 @@ type Job struct {
 	CrossRate      float64   `json:"crossRate"`
 	ID             int       `json:"ID"`
 	MutationRate   float64   `json:"mutationRate"`
+	NumColors      int       `json:"numColors"`
 	NumShapes      int       `json:"numShapes"`
 	OverDraw       int       `json:"overDraw"`
 	PoolSize       uint      `json:"poolSize"`

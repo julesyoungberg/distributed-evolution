@@ -33,6 +33,7 @@ const Field = styled(Box)`
 
 interface Config {
     shapeType: 'circles' | 'lines' | 'polygons' | 'triangles'
+    numColors: number
     numShapes: number
     shapeSize: number
     popSize: number
@@ -44,6 +45,7 @@ interface Config {
 
 const initialConfig: Config = Object.freeze({
     shapeType: 'polygons',
+    numColors: 128,
     numShapes: 7000,
     shapeSize: 30,
     popSize: 50,
@@ -199,6 +201,10 @@ export default function Control() {
                             <option key={type}>{type}</option>
                         ))}
                     </Select>
+                </Field>
+                <Field>
+                    <Label htmlFor='numShapes'>Number of Colors</Label>
+                    <Input type='number' step='8' min='8' max='1024' {...fieldProps('numShapes')} />
                 </Field>
                 <Field>
                     <Label htmlFor='numShapes'>Number of Shapes per slice</Label>

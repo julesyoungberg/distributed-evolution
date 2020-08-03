@@ -76,21 +76,20 @@ func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64
 
 	m.mu.Unlock()
 
-	// get resulting image
-	img, err := util.EncodeImage(output.Image())
-	if err != nil {
-		log.Print("[combiner] error sending output: ", err)
-		return
-	}
-
 	// send encoded image and current generation
 	state := State{
-		Fitness:    1.0 / fitness,
 		Generation: generation,
 		JobID:      jobID,
-		Output:     img,
 		StartedAt:  m.Job.StartedAt,
 		Tasks:      tasks,
+	}
+
+	if img, err := util.EncodeImage(output.Image()); err == nil {
+		state.Output = img
+	}
+
+	if fitness != 0 {
+		state.Fitness = 1.0 / fitness
 	}
 
 	if err := m.conn.WriteJSON(state); err != nil {
