@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/rickyfitts/distributed-evolution/go/api"
+	"github.com/rickyfitts/distributed-evolution/go/cv"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
@@ -120,6 +121,23 @@ func (m *Master) generateTask(
 	}
 }
 
+func (m *Master) preparePalette() {
+	m.mu.Lock()
+	img := m.TargetImage.Image
+	nColors := m.Job.NumColors
+	m.mu.Unlock()
+
+	palette, err := cv.GetPalette(img, nColors)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = m.db.SetPalette(palette)
+	if err != nil {
+		log.Fatalf("error setting palette: %v", err)
+	}
+}
+
 // populates the task queue with tasks, where each is a slice of the target image
 func (m *Master) generateTasks() {
 	err := m.db.Flush()
@@ -160,7 +178,7 @@ func (m *Master) generateTasks() {
 		wg.Done()
 	}()
 
-	edges, err := getEdges(targetImage)
+	edges, err := cv.GetEdges(targetImage)
 	if err != nil {
 		log.Fatal(err)
 	}

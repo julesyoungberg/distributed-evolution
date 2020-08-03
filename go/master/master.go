@@ -47,7 +47,7 @@ func Run() {
 			ID:           1,
 			CrossRate:    0.2,
 			MutationRate: 0.021,
-			NumColors:    256,
+			NumColors:    128,
 			NumShapes:    5000,
 			OverDraw:     20,
 			PoolSize:     10,
