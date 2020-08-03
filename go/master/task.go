@@ -65,18 +65,31 @@ func (m *Master) getTaskRect(x, y, colWidth, rowWidth int) (image.Rectangle, uti
 }
 
 // generate a task given configuration, save it in local state and push to task queue
-func (m *Master) generateTask(x, y, colWidth, rowWidth int, M float64, targetImage image.Image, job api.Job) {
+func (m *Master) generateTask(
+	x, y, colWidth, rowWidth int,
+	M float64,
+	targetImage image.Image,
+	edges image.Image,
+	job api.Job,
+) {
 	rect, pos := m.getTaskRect(x, y, colWidth, rowWidth)
 
 	subImg := util.GetSubImage(targetImage, rect)
+	subImgEdges := util.GetSubImage(edges, rect)
 
 	encoded, err := util.EncodeImage(subImg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	encodedEdges, err := util.EncodeImage(subImgEdges)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	task := api.Task{
 		Dimensions:  util.Vector{X: float64(colWidth), Y: float64(rowWidth)},
+		Edges:       encodedEdges,
 		Generation:  1,
 		ID:          y*int(M) + x + 1,
 		Job:         job,
@@ -147,6 +160,11 @@ func (m *Master) generateTasks() {
 		wg.Done()
 	}()
 
+	edges, err := getEdges(targetImage)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// create a task for each slice of the image
 	for y := 0; y < int(N); y++ {
 		for x := 0; x < int(M); x++ {
@@ -154,7 +172,7 @@ func (m *Master) generateTasks() {
 
 			go func(x, y int) {
 				defer wg.Done()
-				m.generateTask(x, y, colWidth, rowWidth, M, targetImage, job)
+				m.generateTask(x, y, colWidth, rowWidth, M, targetImage, edges, job)
 			}(x, y)
 		}
 	}

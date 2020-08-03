@@ -19,6 +19,7 @@ type Output struct {
 
 type WorkerTask struct {
 	BestFit     Output
+	Edges       image.Image
 	GenOffset   uint
 	Mu          sync.Mutex
 	Palette     []color.RGBA
@@ -45,6 +46,7 @@ type Job struct {
 type Task struct {
 	BestFit     eaopt.Individual  `json:"-"`
 	Dimensions  util.Vector       `json:"dimensions"`
+	Edges       string            `json:"edges"`
 	Generation  uint              `json:"generation"`
 	ID          int               `json:"ID"`
 	Job         Job               `json:"job"`
