@@ -68,10 +68,8 @@ Class:
 
 Fun:
 - Shrink the solution space - https://github.com/hybridgroup/gocv
-    - precompute pieces (store all possible shapes in redis)
-    - run line detection on target image - https://docs.opencv.org/trunk/da/d22/tutorial_py_canny.html
-        - emphasize errors on lines
-        - adjust shape type
+    - adjust shape type on lines
+    - use slices of different image
 
 
 # Design
