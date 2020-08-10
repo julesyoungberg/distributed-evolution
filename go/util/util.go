@@ -148,14 +148,18 @@ func GrayImg(img image.Image) *image.Gray {
 func ImgDiff(ai, bi, e image.Image) float64 {
 	a := RgbaImg(ai)
 	b := RgbaImg(bi)
-	edges := GrayImg(e)
+	var edges *image.Gray
 	var d float64
+
+	if e != nil {
+		edges = GrayImg(e)
+	}
 
 	for i := 0; i < len(a.Pix); i++ {
 		err := SquareDifference(float64(a.Pix[i]), float64(b.Pix[i]))
 
 		// if on a line, square the difference
-		if i < len(edges.Pix) && edges.Pix[i] > 200 {
+		if edges != nil && i < len(edges.Pix) && edges.Pix[i] > 200 {
 			err = math.Pow(err, 2.0)
 		}
 

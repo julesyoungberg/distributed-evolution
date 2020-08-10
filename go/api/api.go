@@ -29,11 +29,13 @@ type WorkerTask struct {
 
 type Job struct {
 	CrossRate      float64   `json:"crossRate"`
+	DetectEdges    bool      `json:"detectEdges"`
 	ID             int       `json:"ID"`
 	MutationRate   float64   `json:"mutationRate"`
 	NumColors      int       `json:"numColors"`
 	NumShapes      int       `json:"numShapes"`
 	OverDraw       int       `json:"overDraw"`
+	PaletteType    string    `json:"paletteType"`
 	PoolSize       uint      `json:"poolSize"`
 	PopSize        uint      `json:"popSize"`
 	ShapeSize      uint      `json:"shapeSize"`

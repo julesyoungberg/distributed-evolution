@@ -17,18 +17,14 @@ export default function AuxImages() {
         <Flex css={{ paddingBottom: 20 }}>
             {targetImageEdges && (
                 <Box width={1 / 2}>
-                    <Text fontSize={[2, 3, 4]}>
-                        Target Edges
-                    </Text>
+                    <Text fontSize={[2, 3, 4]}>Target Edges</Text>
                     <Image src={targetImageEdges} />
                 </Box>
             )}
 
             {palette && (
                 <Box width={1 / 2}>
-                    <Text fontSize={[2, 3, 4]}>
-                        Palette
-                    </Text>
+                    <Text fontSize={[2, 3, 4]}>Palette</Text>
                     <Image src={palette} />
                 </Box>
             )}

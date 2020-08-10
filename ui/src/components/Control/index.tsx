@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
 import styled from '@emotion/styled'
-import { Input, Label, Select } from '@rebass/forms'
+import { Checkbox, Input, Label, Select } from '@rebass/forms'
 import fetch from 'isomorphic-fetch'
 import download from 'downloadjs'
 import getConfig from 'next/config'
@@ -33,10 +33,12 @@ const Field = styled(Box)`
 
 interface Config {
     crossRate: number
+    detectEdges: boolean
     mutationRate: number
     numColors: number
     numShapes: number
     overDraw: number
+    paletteType: 'random' | 'targetImage'
     poolSize: number
     popSize: number
     shapeSize: number
@@ -45,10 +47,12 @@ interface Config {
 
 const initialConfig: Config = Object.freeze({
     crossRate: 0.2,
+    detectEdges: true,
     mutationRate: 0.02,
     numColors: 256,
     numShapes: 7000,
     overDraw: 20,
+    paletteType: 'targetImage',
     poolSize: 10,
     popSize: 50,
     shapeSize: 30,
@@ -177,10 +181,15 @@ export default function Control() {
             } else {
                 value = parseFloat(value)
             }
-    
+
             setConfig({ ...config, [key]: value })
         },
     })
+
+    const onCheckboxChange = (e: InputEvent) => {
+        const target = e.target as HTMLInputElement
+        setConfig({ ...config, [target.name]: target.checked })
+    }
 
     const disableButtons = loading || ['disconnected', 'error'].includes(status)
 
@@ -224,7 +233,7 @@ export default function Control() {
                     <Input type='number' step='8' min='8' max='1024' {...fieldProps('numColors')} />
                 </Field>
                 <Field>
-                    <Label htmlFor='numShapes'>Number of Shapes Per Slice</Label>
+                    <Label htmlFor='numShapes'>Number of Shapes</Label>
                     <Input type='number' step='10' min='10' max='10000' {...fieldProps('numShapes')} />
                 </Field>
                 <Field>
@@ -250,6 +259,26 @@ export default function Control() {
                 <Field>
                     <Label htmlFor='overDraw'>Over Draw</Label>
                     <Input type='number' step='1' min='0' max='100' {...fieldProps('overDraw')} />
+                </Field>
+                <Field>
+                    <Label htmlFor='paletteType'>Palette Type</Label>
+                    <Select {...fieldProps('paletteType')}>
+                        {['random', 'targetImage'].map((type) => (
+                            <option key={type}>{type}</option>
+                        ))}
+                    </Select>
+                </Field>
+                <Field>
+                    <Label>
+                        <Checkbox
+                            checked={config.detectEdges}
+                            id='detectEdges'
+                            name='detectEdges'
+                            onChange={onCheckboxChange}
+                            type='checkbox'
+                        />
+                        Detect Edges
+                    </Label>
                 </Field>
             </Flex>
         </form>

@@ -49,10 +49,12 @@ func Run() {
 		Job: api.Job{
 			ID:           1,
 			CrossRate:    0.2,
+			DetectEdges:  true,
 			MutationRate: 0.021,
-			NumColors:    256,
+			NumColors:    128,
 			NumShapes:    5000,
 			OverDraw:     20,
+			PaletteType:  "targetImage",
 			PoolSize:     10,
 			PopSize:      50,
 			ShapeSize:    25,
