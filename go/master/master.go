@@ -16,8 +16,10 @@ import (
 type Master struct {
 	Job               api.Job
 	NumWorkers        int
+	Palette           string
 	TargetImage       util.Image
 	TargetImageBase64 string
+	TargetImageEdges  string
 	Tasks             map[int]*api.TaskState
 	ThreadsPerWorker  int
 
@@ -26,6 +28,7 @@ type Master struct {
 	connMu             sync.Mutex
 	lastUpdate         time.Time
 	mu                 sync.Mutex
+	transitioning      bool
 	wsHeartbeatTimeout time.Duration
 }
 

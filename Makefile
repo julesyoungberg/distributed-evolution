@@ -36,7 +36,10 @@ build_apply: build apply
 
 start: 
 	docker-compose down -v && \
-	docker-compose up --build --scale worker=6 --scale sentinel=3 --scale redis-slave=2
+	docker-compose up --build --scale worker=5 --scale sentinel=3 --scale redis-slave=2
+
+clean_docker:
+	rm -rf .container-* .dockerfile-*
 
 master_logs:
 	kubectl logs -l app=master -f
@@ -44,5 +47,3 @@ master_logs:
 worker_logs:
 	kubectl logs -l app=worker -f --max-log-requests 10
 
-clean:
-	rm -rf .container-* .dockerfile-*

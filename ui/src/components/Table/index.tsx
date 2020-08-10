@@ -53,7 +53,7 @@ export default function Table() {
                 header: {
                     style: {
                         paddingLeft: 0,
-                    }
+                    },
                 },
             }}
             data={Object.values(state.tasks || {}).map((task) => ({

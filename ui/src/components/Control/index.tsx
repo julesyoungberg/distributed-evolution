@@ -32,27 +32,27 @@ const Field = styled(Box)`
 `
 
 interface Config {
-    shapeType: 'circles' | 'lines' | 'polygons' | 'triangles'
+    crossRate: number
+    mutationRate: number
     numColors: number
     numShapes: number
-    shapeSize: number
-    popSize: number
-    poolSize: number
-    mutationRate: number
-    crossRate: number
     overDraw: number
+    poolSize: number
+    popSize: number
+    shapeSize: number
+    shapeType: 'circles' | 'lines' | 'polygons' | 'triangles'
 }
 
 const initialConfig: Config = Object.freeze({
-    shapeType: 'polygons',
+    crossRate: 0.2,
+    mutationRate: 0.02,
     numColors: 256,
     numShapes: 7000,
-    shapeSize: 30,
-    popSize: 50,
-    poolSize: 10,
-    mutationRate: 0.02,
-    crossRate: 0.2,
     overDraw: 20,
+    poolSize: 10,
+    popSize: 50,
+    shapeSize: 30,
+    shapeType: 'polygons',
 })
 
 function getBase64Image(img: HTMLImageElement) {
@@ -91,7 +91,13 @@ export default function Control() {
 
         const file = fileInputRef.current.files[0]
         const reader = new FileReader()
-        reader.addEventListener('load', () => { img.src = (reader.result as string) }, false)
+        reader.addEventListener(
+            'load',
+            () => {
+                img.src = reader.result as string
+            },
+            false
+        )
 
         reader.readAsDataURL(file)
     }
@@ -162,11 +168,17 @@ export default function Control() {
         value: config[name],
         onChange: (e: InputEvent) => {
             const target = e.target as HTMLInputElement
-            console.log(Object.keys(target))
-            setConfig({
-                ...config,
-                [target.name]: target.value,
-            })
+
+            const key = target.name
+            let value: any = target.value
+
+            if (Number.isInteger(initialConfig[key])) {
+                value = parseInt(value, 10)
+            } else {
+                value = parseFloat(value)
+            }
+    
+            setConfig({ ...config, [key]: value })
         },
     })
 
@@ -185,7 +197,12 @@ export default function Control() {
                     </StyledButton>
                 </Box>
                 <Box width={1 / 2}>
-                    <StyledButton css={{ marginRight: 10 }} disabled={status !== 'editing'} onClick={onStart} type='submit'>
+                    <StyledButton
+                        css={{ marginRight: 10 }}
+                        disabled={status !== 'editing'}
+                        onClick={onStart}
+                        type='submit'
+                    >
                         Start
                     </StyledButton>
                     <StyledButton disabled={status !== 'active' || !output} onClick={onSave}>
@@ -207,7 +224,7 @@ export default function Control() {
                     <Input type='number' step='8' min='8' max='1024' {...fieldProps('numColors')} />
                 </Field>
                 <Field>
-                    <Label htmlFor='numShapes'>Number of Shapes per slice</Label>
+                    <Label htmlFor='numShapes'>Number of Shapes Per Slice</Label>
                     <Input type='number' step='10' min='10' max='10000' {...fieldProps('numShapes')} />
                 </Field>
                 <Field>

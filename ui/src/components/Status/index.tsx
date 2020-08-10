@@ -4,7 +4,7 @@ import { Box, Flex, Text } from 'rebass'
 
 import useAppState from '../../hooks/useAppState'
 
-import Image from './Image'
+import Image from '../Image'
 
 export default function Status() {
     const { state } = useAppState()
@@ -31,17 +31,15 @@ export default function Status() {
                         </Text>
                         <Image src={output} />
                     </Box>
-                ) : (typeof error === 'string' && (
-                    <Box width={1 / 2}>
-                        <Flex
-                            css={{ height: '100%' }}
-                            alignItems='center'
-                            justifyContent='center'
-                        >
-                            <Box>{error}</Box>
-                        </Flex>
-                    </Box>
-                ))}
+                ) : (
+                    typeof error === 'string' && (
+                        <Box width={1 / 2}>
+                            <Flex css={{ height: '100%' }} alignItems='center' justifyContent='center'>
+                                <Box>{error}</Box>
+                            </Flex>
+                        </Box>
+                    )
+                )}
             </Flex>
         )
     }

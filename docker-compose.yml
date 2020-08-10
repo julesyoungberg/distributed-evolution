@@ -17,6 +17,8 @@ services:
         ports:
             - 9000:9000
             - 8080
+        # volumes:
+        #     - ./go:/app/go
     worker:
         build:
             context: .
@@ -26,6 +28,8 @@ services:
             REDIS_MASTER_NAME: mymaster
             SENTINELS: distributed-evolution_sentinel_1:26379,distributed-evolution_sentinel_2:26379,distributed-evolution_sentinel_3:26379
             THREADS: 5
+        # volumes:
+        #     - ./go:/app/go
     ui:
         build:
             context: ui

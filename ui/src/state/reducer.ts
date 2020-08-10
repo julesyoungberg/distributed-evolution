@@ -12,7 +12,7 @@ function handleStatus(payload: Record<string, any>): Partial<State> {
 }
 
 function handleUpdate(state: State, payload: Record<string, any>): Partial<State> {
-    if (payload.generation < state.generation) {
+    if (payload.jobID < state.jobID) {
         return state
     }
 
@@ -29,7 +29,18 @@ function handleUpdate(state: State, payload: Record<string, any>): Partial<State
     }
 
     const nextState: Partial<State> = { status }
-    const fields = ['fitness', 'generation', 'jobID', 'numWorkers', 'output', 'startedAt', 'targetImage', 'tasks']
+    const fields = [
+        'fitness',
+        'generation',
+        'jobID',
+        'numWorkers',
+        'output',
+        'palette',
+        'startedAt',
+        'targetImage',
+        'targetImageEdges',
+        'tasks',
+    ]
 
     fields.forEach((field) => {
         if (payload[field] || payload[field] === 0) nextState[field] = payload[field]
@@ -52,8 +63,11 @@ function reducer(state: State, action: Action): State {
             return {
                 ...state,
                 nextTargetImage: undefined,
+                jobID: state.jobID + 1,
                 output: undefined,
+                palette: undefined,
                 targetImage: state.nextTargetImage,
+                targetImageEdges: undefined,
                 ...handleUpdate(state, action.payload),
                 status: 'active',
                 error: action.payload.statusCode >= 400 ? action.payload.data : '',

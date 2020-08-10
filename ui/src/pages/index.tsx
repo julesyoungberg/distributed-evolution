@@ -6,6 +6,7 @@ import Head from 'next/head'
 import { useReducer } from 'react'
 import { Heading } from 'rebass'
 
+import AuxImages from '../components/AuxImages'
 import Control from '../components/Control'
 import Performance from '../components/Performance'
 import Status from '../components/Status'
@@ -51,6 +52,8 @@ export default function Home() {
                         <Control />
 
                         <Performance />
+
+                        <AuxImages />
 
                         <Table />
                     </Main>

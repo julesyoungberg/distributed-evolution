@@ -60,16 +60,15 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	var job api.Job
 	err := json.NewDecoder(r.Body).Decode(&job)
 	if err != nil {
-		log.Printf("error decoding new job request body")
+		log.Printf("error decoding new job request body: %v", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// decode and save target image
-	base64 := job.TargetImage
 	img, err := util.DecodeImage(job.TargetImage)
 	if err != nil {
-		log.Printf("error decoding target image")
+		log.Printf("error decoding target image: %v", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -77,44 +76,22 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.mu.Lock()
 
 	// save the job with a new ID
-	newID := m.Job.ID + 1
+	job.ID = m.Job.ID + 1
 	m.Job = job
-	m.Job.ID = newID
+
+	m.TargetImageBase64 = job.TargetImage
+	m.setTargetImage(img)
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
 	m.Job.StartedAt = time.Now()
 
-	go m.respondWithState(w)
-
-	m.TargetImageBase64 = base64
-	m.setTargetImage(img)
-
 	m.mu.Unlock()
 
-	// clear the queue of all tasks
-	for {
-		_, err := m.db.PullTask()
-		if err != nil {
-			break
-		}
-	}
+	go func() {
+		m.stopJob()
+		m.generateTasks()
+	}()
 
-	m.mu.Lock()
-
-	// mark any qeued tasks as stale
-	for _, task := range m.Tasks {
-		if task.Status == "queued" {
-			task.Status = "stale"
-		}
-	}
-
-	m.mu.Unlock()
-
-	// wait for all the workers to stop
-	for !m.allStale() {
-		time.Sleep(time.Second)
-	}
-
-	m.generateTasks()
+	m.respondWithState(w)
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
@@ -132,7 +109,7 @@ func (m *Master) getKeyFromRedis(w http.ResponseWriter, r *http.Request) {
 	data, err := m.db.Get(params["key"])
 	if err != nil {
 		e := fmt.Sprintf("error getting key %v from redis: %v", params["key"], err)
-		log.Printf(e)
+		log.Print(e)
 		w.WriteHeader(http.StatusInternalServerError)
 
 		if _, err := io.WriteString(w, e); err != nil {
@@ -143,6 +120,21 @@ func (m *Master) getKeyFromRedis(w http.ResponseWriter, r *http.Request) {
 	if _, err := io.WriteString(w, data); err != nil {
 		log.Printf("error writing value from redis key %v to response: %v", params["key"], err)
 		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+}
+
+func (m *Master) fetchPalette(w http.ResponseWriter, r *http.Request) {
+	m.mu.Lock()
+	palette := m.Palette
+	m.mu.Unlock()
+
+	if _, err := io.WriteString(w, palette); err != nil {
+		log.Printf("error writing palette to response: %v", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -156,6 +148,7 @@ func (m *Master) httpServer() {
 	r.HandleFunc("/api/subscribe", m.subscribe)
 	r.HandleFunc("/api/healthz", healthCheck).Methods(http.MethodGet)
 	r.HandleFunc("/api/redis/{key:[0-9A-Za-z:]+}", m.getKeyFromRedis).Methods(http.MethodGet)
+	r.HandleFunc("/api/palette", m.fetchPalette).Methods(http.MethodGet)
 
 	port := os.Getenv("HTTP_PORT")
 

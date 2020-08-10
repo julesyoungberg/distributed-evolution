@@ -4,7 +4,7 @@ import styled from '@emotion/styled'
 import BeatLoader from 'react-spinners/BeatLoader'
 import { Box, Flex, Image } from 'rebass'
 
-import useTheme from '../../hooks/useTheme'
+import useTheme from '../hooks/useTheme'
 import { ReactElement } from 'react'
 
 interface ImageProps {
@@ -46,9 +46,7 @@ export default function Img({ src }: ImageProps) {
         <Container>
             <Wrapper>
                 <Flex css={{ height: '100%' }} alignItems='center' justifyContent='center'>
-                    <Box>
-                        {content}
-                    </Box>
+                    <Box>{content}</Box>
                 </Flex>
             </Wrapper>
         </Container>

@@ -2,11 +2,13 @@ package master
 
 import (
 	"image"
+	"image/color"
 	"log"
 	"math"
 	"sync"
 	"time"
 
+	"github.com/fogleman/gg"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/cv"
 	"github.com/rickyfitts/distributed-evolution/go/util"
@@ -16,12 +18,16 @@ func (m *Master) allStale() bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
+	log.Printf("checking for staleness")
+
 	for _, t := range m.Tasks {
 		if t.Status != "stale" {
+			log.Printf("not all tasks are stale, task %v is %v", t.ID, t.Status)
 			return false
 		}
 	}
 
+	log.Printf("all tasks are stale")
 	return true
 }
 
@@ -121,7 +127,40 @@ func (m *Master) generateTask(
 	}
 }
 
+func (m *Master) savePalete(palette []color.RGBA) {
+	log.Printf("[task-generator] saving pallete")
+	nColors := len(palette)
+	colorsPerEdge := int(math.Ceil(math.Sqrt(float64(nColors))))
+	size := 32
+
+	dc := gg.NewContext(size*colorsPerEdge, size*colorsPerEdge)
+
+	for i, color := range palette {
+		y := i / colorsPerEdge
+		x := i % colorsPerEdge
+
+		dc.DrawRectangle(float64(x*size), float64(y*size), float64(size), float64(size))
+		dc.SetColor(color)
+		dc.Fill()
+	}
+
+	img := dc.Image()
+	encoded, err := util.EncodeImage(img)
+	if err != nil {
+		log.Printf("[task-generator] failed to encoded palette: %v", err)
+		return
+	}
+
+	m.mu.Lock()
+	m.Palette = encoded
+	m.mu.Unlock()
+
+	go m.sendPalette()
+}
+
 func (m *Master) preparePalette() {
+	log.Printf("[task-generator] preparing palette")
+
 	m.mu.Lock()
 	img := m.TargetImage.Image
 	nColors := m.Job.NumColors
@@ -136,6 +175,23 @@ func (m *Master) preparePalette() {
 	if err != nil {
 		log.Fatalf("error setting palette: %v", err)
 	}
+
+	m.savePalete(palette)
+}
+
+func (m *Master) saveEdges(edges image.Image) {
+	log.Print("[task-generator] saving edges")
+
+	encodedEdges, err := util.EncodeImage(edges)
+	if err != nil {
+		log.Printf("[task generator] failed to encode edges: %v", err)
+	}
+
+	m.mu.Lock()
+	m.TargetImageEdges = encodedEdges
+	m.mu.Unlock()
+
+	m.sendEdges()
 }
 
 // populates the task queue with tasks, where each is a slice of the target image
@@ -174,14 +230,17 @@ func (m *Master) generateTasks() {
 
 	wg.Add(1)
 	go func() {
-		go m.preparePalette()
+		m.preparePalette()
 		wg.Done()
 	}()
 
+	log.Printf("[task-generator] getting target image edges")
 	edges, err := cv.GetEdges(targetImage)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	go m.saveEdges(edges)
 
 	// create a task for each slice of the image
 	for y := 0; y < int(N); y++ {
@@ -189,8 +248,8 @@ func (m *Master) generateTasks() {
 			wg.Add(1)
 
 			go func(x, y int) {
-				defer wg.Done()
 				m.generateTask(x, y, colWidth, rowWidth, M, targetImage, edges, job)
+				wg.Done()
 			}(x, y)
 		}
 	}
@@ -219,4 +278,46 @@ func (m *Master) startRandomJob() {
 	m.Job.StartedAt = time.Now()
 
 	go m.generateTasks()
+}
+
+func (m *Master) stopJob() {
+	log.Printf("transitioning")
+
+	m.mu.Lock()
+	m.transitioning = true
+	m.mu.Unlock()
+
+	log.Printf("clearing the task queue")
+
+	// clear the queue of all tasks
+	for {
+		_, err := m.db.PullTask()
+		if err != nil {
+			break
+		}
+	}
+
+	m.mu.Lock()
+
+	// mark any qeued tasks as stale
+	for _, task := range m.Tasks {
+		if task.Status == "queued" {
+			task.Status = "stale"
+		}
+	}
+
+	m.mu.Unlock()
+
+	log.Printf("waiting for workers to stop")
+
+	// wait for all the workers to stop
+	for !m.allStale() {
+		time.Sleep(time.Second)
+	}
+
+	m.mu.Lock()
+	m.transitioning = false
+	m.mu.Unlock()
+
+	log.Printf("transition complete")
 }

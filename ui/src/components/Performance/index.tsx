@@ -62,23 +62,14 @@ interface ChartProps {
 function Chart({ color, data, dataKey, label }: ChartProps) {
     return (
         <Box>
-            <Text css={{ textAlign: 'center' }} fontSize={[2, 3, 4]}>{label}</Text>
-            
+            <Text css={{ textAlign: 'center' }} fontSize={[2, 3, 4]}>
+                {label}
+            </Text>
+
             <LineChart data={data} width={600} height={400}>
-                <XAxis 
-                    dataKey='time' 
-                    height={40}
-                    interval='preserveStartEnd'
-                    minTickGap={20}
-                    tickCount={5}
-                />
+                <XAxis dataKey='time' height={40} interval='preserveStartEnd' minTickGap={20} tickCount={5} />
                 <YAxis width={80} />
-                <Line 
-                    dataKey={dataKey}
-                    dot={false}
-                    type='monotone'
-                    stroke={color} 
-                />
+                <Line dataKey={dataKey} dot={false} type='monotone' stroke={color} />
             </LineChart>
         </Box>
     )
@@ -108,31 +99,27 @@ export default function Performance() {
     return (
         <Box css={{ marginTop: 50, marginBottom: 50 }}>
             <Box css={{ marginBottom: 40 }}>
-                <Text fontSize={[2, 3, 4]}>
-                    Performance
-                </Text>
-                <StyledText><b>Generation:</b> {generation}</StyledText> 
-                <StyledText><b>Fitness:</b> {twoDecimals(fitness)}</StyledText>
-                {startedAt && <StyledText><b>Duration:</b> {formatDuration(duration)}</StyledText>}
+                <Text fontSize={[2, 3, 4]}>Performance</Text>
+                <StyledText>
+                    <b>Generation:</b> {generation}
+                </StyledText>
+                <StyledText>
+                    <b>Fitness:</b> {twoDecimals(fitness)}
+                </StyledText>
+                {startedAt && (
+                    <StyledText>
+                        <b>Duration:</b> {formatDuration(duration)}
+                    </StyledText>
+                )}
             </Box>
 
             <Flex>
                 <Box>
-                    <Chart
-                        color={theme.colors.blue}
-                        data={data}
-                        dataKey='fitness'
-                        label='Fitness'
-                    />
+                    <Chart color={theme.colors.blue} data={data} dataKey='fitness' label='Fitness' />
                 </Box>
 
                 <Box>
-                    <Chart
-                        color={theme.colors.primary}
-                        data={data}
-                        dataKey='generation'
-                        label='Generation'
-                    />
+                    <Chart color={theme.colors.primary} data={data} dataKey='generation' label='Generation' />
                 </Box>
             </Flex>
         </Box>

@@ -10,9 +10,11 @@ export interface State {
     nextTargetImage?: string
     numWorkers?: number
     output?: string
+    palette?: string
     startedAt?: string
     status: Status
     targetImage?: string
+    targetImageEdges?: string
     tasks?: Record<string, any>[]
 }
 

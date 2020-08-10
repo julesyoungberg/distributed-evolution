@@ -2,6 +2,7 @@ package master
 
 import (
 	"image"
+	"log"
 	"sync"
 	"time"
 
@@ -71,18 +72,15 @@ func (m *Master) combineResults(ids []int, results chan Result) {
 
 // periodically read all tasks from db, combine results, save and update ui
 func (m *Master) combine() {
-	m.mu.Lock()
-	jobId := m.Job.ID
-	m.mu.Unlock()
-
 	for {
 		time.Sleep(5 * time.Second)
 
 		m.mu.Lock()
 
-		if m.Job.ID != jobId {
-			jobId = m.Job.ID
+		if m.transitioning {
+			log.Printf("transitioning, sending update")
 			m.mu.Unlock()
+			m.sendUpdate()
 			continue
 		}
 
