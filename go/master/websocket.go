@@ -1,11 +1,11 @@
 package master
 
 import (
+	"image"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/fogleman/gg"
 	"github.com/gorilla/websocket"
 	"github.com/rickyfitts/distributed-evolution/go/api"
 	"github.com/rickyfitts/distributed-evolution/go/util"
@@ -47,6 +47,8 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 	m.mu.Lock()
 
 	response := State{
+		Fitness:          m.Fitness,
+		Generation:       m.Generation,
 		JobID:            m.Job.ID,
 		Palette:          m.Palette,
 		TargetImage:      m.TargetImageBase64,
@@ -70,6 +72,8 @@ func (m *Master) getState() State {
 	m.mu.Lock()
 
 	m.lastUpdate = time.Now()
+	fitness := m.Fitness
+	generation := m.Generation
 	jobID := m.Job.ID
 	tasks := make(map[int]api.TaskState, len(m.Tasks))
 
@@ -81,13 +85,15 @@ func (m *Master) getState() State {
 
 	// send encoded image and current generation
 	return State{
-		JobID:     jobID,
-		StartedAt: m.Job.StartedAt,
-		Tasks:     tasks,
+		Fitness:    fitness,
+		Generation: generation,
+		JobID:      jobID,
+		StartedAt:  m.Job.StartedAt,
+		Tasks:      tasks,
 	}
 }
 
-func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64) {
+func (m *Master) sendOutput(output image.Image) {
 	m.connMu.Lock()
 	defer m.connMu.Unlock()
 
@@ -96,14 +102,9 @@ func (m *Master) sendOutput(output *gg.Context, generation uint, fitness float64
 	}
 
 	state := m.getState()
-	state.Generation = generation
 
-	if img, err := util.EncodeImage(output.Image()); err == nil {
+	if img, err := util.EncodeImage(output); err == nil {
 		state.Output = img
-	}
-
-	if fitness != 0 {
-		state.Fitness = 1.0 / fitness
 	}
 
 	if err := m.conn.WriteJSON(state); err != nil {
@@ -132,8 +133,10 @@ func (m *Master) sendData(state State) error {
 func (m *Master) sendEdges() {
 	log.Printf("[task-generator] sending edges")
 
+	state := m.getState()
+
 	m.mu.Lock()
-	state := State{JobID: m.Job.ID, TargetImageEdges: m.TargetImageEdges}
+	state.TargetImageEdges = m.TargetImageEdges
 	m.mu.Unlock()
 
 	if err := m.sendData(state); err != nil {
@@ -144,8 +147,10 @@ func (m *Master) sendEdges() {
 func (m *Master) sendPalette() {
 	log.Printf("[task-generator] sending palette")
 
+	state := m.getState()
+
 	m.mu.Lock()
-	state := State{JobID: m.Job.ID, Palette: m.Palette}
+	state.Palette = m.Palette
 	m.mu.Unlock()
 
 	if err := m.sendData(state); err != nil {

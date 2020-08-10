@@ -26,6 +26,10 @@ func (m *Master) getTaskResult(id int) Result {
 		return Result{ID: -1}
 	}
 
+	if len(task.Output) == 0 {
+		return Result{ID: -1}
+	}
+
 	img, err := util.DecodeImage(task.Output)
 	if err != nil {
 		util.DPrintf("[combiner] error decoding task %v output", id)
@@ -65,9 +69,15 @@ func (m *Master) combineResults(ids []int, results chan Result) {
 
 	if total > 0 {
 		fitness /= float64(total)
+		fitness = 1 / fitness
 	}
 
-	m.sendOutput(dc, latest, fitness)
+	m.mu.Lock()
+	m.Fitness = fitness
+	m.Generation = latest
+	m.mu.Unlock()
+
+	m.sendOutput(dc.Image())
 }
 
 // periodically read all tasks from db, combine results, save and update ui

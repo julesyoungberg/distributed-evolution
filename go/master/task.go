@@ -118,6 +118,8 @@ func (m *Master) saveEdges(edges image.Image) {
 
 // populates the task queue with tasks, where each is a slice of the target image
 func (m *Master) generateTasks() {
+	log.Print("[task generator] flushing the db")
+
 	err := m.db.Flush()
 	for err != nil {
 		log.Printf("[task generator] failed to flush db: %v", err)

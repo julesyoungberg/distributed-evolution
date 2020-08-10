@@ -14,6 +14,8 @@ import (
 )
 
 type Master struct {
+	Fitness           float64
+	Generation        uint
 	Job               api.Job
 	NumWorkers        int
 	Palette           string
@@ -50,14 +52,14 @@ func Run() {
 			ID:           1,
 			CrossRate:    0.2,
 			DetectEdges:  true,
-			MutationRate: 0.021,
-			NumColors:    128,
-			NumShapes:    5000,
+			MutationRate: 0.022,
+			NumColors:    64,
+			NumShapes:    7000,
 			OverDraw:     20,
 			PaletteType:  "targetImage",
 			PoolSize:     10,
 			PopSize:      50,
-			ShapeSize:    25,
+			ShapeSize:    20,
 			ShapeType:    "polygons",
 		},
 		lastUpdate:         time.Now(),

@@ -88,10 +88,10 @@ func GetSubImage(img image.Image, rect image.Rectangle) image.Image {
 
 func RandomColor(rng *rand.Rand) color.RGBA {
 	f := func() uint8 {
-		return uint8(rng.Intn(4) * 64)
+		return uint8(rng.Intn(255))
 	}
 
-	return color.RGBA{f(), f(), f(), uint8(rng.Intn(4)*32 + 128)}
+	return color.RGBA{f(), f(), f(), 255}
 }
 
 func RandomColorFromPalette(rng *rand.Rand, palette []color.RGBA) color.RGBA {

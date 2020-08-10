@@ -1,7 +1,6 @@
 package cv
 
 import (
-	"fmt"
 	"image/png"
 	"os"
 	"testing"
@@ -21,6 +20,7 @@ func TestGetEdges(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	defer inputFile.Close()
 
 	err = png.Encode(inputFile, img)
 	if err != nil {
@@ -31,6 +31,7 @@ func TestGetEdges(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+	defer edgesFile.Close()
 
 	err = png.Encode(edgesFile, edges)
 	if err != nil {
@@ -41,12 +42,32 @@ func TestGetEdges(t *testing.T) {
 func TestGetPalette(t *testing.T) {
 	img := util.GetRandomImage()
 
-	palette, err := GetPalette(img, 8)
+	palette, err := GetPalette(img, 64, false)
 	if err != nil {
 		t.Error(err)
 	}
 
-	for _, c := range palette {
-		fmt.Printf("%v", c)
+	paletteImg := GetPaletteImage(palette)
+
+	inputFile, err := os.Create("input.png")
+	if err != nil {
+		t.Error(err)
+	}
+	defer inputFile.Close()
+
+	err = png.Encode(inputFile, img)
+	if err != nil {
+		t.Error(err)
+	}
+
+	paletteFile, err := os.Create("palette.png")
+	if err != nil {
+		t.Error(err)
+	}
+	defer paletteFile.Close()
+
+	err = png.Encode(paletteFile, paletteImg)
+	if err != nil {
+		t.Error(err)
 	}
 }

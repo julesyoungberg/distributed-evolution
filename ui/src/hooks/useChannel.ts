@@ -27,8 +27,6 @@ export default function useChannel(dispatch: (action: Action) => void) {
                 payload = { error: e }
             }
 
-            console.log(payload)
-
             dispatch({ type: 'update', payload })
         }
 

@@ -3,32 +3,17 @@ package master
 import (
 	"image/color"
 	"log"
-	"math"
 	"math/rand"
 
-	"github.com/fogleman/gg"
 	"github.com/rickyfitts/distributed-evolution/go/cv"
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
 func (m *Master) savePalete(palette []color.RGBA) {
 	log.Printf("[task-generator] saving pallete")
-	nColors := len(palette)
-	colorsPerEdge := int(math.Ceil(math.Sqrt(float64(nColors))))
-	size := 32
 
-	dc := gg.NewContext(size*colorsPerEdge, size*colorsPerEdge)
+	img := cv.GetPaletteImage(palette)
 
-	for i, color := range palette {
-		y := i / colorsPerEdge
-		x := i % colorsPerEdge
-
-		dc.DrawRectangle(float64(x*size), float64(y*size), float64(size), float64(size))
-		dc.SetColor(color)
-		dc.Fill()
-	}
-
-	img := dc.Image()
 	encoded, err := util.EncodeImage(img)
 	if err != nil {
 		log.Printf("[task-generator] failed to encoded palette: %v", err)
@@ -42,7 +27,7 @@ func (m *Master) savePalete(palette []color.RGBA) {
 	go m.sendPalette()
 }
 
-func (m *Master) getPaletteFromTargetImage() []color.RGBA {
+func (m *Master) getPaletteFromTargetImage(randomCenters bool) []color.RGBA {
 	log.Print("[task-generator] getting palette from target image")
 
 	m.mu.Lock()
@@ -50,7 +35,7 @@ func (m *Master) getPaletteFromTargetImage() []color.RGBA {
 	nColors := m.Job.NumColors
 	m.mu.Unlock()
 
-	palette, err := cv.GetPalette(img, nColors)
+	palette, err := cv.GetPalette(img, nColors, randomCenters)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,7 +65,9 @@ func (m *Master) getPalette() []color.RGBA {
 
 	switch paletteType {
 	case "targetImage":
-		return m.getPaletteFromTargetImage()
+		return m.getPaletteFromTargetImage(false)
+	case "targetImageRandomCenters":
+		return m.getPaletteFromTargetImage(true)
 	default:
 		return m.getRandomPalette()
 	}

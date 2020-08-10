@@ -51,7 +51,7 @@ func CreateLine(length float64, bounds util.Vector, rng *rand.Rand, palette []co
 	return Line{
 		Color:    util.RandomColorFromPalette(rng, palette),
 		Position: []util.Vector{p1, p2},
-		Width:    float64(rng.Intn(8)) * 3.0,
+		Width:    float64(rng.Intn(16)),
 	}
 }
 

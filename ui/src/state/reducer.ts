@@ -66,7 +66,7 @@ function reducer(state: State, action: Action): State {
                 jobID: state.jobID + 1,
                 output: undefined,
                 palette: undefined,
-                targetImage: state.nextTargetImage,
+                targetImage: state.nextTargetImage || state.targetImage,
                 targetImageEdges: undefined,
                 ...handleUpdate(state, action.payload),
                 status: 'active',

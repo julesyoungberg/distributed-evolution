@@ -38,24 +38,25 @@ interface Config {
     numColors: number
     numShapes: number
     overDraw: number
-    paletteType: 'random' | 'targetImage'
+    paletteType: 'random' | 'targetImage' | 'targetImageRandomCenters'
     poolSize: number
     popSize: number
     shapeSize: number
     shapeType: 'circles' | 'lines' | 'polygons' | 'triangles'
+    targetImage?: string
 }
 
 const initialConfig: Config = Object.freeze({
     crossRate: 0.2,
     detectEdges: true,
     mutationRate: 0.02,
-    numColors: 256,
+    numColors: 64,
     numShapes: 7000,
     overDraw: 20,
     paletteType: 'targetImage',
     poolSize: 10,
     popSize: 50,
-    shapeSize: 30,
+    shapeSize: 20,
     shapeType: 'polygons',
 })
 
@@ -130,7 +131,9 @@ export default function Control() {
         e.preventDefault()
         setLoading(true)
 
-        const body = { ...config, targetImage: state.nextTargetImage }
+        const body = { ...config }
+        body.targetImage = state.nextTargetImage || state.targetImage
+
         console.log('starting task body', body)
 
         const response = await fetch(`${publicRuntimeConfig.apiUrl}/job`, {
@@ -176,10 +179,12 @@ export default function Control() {
             const key = target.name
             let value: any = target.value
 
-            if (Number.isInteger(initialConfig[key])) {
-                value = parseInt(value, 10)
-            } else {
-                value = parseFloat(value)
+            if (typeof initialConfig[key] === 'number') {
+                if (Number.isInteger(initialConfig[key])) {
+                    value = parseInt(value, 10)
+                } else {
+                    value = parseFloat(value)
+                }
             }
 
             setConfig({ ...config, [key]: value })
@@ -208,13 +213,13 @@ export default function Control() {
                 <Box width={1 / 2}>
                     <StyledButton
                         css={{ marginRight: 10 }}
-                        disabled={status !== 'editing'}
+                        disabled={!['active', 'editing'].includes(status)}
                         onClick={onStart}
                         type='submit'
                     >
                         Start
                     </StyledButton>
-                    <StyledButton disabled={status !== 'active' || !output} onClick={onSave}>
+                    <StyledButton disabled={!output} onClick={onSave}>
                         Save
                     </StyledButton>
                 </Box>
@@ -263,7 +268,7 @@ export default function Control() {
                 <Field>
                     <Label htmlFor='paletteType'>Palette Type</Label>
                     <Select {...fieldProps('paletteType')}>
-                        {['random', 'targetImage'].map((type) => (
+                        {['random', 'targetImage', 'targetImageRandomCenters'].map((type) => (
                             <option key={type}>{type}</option>
                         ))}
                     </Select>
