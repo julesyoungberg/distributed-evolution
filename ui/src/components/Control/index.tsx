@@ -48,12 +48,12 @@ interface Config {
 
 const initialConfig: Config = Object.freeze({
     crossRate: 0.2,
-    detectEdges: true,
+    detectEdges: false,
     mutationRate: 0.02,
     numColors: 64,
     numShapes: 7000,
     overDraw: 20,
-    paletteType: 'targetImage',
+    paletteType: 'random',
     poolSize: 10,
     popSize: 50,
     shapeSize: 20,
