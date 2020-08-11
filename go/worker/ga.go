@@ -9,11 +9,16 @@ import (
 
 // initialize GA
 func CreateGA(config api.Job) *eaopt.GA {
+	nGenerations := config.NumGenerations
+	if nGenerations < 1 {
+		nGenerations = 1000000000000 // 1 trillion
+	}
+
 	gaConfig := eaopt.GAConfig{
 		NPops:        1,
 		PopSize:      config.PopSize,
 		HofSize:      1,
-		NGenerations: config.NGenerations,
+		NGenerations: nGenerations,
 		Model: eaopt.ModGenerational{
 			Selector: eaopt.SelTournament{
 				NContestants: config.PoolSize,

@@ -32,8 +32,8 @@ type Job struct {
 	DetectEdges    bool      `json:"detectEdges"`
 	ID             int       `json:"ID"`
 	MutationRate   float64   `json:"mutationRate"`
-	NGenerations   uint      `json:"nGenerations"`
 	NumColors      int       `json:"numColors"`
+	NumGenerations uint      `json:"numGenerations"`
 	NumShapes      int       `json:"numShapes"`
 	OverDraw       int       `json:"overDraw"`
 	PaletteType    string    `json:"paletteType"`

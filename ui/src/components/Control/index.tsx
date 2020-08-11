@@ -36,11 +36,13 @@ interface Config {
     detectEdges: boolean
     mutationRate: number
     numColors: number
+    numGenerations: number
     numShapes: number
     overDraw: number
     paletteType: 'random' | 'targetImage' | 'targetImageRandomCenters'
     poolSize: number
     popSize: number
+    quantization: number
     shapeSize: number
     shapeType: 'circles' | 'lines' | 'polygons' | 'triangles'
     targetImage?: string
@@ -51,11 +53,13 @@ const initialConfig: Config = Object.freeze({
     detectEdges: false,
     mutationRate: 0.02,
     numColors: 64,
+    numGenerations: 0,
     numShapes: 7000,
     overDraw: 20,
     paletteType: 'random',
     poolSize: 10,
     popSize: 50,
+    quantization: 50,
     shapeSize: 20,
     shapeType: 'polygons',
 })
@@ -244,6 +248,14 @@ export default function Control() {
                 <Field>
                     <Label htmlFor='shapeSize'>Shape Size</Label>
                     <Input type='number' step='5' min='5' max='200' {...fieldProps('shapeSize')} />
+                </Field>
+                <Field>
+                    <Label htmlFor='quantization'>Shape Position Quantization</Label>
+                    <Input type='number' step='5' min='0' max='500' {...fieldProps('quantization')} />
+                </Field>
+                <Field>
+                    <Label htmlFor='numGenerations'>Generations</Label>
+                    <Input type='number' step='1000' min='0' max='1000000000' {...fieldProps('numGenerations')} />
                 </Field>
                 <Field>
                     <Label htmlFor='popSize'>Population Size</Label>
