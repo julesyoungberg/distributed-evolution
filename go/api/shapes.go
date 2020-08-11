@@ -1,7 +1,6 @@
 package api
 
 import (
-	"image/color"
 	"math/rand"
 
 	"github.com/MaxHalford/eaopt"
@@ -10,19 +9,15 @@ import (
 )
 
 type Shapes struct {
-	Bounds  util.Vector
-	Context *WorkerTask
-	Members []Shape
-	Type    string
+	Bounds       util.Vector
+	Context      *WorkerTask
+	Members      []Shape
+	Quantization int
+	Type         string
 }
 
 // get the correct creation function based on the given shape type
-func GetCreateShapeFunc(shapeType string) func(
-	radius float64,
-	bounds util.Vector,
-	rng *rand.Rand,
-	palette []color.RGBA,
-) Shape {
+func GetCreateShapeFunc(shapeType string) func(opt ShapeOptions, rng *rand.Rand) Shape {
 	switch shapeType {
 	case "triangles":
 		return CreateTriangle
@@ -41,16 +36,24 @@ func CreateShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
 
 	createShape := GetCreateShapeFunc(ctx.Task.ShapeType)
 
+	opt := ShapeOptions{
+		Bounds:       bounds,
+		Palette:      ctx.Palette,
+		Quantization: ctx.Task.ScaledQuantization,
+		Size:         float64(ctx.Task.Job.ShapeSize),
+	}
+
 	return func(rng *rand.Rand) eaopt.Genome {
 		shapes := Shapes{
-			Bounds:  bounds,
-			Context: ctx,
-			Members: make([]Shape, ctx.Task.Job.ShapesPerSlice),
-			Type:    ctx.Task.ShapeType,
+			Bounds:       bounds,
+			Context:      ctx,
+			Members:      make([]Shape, ctx.Task.Job.ShapesPerSlice),
+			Quantization: ctx.Task.ScaledQuantization,
+			Type:         ctx.Task.ShapeType,
 		}
 
 		for i := 0; i < int(ctx.Task.Job.ShapesPerSlice); i++ {
-			shapes.Members[i] = createShape(float64(ctx.Task.Job.ShapeSize), bounds, rng, ctx.Palette)
+			shapes.Members[i] = createShape(opt, rng)
 		}
 
 		return shapes
@@ -133,9 +136,16 @@ func (s Shapes) Evaluate() (float64, error) {
 func (s Shapes) Mutate(rng *rand.Rand) {
 	createShape := GetCreateShapeFunc(s.Type)
 
+	opt := ShapeOptions{
+		Bounds:       s.Bounds,
+		Palette:      s.Context.Palette,
+		Quantization: s.Quantization,
+		Size:         float64(s.Context.Task.Job.ShapeSize),
+	}
+
 	for i := range s.Members {
 		if rng.Float64() < s.Context.Task.Job.MutationRate {
-			s.Members[i] = createShape(float64(s.Context.Task.Job.ShapeSize), s.Bounds, rng, s.Context.Palette)
+			s.Members[i] = createShape(opt, rng)
 		}
 	}
 }

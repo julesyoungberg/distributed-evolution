@@ -34,6 +34,31 @@ type Master struct {
 	wsHeartbeatTimeout time.Duration
 }
 
+func newMaster() Master {
+	return Master{
+		Job: api.Job{
+			ID:           1,
+			CrossRate:    0.2,
+			DetectEdges:  false,
+			MutationRate: 0.022,
+			NGenerations: 1000000000000, // 1 trillion
+			NumColors:    64,
+			NumShapes:    7000,
+			OverDraw:     20,
+			PaletteType:  "random",
+			PoolSize:     10,
+			PopSize:      50,
+			Quantization: 50,
+			ShapeSize:    20,
+			ShapeType:    "polygons",
+		},
+		lastUpdate:         time.Now(),
+		TargetImage:        util.Image{},
+		Tasks:              map[int]*api.TaskState{},
+		wsHeartbeatTimeout: 2 * time.Second,
+	}
+}
+
 func Run() {
 	numWorkers, err := strconv.Atoi(os.Getenv("WORKERS"))
 	if err != nil {
@@ -45,29 +70,10 @@ func Run() {
 		log.Fatal("error parsing WORKER_THREADS: ", err)
 	}
 
-	m := Master{
-		db:         db.NewConnection(),
-		NumWorkers: numWorkers,
-		Job: api.Job{
-			ID:           1,
-			CrossRate:    0.2,
-			DetectEdges:  false,
-			MutationRate: 0.022,
-			NumColors:    64,
-			NumShapes:    7000,
-			OverDraw:     20,
-			PaletteType:  "random",
-			PoolSize:     10,
-			PopSize:      50,
-			ShapeSize:    20,
-			ShapeType:    "polygons",
-		},
-		lastUpdate:         time.Now(),
-		TargetImage:        util.Image{},
-		Tasks:              map[int]*api.TaskState{},
-		ThreadsPerWorker:   workerThreads,
-		wsHeartbeatTimeout: 2 * time.Second,
-	}
+	m := newMaster()
+	m.db = db.NewConnection()
+	m.NumWorkers = numWorkers
+	m.ThreadsPerWorker = workerThreads
 
 	if !m.restoreFromSnapshot() && os.Getenv("START_RANDOM_JOB") == "true" {
 		m.startRandomJob()

@@ -15,10 +15,9 @@ import (
 )
 
 type Worker struct {
-	ID           uint32
-	NGenerations uint
-	Palette      []color.RGBA
-	Tasks        map[int]*api.WorkerTask
+	ID      uint32
+	Palette []color.RGBA
+	Tasks   map[int]*api.WorkerTask
 
 	db db.DB
 	ga *eaopt.GA
@@ -68,10 +67,9 @@ func (w *Worker) thread(thread int) {
 
 func Run() {
 	w := Worker{
-		ID:           uuid.New().ID(),
-		db:           db.NewConnection(),
-		NGenerations: 1000000000000, // 1 trillion
-		Tasks:        map[int]*api.WorkerTask{},
+		ID:    uuid.New().ID(),
+		db:    db.NewConnection(),
+		Tasks: map[int]*api.WorkerTask{},
 	}
 
 	nThreads, err := strconv.Atoi(os.Getenv("THREADS"))

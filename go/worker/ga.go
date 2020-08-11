@@ -8,12 +8,12 @@ import (
 )
 
 // initialize GA
-func createGA(config api.Job, nGenerations uint) *eaopt.GA {
+func CreateGA(config api.Job) *eaopt.GA {
 	gaConfig := eaopt.GAConfig{
 		NPops:        1,
 		PopSize:      config.PopSize,
 		HofSize:      1,
-		NGenerations: nGenerations,
+		NGenerations: config.NGenerations,
 		Model: eaopt.ModGenerational{
 			Selector: eaopt.SelTournament{
 				NContestants: config.PoolSize,

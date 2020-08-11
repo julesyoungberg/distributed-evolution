@@ -29,21 +29,24 @@ build: master worker sentinel-master sentinel-replica ui
 apply:
 	kubectl delete --all deployments && kubectl apply -f deployment/dev
 
-apply_prod:
+apply-prod:
 	kubectl apply -f deployment/prod
 
-build_apply: build apply
+build-apply: build apply
 
 start: 
 	docker-compose down -v && \
 	docker-compose up --build --scale worker=5 --scale sentinel=3 --scale redis-slave=2
 
-clean_docker:
+single-system:
+	docker-compose -f docker-compose.single-system.yml up --build 
+
+clean-docker:
 	rm -rf .container-* .dockerfile-*
 
-master_logs:
+master-logs:
 	kubectl logs -l app=master -f
 
-worker_logs:
+worker-logs:
 	kubectl logs -l app=worker -f --max-log-requests 10
 

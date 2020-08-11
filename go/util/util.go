@@ -100,11 +100,17 @@ func RandomColorFromPalette(rng *rand.Rand, palette []color.RGBA) color.RGBA {
 	return color
 }
 
-func RandomVector(rng *rand.Rand, bounds Vector) Vector {
-	scale := 8
+func RandomVector(rng *rand.Rand, bounds Vector, scale int) Vector {
+	var f func(b float64) float64
 
-	f := func(b float64) float64 {
-		return float64(rng.Intn(scale)) * b / float64(scale)
+	if scale > 0 {
+		f = func(b float64) float64 {
+			return float64(rng.Intn(scale)) * b / float64(scale)
+		}
+	} else {
+		f = func(b float64) float64 {
+			return rng.Float64() * b
+		}
 	}
 
 	return Vector{X: f(bounds.X), Y: f(bounds.Y)}

@@ -1,0 +1,35 @@
+---
+    version: '3'
+    
+    services:
+        single-system:
+            build:
+                context: .
+                dockerfile: single-system.Dockerfile
+            environment: 
+                HTTP_PORT: 9000
+                START_RANDOM_JOB: "true"
+            ports:
+                - 9000:9000
+        ui:
+            build:
+                context: ui
+                dockerfile: dev.Dockerfile
+            environment: 
+                API_URL: http://localhost:9000/api
+                CHANNEL_URL: ws://localhost:9000/api/subscribe
+                NODE_ENV: development
+                PORT: 3000
+            ports:
+                - 3000:3000
+            restart: unless-stopped
+            volumes:
+                - ./ui/:/app
+                - /app/node_modules/
+                - /app/.next
+    
+    networks:
+        default:
+            external:
+                name: distributed-ga
+    

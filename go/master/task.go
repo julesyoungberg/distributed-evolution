@@ -45,8 +45,7 @@ func (m *Master) getTaskRect(x, y, colWidth, rowWidth int) (image.Rectangle, uti
 
 // generate a task given configuration, save it in local state and push to task queue
 func (m *Master) generateTask(
-	x, y, colWidth, rowWidth int,
-	M float64,
+	x, y, colWidth, rowWidth, M int,
 	targetImage image.Image,
 	edges image.Image,
 	job api.Job,
@@ -60,13 +59,14 @@ func (m *Master) generateTask(
 	}
 
 	task := api.Task{
-		Dimensions:  util.Vector{X: float64(colWidth), Y: float64(rowWidth)},
-		Generation:  1,
-		ID:          y*int(M) + x + 1,
-		Job:         job,
-		Position:    pos,
-		TargetImage: encoded,
-		ShapeType:   m.Job.ShapeType,
+		Dimensions:         util.Vector{X: float64(colWidth), Y: float64(rowWidth)},
+		Generation:         1,
+		ID:                 y*M + x + 1,
+		Job:                job,
+		Position:           pos,
+		TargetImage:        encoded,
+		ScaledQuantization: job.Quantization / M,
+		ShapeType:          job.ShapeType,
 	}
 
 	if edges != nil {
@@ -93,7 +93,7 @@ func (m *Master) generateTask(
 	e := m.db.PushTask(task)
 	if e != nil {
 		// let it timeout and try again
-		log.Fatalf("[task generator] error pushing task to task queue: %v", e)
+		log.Fatalf("[task-generator] error pushing task to task queue: %v", e)
 		m.mu.Lock()
 		// HACKY - set status to inprogress and let it timeout
 		m.Tasks[task.ID].Status = "inprogress"
@@ -106,7 +106,7 @@ func (m *Master) saveEdges(edges image.Image) {
 
 	encodedEdges, err := util.EncodeImage(edges)
 	if err != nil {
-		log.Printf("[task generator] failed to encode edges: %v", err)
+		log.Printf("[task-generator] failed to encode edges: %v", err)
 	}
 
 	m.mu.Lock()
@@ -118,19 +118,19 @@ func (m *Master) saveEdges(edges image.Image) {
 
 // populates the task queue with tasks, where each is a slice of the target image
 func (m *Master) generateTasks() {
-	log.Print("[task generator] flushing the db")
+	log.Print("[task-generator] flushing the db")
 
 	err := m.db.Flush()
 	for err != nil {
-		log.Printf("[task generator] failed to flush db: %v", err)
+		log.Printf("[task-generator] failed to flush db: %v", err)
 		time.Sleep(1 * time.Second)
 		err = m.db.Flush()
 	}
 
 	m.mu.Lock()
 
-	log.Printf("[task generator] %v workers with %v threads each available", m.NumWorkers, m.ThreadsPerWorker)
-	log.Printf("[task generator] generating tasks for job %v", m.Job.ID)
+	log.Printf("[task-generator] %v workers with %v threads each available", m.NumWorkers, m.ThreadsPerWorker)
+	log.Printf("[task-generator] generating tasks for job %v", m.Job.ID)
 
 	m.Tasks = map[int]*api.TaskState{}
 
@@ -143,7 +143,7 @@ func (m *Master) generateTasks() {
 	colWidth := int(math.Ceil(float64(m.TargetImage.Width) / N))
 	rowWidth := int(math.Ceil(float64(m.TargetImage.Height) / M))
 
-	log.Printf("[task generator] splitting image into %v %vpx cols and %v %vpx rows", N, colWidth, M, rowWidth)
+	log.Printf("[task-generator] splitting image into %v %vpx cols and %v %vpx rows", N, colWidth, M, rowWidth)
 
 	targetImage := m.TargetImage.Image
 	job := m.Job
@@ -176,7 +176,7 @@ func (m *Master) generateTasks() {
 			wg.Add(1)
 
 			go func(x, y int) {
-				m.generateTask(x, y, colWidth, rowWidth, M, targetImage, edges, job)
+				m.generateTask(x, y, colWidth, rowWidth, int(M), targetImage, edges, job)
 				wg.Done()
 			}(x, y)
 		}
@@ -188,5 +188,5 @@ func (m *Master) generateTasks() {
 	nTasks := len(m.Tasks)
 	m.mu.Unlock()
 
-	log.Printf("[task generator] %v tasks created", nTasks)
+	log.Printf("[task-generator] %v tasks created", nTasks)
 }

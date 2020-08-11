@@ -34,7 +34,7 @@ func (m *Master) setTargetImage(image image.Image) {
 	}
 }
 
-func (m *Master) startRandomJob() {
+func (m *Master) setRandomTargetImage() {
 	log.Print("fetching random image...")
 	image := util.GetRandomImage()
 
@@ -46,8 +46,11 @@ func (m *Master) startRandomJob() {
 
 	m.TargetImageBase64 = encodedImg
 	m.setTargetImage(image)
-	m.Job.StartedAt = time.Now()
+}
 
+func (m *Master) startRandomJob() {
+	m.setRandomTargetImage()
+	m.Job.StartedAt = time.Now()
 	go m.generateTasks()
 }
 

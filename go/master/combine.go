@@ -88,7 +88,7 @@ func (m *Master) combine() {
 		m.mu.Lock()
 
 		if m.transitioning {
-			log.Printf("transitioning, sending update")
+			log.Print("transitioning, sending update")
 			m.mu.Unlock()
 			m.sendUpdate()
 			continue

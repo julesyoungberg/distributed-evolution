@@ -32,12 +32,14 @@ type Job struct {
 	DetectEdges    bool      `json:"detectEdges"`
 	ID             int       `json:"ID"`
 	MutationRate   float64   `json:"mutationRate"`
+	NGenerations   uint      `json:"nGenerations"`
 	NumColors      int       `json:"numColors"`
 	NumShapes      int       `json:"numShapes"`
 	OverDraw       int       `json:"overDraw"`
 	PaletteType    string    `json:"paletteType"`
 	PoolSize       uint      `json:"poolSize"`
 	PopSize        uint      `json:"popSize"`
+	Quantization   int       `json:"quantization"`
 	ShapeSize      uint      `json:"shapeSize"`
 	ShapeType      string    `json:"shapeType"`
 	ShapesPerSlice int       `json:"shapesPerSlice"`
@@ -46,17 +48,18 @@ type Job struct {
 }
 
 type Task struct {
-	BestFit     eaopt.Individual  `json:"-"`
-	Dimensions  util.Vector       `json:"dimensions"`
-	Edges       string            `json:"edges"`
-	Generation  uint              `json:"generation"`
-	ID          int               `json:"ID"`
-	Job         Job               `json:"job"`
-	Output      string            `json:"output"`
-	Population  eaopt.Individuals `json:"-"`
-	Position    util.Vector       `json:"position"`
-	ShapeType   string            `json:"shapeType"`
-	TargetImage string            `json:"targetImage"`
+	BestFit            eaopt.Individual  `json:"-"`
+	Dimensions         util.Vector       `json:"dimensions"`
+	Edges              string            `json:"edges"`
+	Generation         uint              `json:"generation"`
+	ID                 int               `json:"ID"`
+	Job                Job               `json:"job"`
+	Output             string            `json:"output"`
+	Population         eaopt.Individuals `json:"-"`
+	Position           util.Vector       `json:"position"`
+	ScaledQuantization int               `json:"quantization"`
+	ShapeType          string            `json:"shapeType"`
+	TargetImage        string            `json:"targetImage"`
 }
 
 type TaskState struct {

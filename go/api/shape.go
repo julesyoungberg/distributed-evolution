@@ -12,6 +12,13 @@ type Shape interface {
 	Draw(dc *gg.Context, offset util.Vector)
 }
 
+type ShapeOptions struct {
+	Bounds       util.Vector
+	Palette      []color.RGBA
+	Quantization int
+	Size         float64
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // CIRCLE
 //////////////////////////////////////////////////////////////////////////////
@@ -21,11 +28,11 @@ type Circle struct {
 	Radius   float64
 }
 
-func CreateCircle(radius float64, bounds util.Vector, rng *rand.Rand, palette []color.RGBA) Shape {
+func CreateCircle(opt ShapeOptions, rng *rand.Rand) Shape {
 	return Circle{
-		Color:    util.RandomColorFromPalette(rng, palette),
-		Position: util.RandomVector(rng, bounds),
-		Radius:   util.RandomRadius(rng, radius),
+		Color:    util.RandomColorFromPalette(rng, opt.Palette),
+		Position: util.RandomVector(rng, opt.Bounds, opt.Quantization),
+		Radius:   util.RandomRadius(rng, opt.Size),
 	}
 }
 
@@ -44,12 +51,15 @@ type Line struct {
 	Width    float64
 }
 
-func CreateLine(length float64, bounds util.Vector, rng *rand.Rand, palette []color.RGBA) Shape {
-	p1 := util.RandomVector(rng, bounds)
-	p2 := util.Vector{X: p1.X + rng.Float64()*length*2, Y: p1.Y + rng.Float64()*length*2}
+func CreateLine(opt ShapeOptions, rng *rand.Rand) Shape {
+	p1 := util.RandomVector(rng, opt.Bounds, opt.Quantization)
+	p2 := util.Vector{
+		X: p1.X + rng.Float64()*opt.Size*2,
+		Y: p1.Y + rng.Float64()*opt.Size*2,
+	}
 
 	return Line{
-		Color:    util.RandomColorFromPalette(rng, palette),
+		Color:    util.RandomColorFromPalette(rng, opt.Palette),
 		Position: []util.Vector{p1, p2},
 		Width:    float64(rng.Intn(16)),
 	}
@@ -73,11 +83,11 @@ type Polygon struct {
 	Sides    int
 }
 
-func CreatePolygon(radius float64, bounds util.Vector, rng *rand.Rand, palette []color.RGBA) Shape {
+func CreatePolygon(opt ShapeOptions, rng *rand.Rand) Shape {
 	return Polygon{
-		Color:    util.RandomColorFromPalette(rng, palette),
-		Position: util.RandomVector(rng, bounds),
-		Radius:   util.RandomRadius(rng, radius),
+		Color:    util.RandomColorFromPalette(rng, opt.Palette),
+		Position: util.RandomVector(rng, opt.Bounds, opt.Quantization),
+		Radius:   util.RandomRadius(rng, opt.Size),
 		Rotation: util.RandomRotation(rng),
 		Sides:    rng.Intn(5) + 3,
 	}
@@ -97,17 +107,17 @@ type Triangle struct {
 	Vertices []util.Vector
 }
 
-func CreateTriangle(radius float64, bounds util.Vector, rng *rand.Rand, palette []color.RGBA) Shape {
+func CreateTriangle(opt ShapeOptions, rng *rand.Rand) Shape {
 	offset := func() float64 {
-		return rng.Float64()*radius*2.0 - radius
+		return rng.Float64()*opt.Size*2.0 - opt.Size
 	}
 
-	p1 := util.RandomVector(rng, bounds)
+	p1 := util.RandomVector(rng, opt.Bounds, opt.Quantization)
 	p2 := util.Vector{X: p1.X + offset(), Y: p1.Y + offset()}
 	p3 := util.Vector{X: p1.X + offset(), Y: p1.Y + offset()}
 
 	return Triangle{
-		Color:    util.RandomColorFromPalette(rng, palette),
+		Color:    util.RandomColorFromPalette(rng, opt.Palette),
 		Vertices: []util.Vector{p1, p2, p3},
 	}
 }

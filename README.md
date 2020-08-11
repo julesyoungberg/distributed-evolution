@@ -15,7 +15,7 @@ Or with minikube:
 ```shell
 minikube start --driver=hyperkit
 minikube addons enable ingress
-make build_apply
+make build-apply
 ```
 
 redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/

@@ -35,14 +35,14 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	if len(task.Edges) > 0 {
 		edges, err := util.DecodeImage(task.Edges)
 		if err != nil {
-			log.Printf("[thread %v] error decoding task target image: %v", thread, err)
+			log.Printf("[thread %v] error decoding task target image edges: %v", thread, err)
 			return
 		}
 
 		t.Edges = edges
 	}
 
-	w.ga = createGA(task.Job, w.NGenerations)
+	w.ga = CreateGA(task.Job)
 
 	// create closure functions with context
 	w.ga.Callback = w.createCallback(task.ID, thread)
