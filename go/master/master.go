@@ -41,7 +41,7 @@ func newMaster() Master {
 			CrossRate:      0.2,
 			DetectEdges:    false,
 			MutationRate:   0.022,
-			NumGenerations: 200,
+			NumGenerations: 0,
 			NumColors:      64,
 			NumShapes:      7000,
 			OverDraw:       20,
