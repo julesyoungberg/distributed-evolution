@@ -55,7 +55,7 @@ export default function Performance() {
 
     const { complete, completedAt, fitness, generation, jobID, startedAt, status } = state
 
-    const duration = getDuration(startedAt, complete ? completedAt : undefined)
+    const duration = generation ? getDuration(startedAt, complete ? completedAt : undefined) : undefined
 
     useEffect(() => {
         if (complete || !(fitness && generation && status === 'active')) {
@@ -92,30 +92,30 @@ export default function Performance() {
 
     const [rate, onRateChange] = useAutosave(onSave)
 
-    if (!(fitness && generation && startedAt)) {
-        return null
-    }
-
     return (
         <Box css={{ marginTop: 50, marginBottom: 50 }}>
             <Box css={{ marginBottom: 40 }}>
                 <Text fontSize={[2, 3, 4]}>Performance</Text>
-                <StyledText>
-                    <b>Generation:</b> {generation}
-                </StyledText>
-                <StyledText>
-                    <b>Fitness:</b> {twoDecimals(fitness)}
-                </StyledText>
-                {startedAt && (
+                {generation > 0 && (
+                    <StyledText>
+                        <b>Generation:</b> {generation}
+                    </StyledText>
+                )}
+                {fitness > 0 && (
+                    <StyledText>
+                        <b>Fitness:</b> {twoDecimals(fitness)}
+                    </StyledText>
+                )}
+                {duration && (
                     <StyledText>
                         <b>Duration:</b> {formatDuration(duration)}
                     </StyledText>
                 )}
                 <Box>
-                    <Button css={{ marginRight: '10px' }} onClick={onClear}>
+                    <Button css={{ marginRight: '10px' }} disabled={data.length === 0} onClick={onClear}>
                         Clear Data
                     </Button>
-                    <Button css={{ marginRight: '10px' }} onClick={onSave}>
+                    <Button css={{ marginRight: '10px' }} disabled={data.length === 0} onClick={onSave}>
                         Save Data
                     </Button>
                     <Box css={{ display: 'inline-block', width: '100px' }}>
@@ -129,15 +129,17 @@ export default function Performance() {
                 </Box>
             </Box>
 
-            <Flex>
-                <Box>
-                    <Chart color={theme.colors.blue} data={data} dataKey='fitness' label='Fitness' />
-                </Box>
+            {data.length > 0 && (
+                <Flex>
+                    <Box>
+                        <Chart color={theme.colors.blue} data={data} dataKey='fitness' label='Fitness' />
+                    </Box>
 
-                <Box>
-                    <Chart color={theme.colors.primary} data={data} dataKey='generation' label='Generation' />
-                </Box>
-            </Flex>
+                    <Box>
+                        <Chart color={theme.colors.primary} data={data} dataKey='generation' label='Generation' />
+                    </Box>
+                </Flex>
+            )}
         </Box>
     )
 }

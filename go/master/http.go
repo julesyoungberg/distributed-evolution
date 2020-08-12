@@ -69,6 +69,8 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
 	m.Job.StartedAt = time.Now()
 	m.Job.Complete = false
+	m.Generation = 0
+	m.Fitness = 0.0
 
 	m.mu.Unlock()
 

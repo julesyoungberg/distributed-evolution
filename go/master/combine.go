@@ -75,6 +75,8 @@ func (m *Master) combineResults(ids []int, results chan Result) {
 	m.Fitness = fitness
 	m.mu.Unlock()
 
+	log.Printf("updating UI (generation: %v, fitness: %v)", generation, fitness)
+
 	m.sendOutput(dc.Image())
 }
 

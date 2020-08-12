@@ -194,6 +194,10 @@ func (s *SingleSystem) updateUI() {
 
 		s.Master.mu.Unlock()
 
+		if output == nil || generation < 1 {
+			continue
+		}
+
 		log.Printf("updating UI (generation: %v, fitness: %v)", generation, fitness)
 
 		s.Master.sendOutput(output)
@@ -238,6 +242,8 @@ func (s *SingleSystem) newJob(w http.ResponseWriter, r *http.Request) {
 	s.Master.Job.TargetImage = "" // no need to be passing it around, its saved on m
 	s.Master.Job.StartedAt = time.Now()
 	s.Master.Job.Complete = false
+	s.Master.Generation = 0
+	s.Master.Fitness = 0.0
 
 	s.Master.mu.Unlock()
 

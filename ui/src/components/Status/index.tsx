@@ -8,7 +8,7 @@ import Image from '../Image'
 
 export default function Status() {
     const { state } = useAppState()
-    const { error, generation, jobID, nextTargetImage, output, status, targetImage } = state
+    const { error, generation, nextTargetImage, output, status, targetImage } = state
 
     console.log(state)
 
@@ -24,7 +24,7 @@ export default function Status() {
                     <Image src={targetSrc} />
                 </Box>
 
-                {['active', 'editing'].includes(status) && jobID > 0 ? (
+                {status === 'active' || (status === 'editing' && generation > 0) ? (
                     <Box width={1 / 2}>
                         <Text fontSize={[3, 4, 5]} fontWeight='bold'>
                             Output - Generation: {generation}

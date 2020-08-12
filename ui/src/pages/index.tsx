@@ -53,9 +53,9 @@ export default function Home() {
 
                         <Performance />
 
-                        <AuxImages />
-
                         <Table />
+
+                        <AuxImages />
                     </Main>
                 </StateContext.Provider>
             </ThemeProvider>

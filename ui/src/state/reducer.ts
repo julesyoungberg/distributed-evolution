@@ -22,7 +22,7 @@ function handleUpdate(state: State, payload: Record<string, any>): Partial<State
 
     if (state.status === 'editing') {
         status = 'editing'
-    } else if (payload.jobID === 0) {
+    } else if (payload.generation === 0) {
         status = 'idle'
     }
 

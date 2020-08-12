@@ -6,7 +6,7 @@ import { secondsSince } from '../util'
 export default function useAutosave(onSave: () => boolean): [string, (v: InputEvent) => void] {
     const { state } = useAppState()
     const lastSaved = useRef<number | undefined>(undefined)
-    const [rate, setRate] = useState<string>('1m')
+    const [rate, setRate] = useState<string>('none')
 
     const { complete } = state
 

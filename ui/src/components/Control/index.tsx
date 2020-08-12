@@ -158,15 +158,22 @@ export default function Control() {
         setLoading(false)
     }
 
-    const onSave = useCallback((event?: MouseEvent) => {
-        if (!output) {
-            return false
-        }
+    const onSave = useCallback(
+        (event?: MouseEvent) => {
+            if (!output) {
+                return false
+            }
 
-        event?.preventDefault()
-        download(`data:image/png;base64,${output}`, `${jobID}-${generation}-${twoDecimals(fitness)}.png`, 'image/png')
-        return true
-    }, [output, jobID, generation, fitness])
+            event?.preventDefault()
+            download(
+                `data:image/png;base64,${output}`,
+                `${jobID}-${generation}-${twoDecimals(fitness)}.png`,
+                'image/png'
+            )
+            return true
+        },
+        [output, jobID, generation, fitness]
+    )
 
     const [rate, onRateChange] = useAutosave(onSave)
 
