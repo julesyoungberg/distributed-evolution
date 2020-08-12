@@ -1,4 +1,4 @@
-FROM julesyoungberg/gocv AS gocv
+FROM julesyoungberg/gocv AS builder
 
 WORKDIR /app
 
@@ -6,13 +6,15 @@ COPY ./go /app/go
 COPY ./go.mod ./go.sum ./
 RUN go mod download
 
+# ENTRYPOINT go run go/main/master/master.go
+
+RUN go build go/main/master/master.go
+
+FROM julesyoungberg/gocv
+
+COPY --from=builder ./app/master .
+
 EXPOSE 9000 
 EXPOSE 8080
 
-ENTRYPOINT go run go/main/master/master.go
-
-# RUN go build go/main/master/master.go
-
-# FROM julesyoungberg/gocv
-# COPY --from=gocv ./app .
-# CMD ["./master"]
+CMD ["./master"]

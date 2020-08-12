@@ -1,4 +1,4 @@
-FROM julesyoungberg/gocv AS gocv
+FROM julesyoungberg/gocv
 
 WORKDIR /app
 
