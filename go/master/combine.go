@@ -48,7 +48,7 @@ func (m *Master) getTaskResult(id int) Result {
 // listens to the results channel, combining results and sends the final result to the ui
 func (m *Master) combineResults(ids []int, results chan Result) {
 	total := 0
-	var latest uint = 0
+	var generation int64 = 0
 	var fitness float64 = 0.0
 	dc := gg.NewContext(m.TargetImage.Width, m.TargetImage.Height)
 
@@ -58,23 +58,21 @@ func (m *Master) combineResults(ids []int, results chan Result) {
 		}
 
 		total++
+		generation += int64(result.Generation)
 		fitness += result.Fitness
-
-		if result.Generation > latest {
-			latest = result.Generation
-		}
 
 		dc.DrawImageAnchored(result.Output, int(result.Position.X), int(result.Position.Y), 0.5, 0.5)
 	}
 
 	if total > 0 {
+		generation /= int64(total)
 		fitness /= float64(total)
 		fitness = 1 / fitness
 	}
 
 	m.mu.Lock()
+	m.Generation = uint(generation)
 	m.Fitness = fitness
-	m.Generation = latest
 	m.mu.Unlock()
 
 	m.sendOutput(dc.Image())

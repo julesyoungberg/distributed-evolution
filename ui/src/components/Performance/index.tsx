@@ -69,8 +69,8 @@ export default function Performance() {
 
     const onSave = () => {
         const json = {
-            historicalData: data,
             metadata: { duration: duration.join('.'), ...state },
+            historicalData: data,
         }
 
         // delete the images
