@@ -12,6 +12,8 @@ import (
 )
 
 type State struct {
+	Complete         bool                  `json:"complete"`
+	CompletedAt      time.Time             `json:"completedAt"`
 	Fitness          float64               `json:"fitness"`
 	Generation       uint                  `json:"generation"`
 	JobID            int                   `json:"jobID"`
@@ -30,6 +32,33 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+func (m *Master) getState() State {
+	m.mu.Lock()
+
+	tasks := make(map[int]api.TaskState, len(m.Tasks))
+
+	for id, task := range m.Tasks {
+		tasks[id] = *task
+	}
+
+	// send encoded image and current generation
+	state := State{
+		Complete:         m.Job.Complete,
+		CompletedAt:      m.Job.CompletedAt,
+		Fitness:          m.Fitness,
+		Generation:       m.Generation,
+		JobID:            m.Job.ID,
+		NumWorkers:       m.NumWorkers,
+		StartedAt:        m.Job.StartedAt,
+		ThreadsPerWorker: m.ThreadsPerWorker,
+		Tasks:            tasks,
+	}
+
+	m.mu.Unlock()
+
+	return state
+}
+
 // subscribe handler creates a websocket connection with the client
 // TODO handle multiple connections
 func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
@@ -44,21 +73,16 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("new websocket connection request")
 
+	state := m.getState()
+
 	m.mu.Lock()
-
-	response := State{
-		Fitness:          m.Fitness,
-		Generation:       m.Generation,
-		JobID:            m.Job.ID,
-		Palette:          m.Palette,
-		TargetImage:      m.TargetImageBase64,
-		TargetImageEdges: m.TargetImageEdges,
-	}
-
+	state.Palette = m.Palette
+	state.TargetImage = m.TargetImageBase64
+	state.TargetImageEdges = m.TargetImageEdges
 	m.mu.Unlock()
 
 	// save the connection for updates
-	if err := conn.WriteJSON(response); err != nil {
+	if err := conn.WriteJSON(state); err != nil {
 		log.Print("error sending initial state over websocket connection: ", err)
 		return
 	}
@@ -66,57 +90,6 @@ func (m *Master) subscribe(w http.ResponseWriter, r *http.Request) {
 	m.connMu.Lock()
 	m.conn = conn
 	m.connMu.Unlock()
-}
-
-func (m *Master) getState() State {
-	m.mu.Lock()
-
-	m.lastUpdate = time.Now()
-	fitness := m.Fitness
-	generation := m.Generation
-	jobID := m.Job.ID
-	tasks := make(map[int]api.TaskState, len(m.Tasks))
-
-	for id, task := range m.Tasks {
-		tasks[id] = *task
-	}
-
-	m.mu.Unlock()
-
-	// send encoded image and current generation
-	return State{
-		Fitness:    fitness,
-		Generation: generation,
-		JobID:      jobID,
-		StartedAt:  m.Job.StartedAt,
-		Tasks:      tasks,
-	}
-}
-
-func (m *Master) sendOutput(output image.Image) {
-	m.connMu.Lock()
-	defer m.connMu.Unlock()
-
-	if m.conn == nil {
-		return
-	}
-
-	state := m.getState()
-
-	if img, err := util.EncodeImage(output); err == nil {
-		state.Output = img
-	}
-
-	if err := m.conn.WriteJSON(state); err != nil {
-		log.Print("[combiner] error sending output: ", err)
-	}
-}
-
-func (m *Master) sendUpdate() {
-	state := m.getState()
-	if err := m.conn.WriteJSON(state); err != nil {
-		log.Print("[combiner] error sending output: ", err)
-	}
 }
 
 func (m *Master) sendData(state State) error {
@@ -128,6 +101,26 @@ func (m *Master) sendData(state State) error {
 	}
 
 	return m.conn.WriteJSON(state)
+}
+
+func (m *Master) sendOutput(output image.Image) {
+	state := m.getState()
+
+	if img, err := util.EncodeImage(output); err == nil {
+		state.Output = img
+	}
+
+	if err := m.sendData(state); err != nil {
+		log.Print("[combiner] error sending output: ", err)
+	}
+}
+
+func (m *Master) sendUpdate() {
+	state := m.getState()
+
+	if err := m.sendData(state); err != nil {
+		log.Print("[combiner] error sending output: ", err)
+	}
 }
 
 func (m *Master) sendEdges() {

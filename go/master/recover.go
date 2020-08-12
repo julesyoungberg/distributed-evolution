@@ -37,6 +37,7 @@ func (m *Master) recover(id int) {
 	task.WorkerID = 0
 	task.Thread = 0
 	task.LastUpdate = time.Now()
+	task.Attempt += 1
 
 	m.mu.Lock()
 	m.Tasks[id] = &task

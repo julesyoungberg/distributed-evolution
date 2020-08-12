@@ -37,6 +37,12 @@ func CreateGA(config api.Job) *eaopt.GA {
 	return ga
 }
 
+func (w *Worker) setTaskState(state *api.WorkerTask) {
+	w.mu.Lock()
+	w.Tasks[state.Task.ID] = state
+	w.mu.Unlock()
+}
+
 // returns a closure to be called after each generation
 func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 	// send the currrent best fit and other data to the master
@@ -47,20 +53,20 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 
 		state.Task.Generation = state.GenOffset + ga.Generations
 
-		success := w.updateMaster(state, thread)
+		status := "inprogress"
+		if state.Task.Generation >= state.Task.Job.NumGenerations {
+			status = "done"
+		}
+
+		success := w.updateMaster(state, thread, status)
 		if !success {
-			w.mu.Lock()
-			w.Tasks[id] = state
-			w.mu.Unlock()
+			w.setTaskState(state)
 			return
 		}
 
 		go func() {
 			w.updateTask(state, ga, thread)
-
-			w.mu.Lock()
-			w.Tasks[id] = state
-			w.mu.Unlock()
+			w.setTaskState(state)
 		}()
 	}
 }
@@ -69,9 +75,15 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 func (w *Worker) createEarlyStop(taskID int) func(ga *eaopt.GA) bool {
 	return func(ga *eaopt.GA) bool {
 		w.mu.Lock()
-		id := w.Tasks[taskID].Task.ID
+		state := w.Tasks[taskID]
+		taskID := state.Task.ID
+		generation := state.Task.Generation
+		nGenerations := state.Task.Job.NumGenerations
 		w.mu.Unlock()
 
-		return id == -1
+		// extra check because eaopt seems to disregard
+		done := nGenerations > 0 && generation >= nGenerations
+
+		return taskID == -1 || done
 	}
 }

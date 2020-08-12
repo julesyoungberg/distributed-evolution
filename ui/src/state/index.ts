@@ -3,6 +3,8 @@ import React from 'react'
 export type Status = 'active' | 'disconnected' | 'editing' | 'error' | 'idle'
 
 export interface State {
+    complete?: boolean
+    completedAt?: string
     error?: any
     fitness?: number
     generation: number

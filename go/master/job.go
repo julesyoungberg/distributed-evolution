@@ -8,21 +8,29 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
-func (m *Master) allStale() bool {
+func (m *Master) allTasksOfState(status string) bool {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	log.Printf("checking for staleness")
+	log.Printf("checking for %vness", status)
 
 	for _, t := range m.Tasks {
-		if t.Status != "stale" {
+		if t.Status != status {
 			log.Printf("task %v is %v", t.ID, t.Status)
 			return false
 		}
 	}
 
-	log.Printf("all tasks are stale")
+	log.Printf("all tasks are %v", status)
 	return true
+}
+
+func (m *Master) allStale() bool {
+	return m.allTasksOfState("stale")
+}
+
+func (m *Master) allDone() bool {
+	return m.allTasksOfState("done")
 }
 
 func (m *Master) setTargetImage(image image.Image) {

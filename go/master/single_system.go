@@ -95,22 +95,46 @@ func (s *SingleSystem) generateTask() {
 
 func (s *SingleSystem) createCallback() func(ga *eaopt.GA) {
 	return func(ga *eaopt.GA) {
-		s.WorkerTask.Mu.Lock()
-		output := s.WorkerTask.BestFit.Output
-		fitness := s.WorkerTask.BestFit.Fitness
-		s.WorkerTask.Mu.Unlock()
-
 		s.Master.mu.Lock()
+		state := s.WorkerTask
+		s.Master.mu.Unlock()
+
+		state.Mu.Lock()
+		output := state.BestFit.Output
+		fitness := state.BestFit.Fitness
+		state.Mu.Unlock()
 
 		if fitness != 0 {
 			fitness = 1 / fitness
 		}
 
+		s.Master.mu.Lock()
+		defer s.Master.mu.Unlock()
+
 		s.Master.Fitness = fitness
 		s.Master.Generation = ga.Generations
 		s.Output = output
 
+		if s.Master.Generation == s.Master.Job.NumGenerations {
+			s.Master.Job.Complete = true
+			s.Master.Job.CompletedAt = time.Now()
+		}
+	}
+}
+
+func (s *SingleSystem) createEarlyStop() func(ga *eaopt.GA) bool {
+	return func(ga *eaopt.GA) bool {
+		s.Master.mu.Lock()
+		state := s.WorkerTask
 		s.Master.mu.Unlock()
+
+		state.Mu.Lock()
+		nGenerations := state.Task.Job.NumGenerations
+		generation := state.Task.Generation
+		state.Mu.Unlock()
+
+		// extra check because eaopt seems to disregard
+		return nGenerations > 0 && generation >= nGenerations
 	}
 }
 
@@ -134,6 +158,7 @@ func (s *SingleSystem) runTask() {
 
 	s.ga = worker.CreateGA(job)
 	s.ga.Callback = s.createCallback()
+	s.ga.EarlyStop = s.createEarlyStop()
 	factory := api.GetShapesFactory(&t, task.Population)
 
 	s.Master.mu.Lock()
@@ -159,9 +184,11 @@ func (s *SingleSystem) updateUI() {
 		time.Sleep(5 * time.Second)
 
 		s.Master.mu.Lock()
+
 		output := s.Output
 		generation := s.Master.Generation
 		fitness := s.Master.Fitness
+
 		s.Master.mu.Unlock()
 
 		log.Printf("updating UI (generation: %v, fitness: %v)", generation, fitness)
@@ -207,6 +234,7 @@ func (s *SingleSystem) newJob(w http.ResponseWriter, r *http.Request) {
 	s.Master.setTargetImage(img)
 	s.Master.Job.TargetImage = "" // no need to be passing it around, its saved on m
 	s.Master.Job.StartedAt = time.Now()
+	s.Master.Job.Complete = false
 
 	s.Master.mu.Unlock()
 
@@ -223,6 +251,7 @@ func (s *SingleSystem) httpServer() {
 	r.HandleFunc("/api/subscribe", s.Master.subscribe)
 	r.HandleFunc("/api/healthz", healthCheck).Methods(http.MethodGet)
 	r.HandleFunc("/api/palette", s.Master.fetchPalette).Methods(http.MethodGet)
+	r.HandleFunc("/api/state", s.Master.fetchState).Methods(http.MethodGet)
 
 	port := os.Getenv("HTTP_PORT")
 

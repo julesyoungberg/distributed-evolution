@@ -15,23 +15,53 @@ import (
 // handles a progress update from a worker, updates the state, and updates the ui
 func (m *Master) UpdateTask(args, reply *api.TaskState) error {
 	m.mu.Lock()
-	defer m.mu.Unlock()
 
-	if args.JobID != m.Job.ID {
-		return fmt.Errorf("expected job ID %v, got %v", m.Job.ID, args.JobID)
+	jobID := m.Job.ID
+
+	t, ok := m.Tasks[args.ID]
+	if !ok || t == nil {
+		m.mu.Unlock()
+		return fmt.Errorf("task %v not found", args.ID)
+	}
+	task := *t
+
+	nGenerations := m.Job.NumGenerations
+
+	m.mu.Unlock()
+
+	if args.JobID != jobID {
+		return fmt.Errorf("expected job ID %v, got %v", jobID, args.JobID)
 	}
 
-	task, ok := m.Tasks[args.ID]
-	if !ok || task == nil {
-		return fmt.Errorf("task %v not found", args.ID)
+	if task.Complete {
+		return fmt.Errorf("task %v is complete", args.ID)
 	}
 
 	if !(task.WorkerID == 0 && task.Thread == 0) && (args.WorkerID != task.WorkerID || args.Thread != task.Thread) {
 		return fmt.Errorf("task %v is being worked on by thread %v of worker %v", task.ID, task.Thread, task.WorkerID)
 	}
 
-	args.LastUpdate = time.Now()
-	m.Tasks[args.ID] = args
+	newTask := *args
+	newTask.LastUpdate = time.Now()
+	newTask.Attempt = task.Attempt
+	newTask.StartedAt = task.StartedAt
+
+	if args.Status == "done" || task.Generation >= nGenerations {
+		newTask.Status = "done"
+		newTask.Complete = true
+		newTask.CompletedAt = time.Now()
+	}
+
+	m.mu.Lock()
+	m.Tasks[args.ID] = &newTask
+	m.mu.Unlock()
+
+	if newTask.Status == "done" && m.allDone() {
+		m.mu.Lock()
+		m.Job.Complete = true
+		m.Job.CompletedAt = time.Now()
+		m.mu.Unlock()
+	}
 
 	return nil
 }

@@ -34,6 +34,9 @@ apply-prod:
 
 build-apply: build apply
 
+down:
+	docker-compose down -v --remove-orphans
+
 start: 
 	docker-compose down -v && \
 	docker-compose up --build --scale worker=5 --scale sentinel=3 --scale redis-slave=2

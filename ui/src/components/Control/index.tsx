@@ -6,25 +6,14 @@ import fetch from 'isomorphic-fetch'
 import download from 'downloadjs'
 import getConfig from 'next/config'
 import { FormEvent, useRef, useState } from 'react'
-import { Box, Button, Flex } from 'rebass'
+import { Box, Flex } from 'rebass'
 
 import useAppState from '../../hooks/useAppState'
-import { Theme } from '../../theme'
 import { twoDecimals } from '../../util'
 
+import Button from '../Button'
+
 const { publicRuntimeConfig } = getConfig()
-
-const StyledButton = styled(Button)<{ disabled: boolean }, Theme>`
-    padding: 10px 20px;
-    cursor: pointer;
-    font-weight: 700;
-    text-transform: uppercase;
-    background-color: ${({ disabled, theme }) => (disabled ? theme.colors.lightgray : theme.colors.primary)};
-
-    &:focus {
-        outline: none;
-    }
-`
 
 const Field = styled(Box)`
     width: 250px;
@@ -207,25 +196,25 @@ export default function Control() {
             <Flex css={{ textAlign: 'center' }} justifyContent='space-around'>
                 <Box width={1 / 2}>
                     <Input css={{ display: 'none ' }} onChange={onFileInputChange} ref={fileInputRef} type='file' />
-                    <StyledButton css={{ marginRight: 10 }} disabled={disableButtons} onClick={uploadTargetImage}>
+                    <Button css={{ marginRight: 10 }} disabled={disableButtons} onClick={uploadTargetImage}>
                         Upload Target
-                    </StyledButton>
-                    <StyledButton disabled={disableButtons} onClick={getRangomTargetImage}>
+                    </Button>
+                    <Button disabled={disableButtons} onClick={getRangomTargetImage}>
                         Random Target
-                    </StyledButton>
+                    </Button>
                 </Box>
                 <Box width={1 / 2}>
-                    <StyledButton
+                    <Button
                         css={{ marginRight: 10 }}
                         disabled={!['active', 'editing'].includes(status)}
                         onClick={onStart}
                         type='submit'
                     >
                         Start
-                    </StyledButton>
-                    <StyledButton disabled={!output} onClick={onSave}>
+                    </Button>
+                    <Button disabled={!output} onClick={onSave}>
                         Save
-                    </StyledButton>
+                    </Button>
                 </Box>
             </Flex>
             <Flex css={{ marginTop: '20px' }} flexWrap='wrap' justifyContent='space-between'>

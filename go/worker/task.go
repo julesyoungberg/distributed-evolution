@@ -62,8 +62,8 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	}
 }
 
-func (w *Worker) updateMaster(state *api.WorkerTask, thread int) bool {
-	err := state.Task.UpdateMaster(w.ID, thread, "inprogress")
+func (w *Worker) updateMaster(state *api.WorkerTask, thread int, status string) bool {
+	err := state.Task.UpdateMaster(w.ID, thread, status)
 	if err != nil {
 		log.Printf("[thread %v] failed to update master: %v", thread, err)
 		state.Task.ID = -1

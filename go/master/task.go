@@ -80,9 +80,11 @@ func (m *Master) generateTask(
 	}
 
 	taskState := api.TaskState{
+		Attempt:    1,
 		ID:         task.ID,
 		JobID:      job.ID,
 		LastUpdate: time.Now(),
+		StartedAt:  time.Now(),
 		Status:     "queued",
 	}
 

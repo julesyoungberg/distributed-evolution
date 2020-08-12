@@ -11,6 +11,11 @@ const columns = [
         sortable: true,
     },
     {
+        name: 'Attempt',
+        selector: 'attempt',
+        sortable: true,
+    },
+    {
         name: 'Job ID',
         selector: 'jobID',
         sortable: true,
@@ -30,8 +35,18 @@ const columns = [
         sortable: true,
     },
     {
+        name: 'Fitness',
+        selector: 'fitness',
+        sortable: true,
+    },
+    {
         name: 'Last Update',
         selector: 'lastUpdate',
+        sortable: true,
+    },
+    {
+        name: 'Duration',
+        selector: 'duration',
         sortable: true,
     },
     {
@@ -56,9 +71,9 @@ export default function Table() {
                     },
                 },
             }}
-            data={Object.values(state.tasks || {}).map((task) => ({
+            data={(state.tasks || []).map((task) => ({
                 ...task,
-                lastUpdate: `${(now - new Date(task.lastUpdate).getTime()) / 1000} seconds ago`,
+                lastUpdate: `${(now - new Date(task.lastUpdate).getTime()) / 1000}s ago`
             }))}
         />
     )

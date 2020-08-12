@@ -22,26 +22,9 @@ func cors(w http.ResponseWriter) {
 }
 
 func (m *Master) respondWithState(w http.ResponseWriter) {
-	m.mu.Lock()
-
-	response := State{
-		Fitness:          m.Fitness,
-		Generation:       m.Generation,
-		JobID:            m.Job.ID,
-		NumWorkers:       m.NumWorkers,
-		Tasks:            make(map[int]api.TaskState, len(m.Tasks)),
-		ThreadsPerWorker: m.ThreadsPerWorker,
-		StartedAt:        m.Job.StartedAt,
-	}
-
-	for id, task := range m.Tasks {
-		response.Tasks[id] = *task
-	}
-
-	m.mu.Unlock()
-
+	state := m.getState()
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(response); err != nil {
+	if err := json.NewEncoder(w).Encode(state); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
@@ -85,6 +68,7 @@ func (m *Master) newJob(w http.ResponseWriter, r *http.Request) {
 	m.setTargetImage(img)
 	m.Job.TargetImage = "" // no need to be passing it around, its saved on m
 	m.Job.StartedAt = time.Now()
+	m.Job.Complete = false
 
 	m.mu.Unlock()
 
@@ -142,6 +126,10 @@ func (m *Master) fetchPalette(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+func (m *Master) fetchState(w http.ResponseWriter, r *http.Request) {
+	m.respondWithState(w)
+}
+
 // handles requests from the ui and websocket communication
 func (m *Master) httpServer() {
 	r := mux.NewRouter()
@@ -151,6 +139,7 @@ func (m *Master) httpServer() {
 	r.HandleFunc("/api/healthz", healthCheck).Methods(http.MethodGet)
 	r.HandleFunc("/api/redis/{key:[0-9A-Za-z:]+}", m.getKeyFromRedis).Methods(http.MethodGet)
 	r.HandleFunc("/api/palette", m.fetchPalette).Methods(http.MethodGet)
+	r.HandleFunc("/api/state", m.fetchState).Methods(http.MethodGet)
 
 	port := os.Getenv("HTTP_PORT")
 
