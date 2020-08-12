@@ -16,9 +16,14 @@ export function formatDuration(d: number[]): string {
     return duration
 }
 
+export function secondsSince(startTime: number, endTime?: number): number {
+    const now = endTime ? endTime : new Date().getTime()
+    return (now - startTime) / 1000
+}
+
 export function getDurationInSeconds(startedAt: string, completedAt?: string): number {
-    const now = completedAt ? new Date(completedAt).getTime() : new Date().getTime()
-    return (now - new Date(startedAt).getTime()) / 1000
+    const now = completedAt ? new Date(completedAt).getTime() : undefined
+    return secondsSince(new Date(startedAt).getTime(), now)
 }
 
 export function getDuration(startedAt: string, completedAt?: string): number[] {

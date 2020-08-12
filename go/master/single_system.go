@@ -115,7 +115,10 @@ func (s *SingleSystem) createCallback() func(ga *eaopt.GA) {
 		s.Master.Generation = ga.Generations
 		s.Output = output
 
-		if s.Master.Generation == s.Master.Job.NumGenerations {
+		generation := s.Master.Generation
+		nGenerations := s.Master.Job.NumGenerations
+
+		if nGenerations > 0 && generation >= nGenerations {
 			s.Master.Job.Complete = true
 			s.Master.Job.CompletedAt = time.Now()
 		}

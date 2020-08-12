@@ -73,7 +73,7 @@ export default function Table() {
             }}
             data={(state.tasks || []).map((task) => ({
                 ...task,
-                lastUpdate: `${(now - new Date(task.lastUpdate).getTime()) / 1000}s ago`
+                lastUpdate: `${(now - new Date(task.lastUpdate).getTime()) / 1000}s ago`,
             }))}
         />
     )

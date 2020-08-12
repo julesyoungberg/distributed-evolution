@@ -69,15 +69,16 @@ function reducer(state: State, action: Action): State {
         case 'start':
             return {
                 ...state,
+                ...handleUpdate(state, action.payload),
                 nextTargetImage: undefined,
                 jobID: state.jobID + 1,
                 output: undefined,
                 palette: undefined,
                 targetImage: state.nextTargetImage || state.targetImage,
                 targetImageEdges: undefined,
-                ...handleUpdate(state, action.payload),
                 status: 'active',
                 error: action.payload.statusCode >= 400 ? action.payload.data : '',
+                complete: false,
             }
         case 'start':
         default:

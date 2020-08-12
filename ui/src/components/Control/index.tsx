@@ -5,10 +5,11 @@ import { Checkbox, Input, Label, Select } from '@rebass/forms'
 import fetch from 'isomorphic-fetch'
 import download from 'downloadjs'
 import getConfig from 'next/config'
-import { FormEvent, useRef, useState } from 'react'
+import { FormEvent, useCallback, useRef, useState } from 'react'
 import { Box, Flex } from 'rebass'
 
 import useAppState from '../../hooks/useAppState'
+import useAutosave from '../../hooks/useAutosave'
 import { twoDecimals } from '../../util'
 
 import Button from '../Button'
@@ -157,10 +158,17 @@ export default function Control() {
         setLoading(false)
     }
 
-    const onSave = (event: MouseEvent) => {
-        event.preventDefault()
+    const onSave = useCallback((event?: MouseEvent) => {
+        if (!output) {
+            return false
+        }
+
+        event?.preventDefault()
         download(`data:image/png;base64,${output}`, `${jobID}-${generation}-${twoDecimals(fitness)}.png`, 'image/png')
-    }
+        return true
+    }, [output, jobID, generation, fitness])
+
+    const [rate, onRateChange] = useAutosave(onSave)
 
     const fieldProps = (name: string) => ({
         id: name,
@@ -212,9 +220,17 @@ export default function Control() {
                     >
                         Start
                     </Button>
-                    <Button disabled={!output} onClick={onSave}>
+                    <Button css={{ marginRight: 10 }} disabled={!output} onClick={onSave}>
                         Save
                     </Button>
+                    <Box css={{ display: 'inline-block', width: '100px' }}>
+                        <Label htmlFor='outputSaveRate'>Save Rate</Label>
+                        <Select id='outputSaveRate' name='outputSaveRate' value={rate} onChange={onRateChange}>
+                            {['none', '1m', '5m', '10m', '15m', '30m', '60m', '90m', '120m'].map((type) => (
+                                <option key={type}>{type}</option>
+                            ))}
+                        </Select>
+                    </Box>
                 </Box>
             </Flex>
             <Flex css={{ marginTop: '20px' }} flexWrap='wrap' justifyContent='space-between'>

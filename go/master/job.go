@@ -25,12 +25,12 @@ func (m *Master) allTasksOfState(status string) bool {
 	return true
 }
 
-func (m *Master) allStale() bool {
-	return m.allTasksOfState("stale")
-}
-
 func (m *Master) allDone() bool {
 	return m.allTasksOfState("done")
+}
+
+func (m *Master) allStale() bool {
+	return m.allTasksOfState("stale") || m.allTasksOfState("done")
 }
 
 func (m *Master) setTargetImage(image image.Image) {

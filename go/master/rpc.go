@@ -46,7 +46,7 @@ func (m *Master) UpdateTask(args, reply *api.TaskState) error {
 	newTask.Attempt = task.Attempt
 	newTask.StartedAt = task.StartedAt
 
-	if args.Status == "done" || task.Generation >= nGenerations {
+	if args.Status == "done" || (nGenerations > 0 && task.Generation >= nGenerations) {
 		newTask.Status = "done"
 		newTask.Complete = true
 		newTask.CompletedAt = time.Now()

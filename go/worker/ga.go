@@ -51,10 +51,12 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 		state := w.Tasks[id]
 		w.mu.Unlock()
 
-		state.Task.Generation = state.GenOffset + ga.Generations
+		generation := state.GenOffset + ga.Generations
+		nGenerations := state.Task.Job.NumGenerations
+		state.Task.Generation = generation
 
 		status := "inprogress"
-		if state.Task.Generation >= state.Task.Job.NumGenerations {
+		if nGenerations > 0 && generation >= nGenerations {
 			status = "done"
 		}
 

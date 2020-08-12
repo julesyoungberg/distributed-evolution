@@ -1,12 +1,14 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
 import styled from '@emotion/styled'
+import { Label, Select } from '@rebass/forms'
 import download from 'downloadjs'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Box, Flex, Text } from 'rebass'
 import { LineChart, Line, XAxis, YAxis } from 'recharts'
 
 import useAppState from '../../hooks/useAppState'
+import useAutosave from '../../hooks/useAutosave'
 import useTheme from '../../hooks/useTheme'
 import { formatDuration, getDuration, twoDecimals } from '../../util'
 
@@ -51,7 +53,7 @@ export default function Performance() {
     const { state } = useAppState()
     const theme = useTheme()
 
-    const { complete, completedAt, fitness, generation, startedAt, status } = state
+    const { complete, completedAt, fitness, generation, jobID, startedAt, status } = state
 
     const duration = getDuration(startedAt, complete ? completedAt : undefined)
 
@@ -63,11 +65,13 @@ export default function Performance() {
         setData([...data, { fitness, generation, time: duration.join('.') }])
     }, [fitness, generation, complete])
 
-    if (!(fitness && generation && startedAt)) {
-        return null
-    }
+    const onClear = () => setData([])
 
-    const onSave = () => {
+    const onSave = useCallback(() => {
+        if (!generation) {
+            return false
+        }
+
         const json = {
             metadata: { duration: duration.join('.'), ...state },
             historicalData: data,
@@ -82,10 +86,15 @@ export default function Performance() {
 
         const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(json, null, 4))}`
 
-        download(jsonString, 'distributed-evolution-data.json')
-    }
+        download(jsonString, `${jobID}-${generation}-${twoDecimals(fitness)}.json`)
+        return true
+    }, [data, duration, state])
 
-    const onClear = () => setData([])
+    const [rate, onRateChange] = useAutosave(onSave)
+
+    if (!(fitness && generation && startedAt)) {
+        return null
+    }
 
     return (
         <Box css={{ marginTop: 50, marginBottom: 50 }}>
@@ -102,14 +111,22 @@ export default function Performance() {
                         <b>Duration:</b> {formatDuration(duration)}
                     </StyledText>
                 )}
-                <Flex>
-                    <Box css={{ marginRight: '10px' }}>
-                        <Button onClick={onSave}>Save Data</Button>
+                <Box>
+                    <Button css={{ marginRight: '10px' }} onClick={onClear}>
+                        Clear Data
+                    </Button>
+                    <Button css={{ marginRight: '10px' }} onClick={onSave}>
+                        Save Data
+                    </Button>
+                    <Box css={{ display: 'inline-block', width: '100px' }}>
+                        <Label htmlFor='dataSaveRate'>Save Rate</Label>
+                        <Select id='dataSaveRate' name='dataSaveRate' value={rate} onChange={onRateChange}>
+                            {['none', '1m', '5m', '10m', '15m', '30m', '60m', '90m', '120m'].map((type) => (
+                                <option key={type}>{type}</option>
+                            ))}
+                        </Select>
                     </Box>
-                    <Box>
-                        <Button onClick={onClear}>Clear Data</Button>
-                    </Box>
-                </Flex>
+                </Box>
             </Box>
 
             <Flex>
