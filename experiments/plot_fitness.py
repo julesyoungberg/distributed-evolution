@@ -2,8 +2,8 @@
 import matplotlib.pyplot as plt
 import json
 
-experiment = 'target1'
-scales = ['scale1', 'scale2', 'scale3']
+experiment = 'target3'
+scales = ['scale2', 'scale3', 'scale4']
 
 def get_scale_historical_data(scale):
     filename = experiment + '/' + scale + '/summary.json'
@@ -11,6 +11,7 @@ def get_scale_historical_data(scale):
         with open(filename, 'r') as f:
             data = json.load(f)
     except FileNotFoundError:
+        print(filename)
         return None
     return data
 
@@ -42,14 +43,21 @@ def get_plot_data(series):
 def plot_fitness():
     data = get_historical_data()
 
+    labels = {
+        'scale1': 'single system',
+        'scale2': 'simulated',
+        'scale3': 'distributed w/ 10s timeout',
+        'scale4': 'distributed w/ 5s timeout'
+    }
+
     for scale in data:
         (time, fitness) = get_plot_data(data[scale])
-        plt.plot(time, fitness, label=scale)
+        plt.plot(time, fitness, label=labels[scale])
 
     plt.xlabel('Time (Minutes)')
     plt.ylabel('Fitness')
     plt.title('Experiment Fitness Over Time')
     plt.legend()
-    plt.savefig('plots/fitness.png')
+    plt.savefig('plots/fitness_by_time.png')
 
 plot_fitness()

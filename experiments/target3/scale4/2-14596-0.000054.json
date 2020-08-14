@@ -1,0 +1,2748 @@
+{
+    "metadata": {
+        "duration": "0.57.53",
+        "generation": 14596,
+        "status": "active",
+        "error": "",
+        "completedAt": "0001-01-01T00:00:00Z",
+        "fitness": 0.00005408154491956603,
+        "jobID": 2,
+        "numWorkers": 7,
+        "startedAt": "2020-08-14T02:02:56.222669963Z",
+        "tasks": [
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000055731683925940396,
+                "generation": 15232,
+                "ID": 1,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.801539841Z",
+                "startedAt": "2020-08-14T02:02:56.325187277Z",
+                "status": "inprogress",
+                "thread": 5,
+                "workerID": 1299015222,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000060308662740299366,
+                "generation": 14161,
+                "ID": 2,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.770412963Z",
+                "startedAt": "2020-08-14T02:02:56.420331005Z",
+                "status": "inprogress",
+                "thread": 6,
+                "workerID": 1299015222,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 9,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000058486275445399015,
+                "generation": 14344,
+                "ID": 3,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.85234679Z",
+                "startedAt": "2020-08-14T02:02:56.426657736Z",
+                "status": "inprogress",
+                "thread": 3,
+                "workerID": 3556317542,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 2,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005324804905024625,
+                "generation": 15855,
+                "ID": 4,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.868943733Z",
+                "startedAt": "2020-08-14T02:02:56.516326054Z",
+                "status": "inprogress",
+                "thread": 7,
+                "workerID": 243547833,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 2,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000056643903369313436,
+                "generation": 14202,
+                "ID": 5,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.801362327Z",
+                "startedAt": "2020-08-14T02:02:56.321884618Z",
+                "status": "inprogress",
+                "thread": 7,
+                "workerID": 1299015222,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 4,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005589593511706166,
+                "generation": 14515,
+                "ID": 6,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.802180894Z",
+                "startedAt": "2020-08-14T02:02:56.411745697Z",
+                "status": "inprogress",
+                "thread": 5,
+                "workerID": 2346508328,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 4,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005929779709732344,
+                "generation": 14418,
+                "ID": 7,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.801991601Z",
+                "startedAt": "2020-08-14T02:02:56.23483929Z",
+                "status": "inprogress",
+                "thread": 8,
+                "workerID": 2346508328,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 4,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005388542696112728,
+                "generation": 15966,
+                "ID": 8,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.811877072Z",
+                "startedAt": "2020-08-14T02:02:56.323819827Z",
+                "status": "inprogress",
+                "thread": 7,
+                "workerID": 3556317542,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005663108424574164,
+                "generation": 14666,
+                "ID": 9,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.865510617Z",
+                "startedAt": "2020-08-14T02:02:56.428260054Z",
+                "status": "inprogress",
+                "thread": 4,
+                "workerID": 243547833,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 6,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005450200443558856,
+                "generation": 14147,
+                "ID": 10,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.833052066Z",
+                "startedAt": "2020-08-14T02:02:56.426571194Z",
+                "status": "inprogress",
+                "thread": 5,
+                "workerID": 2140079797,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 7,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000054395959593807996,
+                "generation": 15368,
+                "ID": 11,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.691199352Z",
+                "startedAt": "2020-08-14T02:02:56.425902419Z",
+                "status": "inprogress",
+                "thread": 7,
+                "workerID": 2140079797,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005298728363433018,
+                "generation": 15561,
+                "ID": 12,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.869157122Z",
+                "startedAt": "2020-08-14T02:02:56.410904797Z",
+                "status": "inprogress",
+                "thread": 5,
+                "workerID": 243547833,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 9,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005636645503319882,
+                "generation": 14356,
+                "ID": 13,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.852982799Z",
+                "startedAt": "2020-08-14T02:02:56.420278813Z",
+                "status": "inprogress",
+                "thread": 9,
+                "workerID": 974642029,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 4,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005425630769254768,
+                "generation": 15234,
+                "ID": 14,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.802000014Z",
+                "startedAt": "2020-08-14T02:02:56.233875548Z",
+                "status": "inprogress",
+                "thread": 3,
+                "workerID": 2346508328,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 1,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005119661714677311,
+                "generation": 14233,
+                "ID": 15,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.608872277Z",
+                "startedAt": "2020-08-14T02:02:56.426464018Z",
+                "status": "inprogress",
+                "thread": 4,
+                "workerID": 1299015222,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 2,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000056134302395926694,
+                "generation": 15017,
+                "ID": 16,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.832836032Z",
+                "startedAt": "2020-08-14T02:02:56.416659042Z",
+                "status": "inprogress",
+                "thread": 3,
+                "workerID": 2140079797,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00004955198484402013,
+                "generation": 13994,
+                "ID": 17,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.880070391Z",
+                "startedAt": "2020-08-14T02:02:56.512992544Z",
+                "status": "inprogress",
+                "thread": 4,
+                "workerID": 974642029,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 7,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00006286282432649528,
+                "generation": 14034,
+                "ID": 18,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.664340856Z",
+                "startedAt": "2020-08-14T02:02:56.325915542Z",
+                "status": "inprogress",
+                "thread": 10,
+                "workerID": 1299015222,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00006162592009257996,
+                "generation": 14154,
+                "ID": 19,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.801362901Z",
+                "startedAt": "2020-08-14T02:02:56.333080971Z",
+                "status": "inprogress",
+                "thread": 8,
+                "workerID": 1299015222,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 7,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005199266850663523,
+                "generation": 14526,
+                "ID": 20,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.663430475Z",
+                "startedAt": "2020-08-14T02:02:56.427769937Z",
+                "status": "inprogress",
+                "thread": 6,
+                "workerID": 243547833,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005565155113489486,
+                "generation": 14428,
+                "ID": 21,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.803222182Z",
+                "startedAt": "2020-08-14T02:02:56.435532985Z",
+                "status": "inprogress",
+                "thread": 2,
+                "workerID": 1299015222,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000054046151260615494,
+                "generation": 13968,
+                "ID": 22,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.672580645Z",
+                "startedAt": "2020-08-14T02:02:56.523302439Z",
+                "status": "inprogress",
+                "thread": 4,
+                "workerID": 2346508328,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 4,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005096387758486213,
+                "generation": 14040,
+                "ID": 23,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.852551835Z",
+                "startedAt": "2020-08-14T02:02:56.527400856Z",
+                "status": "inprogress",
+                "thread": 9,
+                "workerID": 1299015222,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 2,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005416330460080596,
+                "generation": 14292,
+                "ID": 24,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.700035603Z",
+                "startedAt": "2020-08-14T02:02:56.527737916Z",
+                "status": "inprogress",
+                "thread": 5,
+                "workerID": 3556317542,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00008304874545189018,
+                "generation": 14641,
+                "ID": 25,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.809358584Z",
+                "startedAt": "2020-08-14T02:02:56.323450837Z",
+                "status": "inprogress",
+                "thread": 7,
+                "workerID": 2346508328,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 6,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000058005581450030916,
+                "generation": 15045,
+                "ID": 26,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.865450566Z",
+                "startedAt": "2020-08-14T02:02:56.40885363Z",
+                "status": "inprogress",
+                "thread": 10,
+                "workerID": 243547833,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 2,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000050979511174233944,
+                "generation": 15259,
+                "ID": 27,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.836429445Z",
+                "startedAt": "2020-08-14T02:02:56.243689998Z",
+                "status": "inprogress",
+                "thread": 8,
+                "workerID": 2140079797,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005577632583258973,
+                "generation": 14072,
+                "ID": 28,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.810917273Z",
+                "startedAt": "2020-08-14T02:02:56.237565071Z",
+                "status": "inprogress",
+                "thread": 3,
+                "workerID": 974642029,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000054659714928904177,
+                "generation": 14811,
+                "ID": 29,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.672720426Z",
+                "startedAt": "2020-08-14T02:02:56.516974316Z",
+                "status": "inprogress",
+                "thread": 2,
+                "workerID": 2346508328,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00004852312354926856,
+                "generation": 14523,
+                "ID": 30,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.879923607Z",
+                "startedAt": "2020-08-14T02:02:56.515183177Z",
+                "status": "inprogress",
+                "thread": 5,
+                "workerID": 974642029,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00006184365233257545,
+                "generation": 14320,
+                "ID": 31,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.70020357Z",
+                "startedAt": "2020-08-14T02:02:56.510151499Z",
+                "status": "inprogress",
+                "thread": 8,
+                "workerID": 3556317542,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 6,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00007337250619921178,
+                "generation": 14537,
+                "ID": 32,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.790338225Z",
+                "startedAt": "2020-08-14T02:02:56.510619542Z",
+                "status": "inprogress",
+                "thread": 10,
+                "workerID": 2346508328,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 9,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005497436900858273,
+                "generation": 13999,
+                "ID": 33,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.85321837Z",
+                "startedAt": "2020-08-14T02:02:56.518955669Z",
+                "status": "inprogress",
+                "thread": 2,
+                "workerID": 974642029,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00004853840501149457,
+                "generation": 14195,
+                "ID": 34,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.809526811Z",
+                "startedAt": "2020-08-14T02:02:56.31258101Z",
+                "status": "inprogress",
+                "thread": 9,
+                "workerID": 2346508328,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 4,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000054892034932694875,
+                "generation": 15498,
+                "ID": 35,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.802183001Z",
+                "startedAt": "2020-08-14T02:02:56.432467283Z",
+                "status": "inprogress",
+                "thread": 10,
+                "workerID": 2140079797,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.0000538308661175484,
+                "generation": 14040,
+                "ID": 36,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.879249974Z",
+                "startedAt": "2020-08-14T02:02:56.42931676Z",
+                "status": "inprogress",
+                "thread": 6,
+                "workerID": 974642029,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000050156049010630785,
+                "generation": 15210,
+                "ID": 37,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.751522072Z",
+                "startedAt": "2020-08-14T02:02:56.529722096Z",
+                "status": "inprogress",
+                "thread": 9,
+                "workerID": 2140079797,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 6,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00004701159043871829,
+                "generation": 14891,
+                "ID": 38,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.699527241Z",
+                "startedAt": "2020-08-14T02:02:56.240686985Z",
+                "status": "inprogress",
+                "thread": 8,
+                "workerID": 243547833,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 2,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005126996162576534,
+                "generation": 14949,
+                "ID": 39,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.833285933Z",
+                "startedAt": "2020-08-14T02:02:56.415817383Z",
+                "status": "inprogress",
+                "thread": 6,
+                "workerID": 2140079797,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000046352036353177006,
+                "generation": 14261,
+                "ID": 40,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.811527829Z",
+                "startedAt": "2020-08-14T02:02:56.411797634Z",
+                "status": "inprogress",
+                "thread": 9,
+                "workerID": 3556317542,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000051227744506480265,
+                "generation": 14253,
+                "ID": 41,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.87975292Z",
+                "startedAt": "2020-08-14T02:02:56.416116476Z",
+                "status": "inprogress",
+                "thread": 7,
+                "workerID": 974642029,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000053547321447880555,
+                "generation": 14280,
+                "ID": 42,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.728057725Z",
+                "startedAt": "2020-08-14T02:02:56.251297425Z",
+                "status": "inprogress",
+                "thread": 10,
+                "workerID": 3556317542,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005120157649777396,
+                "generation": 14848,
+                "ID": 43,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.811697586Z",
+                "startedAt": "2020-08-14T02:02:56.433709388Z",
+                "status": "inprogress",
+                "thread": 2,
+                "workerID": 3556317542,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00005128261205592843,
+                "generation": 14357,
+                "ID": 44,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.809668271Z",
+                "startedAt": "2020-08-14T02:02:56.514293988Z",
+                "status": "inprogress",
+                "thread": 6,
+                "workerID": 2346508328,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 5,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00004807835181331938,
+                "generation": 14201,
+                "ID": 45,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.867183347Z",
+                "startedAt": "2020-08-14T02:02:56.416045265Z",
+                "status": "inprogress",
+                "thread": 2,
+                "workerID": 243547833,
+                "duration": "0.57.53"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.00004586411827105749,
+                "generation": 14174,
+                "ID": 46,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.880434389Z",
+                "startedAt": "2020-08-14T02:02:56.515599202Z",
+                "status": "inprogress",
+                "thread": 8,
+                "workerID": 974642029,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 2,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000048537655543861795,
+                "generation": 15731,
+                "ID": 47,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.699876468Z",
+                "startedAt": "2020-08-14T02:02:56.4306632Z",
+                "status": "inprogress",
+                "thread": 4,
+                "workerID": 3556317542,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000052767335227916096,
+                "generation": 14403,
+                "ID": 48,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.759573264Z",
+                "startedAt": "2020-08-14T02:02:56.429805846Z",
+                "status": "inprogress",
+                "thread": 9,
+                "workerID": 243547833,
+                "duration": "0.57.52"
+            },
+            {
+                "attempt": 3,
+                "complete": false,
+                "completedAt": "0001-01-01T00:00:00Z",
+                "fitness": 0.000053035908970127285,
+                "generation": 14465,
+                "ID": 49,
+                "jobID": 2,
+                "lastUpdate": "2020-08-14T03:00:47.880266324Z",
+                "startedAt": "2020-08-14T02:02:56.230462351Z",
+                "status": "inprogress",
+                "thread": 10,
+                "workerID": 974642029,
+                "duration": "0.57.53"
+            }
+        ],
+        "complete": false
+    },
+    "historicalData": [
+        {
+            "fitness": 0.00003451108371599448,
+            "generation": 46,
+            "time": "0.0.16"
+        },
+        {
+            "fitness": 0.00003553517891754155,
+            "generation": 53,
+            "time": "0.0.25"
+        },
+        {
+            "fitness": 0.00003667783253012741,
+            "generation": 92,
+            "time": "0.0.34"
+        },
+        {
+            "fitness": 0.00003739488697571154,
+            "generation": 129,
+            "time": "0.0.42"
+        },
+        {
+            "fitness": 0.00003799940365599631,
+            "generation": 168,
+            "time": "0.0.51"
+        },
+        {
+            "fitness": 0.00003841730395957933,
+            "generation": 205,
+            "time": "0.0.59"
+        },
+        {
+            "fitness": 0.00003886175504930271,
+            "generation": 242,
+            "time": "0.1.7"
+        },
+        {
+            "fitness": 0.000039182134825723054,
+            "generation": 271,
+            "time": "0.1.17"
+        },
+        {
+            "fitness": 0.00003965930736236238,
+            "generation": 316,
+            "time": "0.1.26"
+        },
+        {
+            "fitness": 0.00003997104135204426,
+            "generation": 354,
+            "time": "0.1.34"
+        },
+        {
+            "fitness": 0.00004029454448890426,
+            "generation": 392,
+            "time": "0.1.43"
+        },
+        {
+            "fitness": 0.00004062895572778115,
+            "generation": 430,
+            "time": "0.1.52"
+        },
+        {
+            "fitness": 0.00004083997937083928,
+            "generation": 467,
+            "time": "0.2.0"
+        },
+        {
+            "fitness": 0.00004107888804573751,
+            "generation": 504,
+            "time": "0.2.8"
+        },
+        {
+            "fitness": 0.00004126990427321707,
+            "generation": 531,
+            "time": "0.2.17"
+        },
+        {
+            "fitness": 0.00004156052626173906,
+            "generation": 577,
+            "time": "0.2.26"
+        },
+        {
+            "fitness": 0.00004174692139663536,
+            "generation": 616,
+            "time": "0.2.35"
+        },
+        {
+            "fitness": 0.00004190374491021778,
+            "generation": 655,
+            "time": "0.2.43"
+        },
+        {
+            "fitness": 0.00004206664900636147,
+            "generation": 692,
+            "time": "0.2.52"
+        },
+        {
+            "fitness": 0.00004222034985192778,
+            "generation": 729,
+            "time": "0.3.1"
+        },
+        {
+            "fitness": 0.000042362724065058215,
+            "generation": 767,
+            "time": "0.3.9"
+        },
+        {
+            "fitness": 0.00004251860728358052,
+            "generation": 801,
+            "time": "0.3.19"
+        },
+        {
+            "fitness": 0.000042488723328985084,
+            "generation": 844,
+            "time": "0.3.27"
+        },
+        {
+            "fitness": 0.000042641907047231995,
+            "generation": 880,
+            "time": "0.3.36"
+        },
+        {
+            "fitness": 0.00004284792082231604,
+            "generation": 917,
+            "time": "0.3.46"
+        },
+        {
+            "fitness": 0.00004302245281102085,
+            "generation": 953,
+            "time": "0.3.53"
+        },
+        {
+            "fitness": 0.00004314549577556152,
+            "generation": 989,
+            "time": "0.4.2"
+        },
+        {
+            "fitness": 0.000043260113596849425,
+            "generation": 1024,
+            "time": "0.4.10"
+        },
+        {
+            "fitness": 0.00004318825952938514,
+            "generation": 1062,
+            "time": "0.4.19"
+        },
+        {
+            "fitness": 0.00004311945283636073,
+            "generation": 1099,
+            "time": "0.4.28"
+        },
+        {
+            "fitness": 0.000043253971930616305,
+            "generation": 1137,
+            "time": "0.4.36"
+        },
+        {
+            "fitness": 0.00004339062532424781,
+            "generation": 1174,
+            "time": "0.4.45"
+        },
+        {
+            "fitness": 0.00004351737588361253,
+            "generation": 1211,
+            "time": "0.4.54"
+        },
+        {
+            "fitness": 0.00004365149416613683,
+            "generation": 1248,
+            "time": "0.5.2"
+        },
+        {
+            "fitness": 0.00004375267084628261,
+            "generation": 1284,
+            "time": "0.5.11"
+        },
+        {
+            "fitness": 0.00004388226189449502,
+            "generation": 1325,
+            "time": "0.5.20"
+        },
+        {
+            "fitness": 0.000043968258770247705,
+            "generation": 1363,
+            "time": "0.5.28"
+        },
+        {
+            "fitness": 0.00004407680698357134,
+            "generation": 1401,
+            "time": "0.5.37"
+        },
+        {
+            "fitness": 0.00004418070028379849,
+            "generation": 1436,
+            "time": "0.5.46"
+        },
+        {
+            "fitness": 0.00004425685739055644,
+            "generation": 1473,
+            "time": "0.5.54"
+        },
+        {
+            "fitness": 0.000044415471351793894,
+            "generation": 1509,
+            "time": "0.6.3"
+        },
+        {
+            "fitness": 0.000044516672146661366,
+            "generation": 1546,
+            "time": "0.6.11"
+        },
+        {
+            "fitness": 0.000044635520634689585,
+            "generation": 1582,
+            "time": "0.6.20"
+        },
+        {
+            "fitness": 0.00004458341248194685,
+            "generation": 1618,
+            "time": "0.6.28"
+        },
+        {
+            "fitness": 0.00004475389837687349,
+            "generation": 1655,
+            "time": "0.6.37"
+        },
+        {
+            "fitness": 0.00004482320596478102,
+            "generation": 1692,
+            "time": "0.6.46"
+        },
+        {
+            "fitness": 0.000044929534429093146,
+            "generation": 1728,
+            "time": "0.6.54"
+        },
+        {
+            "fitness": 0.00004502518719594205,
+            "generation": 1763,
+            "time": "0.7.3"
+        },
+        {
+            "fitness": 0.00004515711878063327,
+            "generation": 1802,
+            "time": "0.7.12"
+        },
+        {
+            "fitness": 0.000045263962125237137,
+            "generation": 1841,
+            "time": "0.7.20"
+        },
+        {
+            "fitness": 0.00004534173932109491,
+            "generation": 1878,
+            "time": "0.7.30"
+        },
+        {
+            "fitness": 0.000045402196463247136,
+            "generation": 1915,
+            "time": "0.7.38"
+        },
+        {
+            "fitness": 0.00004547639498421718,
+            "generation": 1951,
+            "time": "0.7.47"
+        },
+        {
+            "fitness": 0.00004554089561394736,
+            "generation": 1989,
+            "time": "0.7.55"
+        },
+        {
+            "fitness": 0.00004563242517589019,
+            "generation": 2024,
+            "time": "0.8.4"
+        },
+        {
+            "fitness": 0.00004519043469983876,
+            "generation": 2060,
+            "time": "0.8.12"
+        },
+        {
+            "fitness": 0.00004527842960463357,
+            "generation": 2097,
+            "time": "0.8.21"
+        },
+        {
+            "fitness": 0.00004542415053345804,
+            "generation": 2133,
+            "time": "0.8.29"
+        },
+        {
+            "fitness": 0.000045522314768132785,
+            "generation": 2171,
+            "time": "0.8.38"
+        },
+        {
+            "fitness": 0.000045641137051599235,
+            "generation": 2208,
+            "time": "0.8.47"
+        },
+        {
+            "fitness": 0.00004575966243605053,
+            "generation": 2243,
+            "time": "0.8.55"
+        },
+        {
+            "fitness": 0.00004576336455362373,
+            "generation": 2281,
+            "time": "0.9.4"
+        },
+        {
+            "fitness": 0.00004585027225982374,
+            "generation": 2318,
+            "time": "0.9.13"
+        },
+        {
+            "fitness": 0.00004541275307225203,
+            "generation": 2353,
+            "time": "0.9.21"
+        },
+        {
+            "fitness": 0.00004552511924589672,
+            "generation": 2378,
+            "time": "0.9.30"
+        },
+        {
+            "fitness": 0.00004566612237147472,
+            "generation": 2423,
+            "time": "0.9.39"
+        },
+        {
+            "fitness": 0.000045432799878177035,
+            "generation": 2460,
+            "time": "0.9.48"
+        },
+        {
+            "fitness": 0.00004560003124358832,
+            "generation": 2497,
+            "time": "0.9.56"
+        },
+        {
+            "fitness": 0.00004567328917312974,
+            "generation": 2534,
+            "time": "0.10.5"
+        },
+        {
+            "fitness": 0.00004566996216002748,
+            "generation": 2571,
+            "time": "0.10.13"
+        },
+        {
+            "fitness": 0.00004580588830123708,
+            "generation": 2610,
+            "time": "0.10.22"
+        },
+        {
+            "fitness": 0.00004592409271861247,
+            "generation": 2640,
+            "time": "0.10.31"
+        },
+        {
+            "fitness": 0.00004588926639936337,
+            "generation": 2686,
+            "time": "0.10.40"
+        },
+        {
+            "fitness": 0.00004584421288916075,
+            "generation": 2723,
+            "time": "0.10.48"
+        },
+        {
+            "fitness": 0.000045597034920561476,
+            "generation": 2761,
+            "time": "0.10.57"
+        },
+        {
+            "fitness": 0.0000457374658970072,
+            "generation": 2798,
+            "time": "0.11.6"
+        },
+        {
+            "fitness": 0.00004540964232802253,
+            "generation": 2837,
+            "time": "0.11.15"
+        },
+        {
+            "fitness": 0.00004518310179444451,
+            "generation": 2873,
+            "time": "0.11.23"
+        },
+        {
+            "fitness": 0.00004536947236740739,
+            "generation": 2903,
+            "time": "0.11.32"
+        },
+        {
+            "fitness": 0.00004561945407921303,
+            "generation": 2950,
+            "time": "0.11.41"
+        },
+        {
+            "fitness": 0.00004574767367071079,
+            "generation": 2988,
+            "time": "0.11.49"
+        },
+        {
+            "fitness": 0.00004587430603035922,
+            "generation": 3027,
+            "time": "0.11.58"
+        },
+        {
+            "fitness": 0.00004600403500039521,
+            "generation": 3062,
+            "time": "0.12.7"
+        },
+        {
+            "fitness": 0.00004611887956011897,
+            "generation": 3097,
+            "time": "0.12.15"
+        },
+        {
+            "fitness": 0.000046203423670734174,
+            "generation": 3134,
+            "time": "0.12.24"
+        },
+        {
+            "fitness": 0.00004625519234812255,
+            "generation": 3164,
+            "time": "0.12.34"
+        },
+        {
+            "fitness": 0.000046373948525843276,
+            "generation": 3209,
+            "time": "0.12.42"
+        },
+        {
+            "fitness": 0.00004652705610972408,
+            "generation": 3246,
+            "time": "0.12.50"
+        },
+        {
+            "fitness": 0.00004659427438511157,
+            "generation": 3285,
+            "time": "0.12.59"
+        },
+        {
+            "fitness": 0.00004672899226126879,
+            "generation": 3321,
+            "time": "0.13.8"
+        },
+        {
+            "fitness": 0.000046807319856870585,
+            "generation": 3359,
+            "time": "0.13.17"
+        },
+        {
+            "fitness": 0.00004685670634640833,
+            "generation": 3396,
+            "time": "0.13.26"
+        },
+        {
+            "fitness": 0.00004691640457026531,
+            "generation": 3428,
+            "time": "0.13.35"
+        },
+        {
+            "fitness": 0.00004698870028271563,
+            "generation": 3473,
+            "time": "0.13.43"
+        },
+        {
+            "fitness": 0.000047102843368955026,
+            "generation": 3510,
+            "time": "0.13.52"
+        },
+        {
+            "fitness": 0.00004718285928206646,
+            "generation": 3546,
+            "time": "0.14.0"
+        },
+        {
+            "fitness": 0.000047238202408746994,
+            "generation": 3581,
+            "time": "0.14.9"
+        },
+        {
+            "fitness": 0.00004730941946902942,
+            "generation": 3619,
+            "time": "0.14.17"
+        },
+        {
+            "fitness": 0.00004722454803949994,
+            "generation": 3655,
+            "time": "0.14.26"
+        },
+        {
+            "fitness": 0.00004730564304741355,
+            "generation": 3692,
+            "time": "0.14.35"
+        },
+        {
+            "fitness": 0.000047382037418028,
+            "generation": 3729,
+            "time": "0.14.44"
+        },
+        {
+            "fitness": 0.00004737437509210106,
+            "generation": 3766,
+            "time": "0.14.53"
+        },
+        {
+            "fitness": 0.000047469798105637706,
+            "generation": 3807,
+            "time": "0.15.1"
+        },
+        {
+            "fitness": 0.0000475523825234427,
+            "generation": 3846,
+            "time": "0.15.10"
+        },
+        {
+            "fitness": 0.000047575382091486886,
+            "generation": 3881,
+            "time": "0.15.19"
+        },
+        {
+            "fitness": 0.000047636160017706926,
+            "generation": 3916,
+            "time": "0.15.27"
+        },
+        {
+            "fitness": 0.000047691828190408954,
+            "generation": 3952,
+            "time": "0.15.36"
+        },
+        {
+            "fitness": 0.00004776759436855275,
+            "generation": 3990,
+            "time": "0.15.44"
+        },
+        {
+            "fitness": 0.00004784959646262219,
+            "generation": 4026,
+            "time": "0.15.53"
+        },
+        {
+            "fitness": 0.000047930367075437365,
+            "generation": 4062,
+            "time": "0.16.1"
+        },
+        {
+            "fitness": 0.00004797449776213151,
+            "generation": 4098,
+            "time": "0.16.10"
+        },
+        {
+            "fitness": 0.00004802295530155727,
+            "generation": 4134,
+            "time": "0.16.19"
+        },
+        {
+            "fitness": 0.00004807326343279693,
+            "generation": 4170,
+            "time": "0.16.28"
+        },
+        {
+            "fitness": 0.00004815411635556154,
+            "generation": 4207,
+            "time": "0.16.37"
+        },
+        {
+            "fitness": 0.000048215533960311335,
+            "generation": 4244,
+            "time": "0.16.45"
+        },
+        {
+            "fitness": 0.00004826643514145099,
+            "generation": 4282,
+            "time": "0.16.54"
+        },
+        {
+            "fitness": 0.000048330504181167566,
+            "generation": 4319,
+            "time": "0.17.3"
+        },
+        {
+            "fitness": 0.00004839306614686576,
+            "generation": 4356,
+            "time": "0.17.11"
+        },
+        {
+            "fitness": 0.000048425467403584666,
+            "generation": 4393,
+            "time": "0.17.20"
+        },
+        {
+            "fitness": 0.000048498708355695046,
+            "generation": 4431,
+            "time": "0.17.29"
+        },
+        {
+            "fitness": 0.00004798106652197031,
+            "generation": 4467,
+            "time": "0.17.38"
+        },
+        {
+            "fitness": 0.00004811405955946486,
+            "generation": 4504,
+            "time": "0.17.46"
+        },
+        {
+            "fitness": 0.00004821852547989871,
+            "generation": 4540,
+            "time": "0.17.55"
+        },
+        {
+            "fitness": 0.00004830792961810326,
+            "generation": 4579,
+            "time": "0.18.3"
+        },
+        {
+            "fitness": 0.000048398923513629474,
+            "generation": 4614,
+            "time": "0.18.12"
+        },
+        {
+            "fitness": 0.00004842355736505737,
+            "generation": 4651,
+            "time": "0.18.20"
+        },
+        {
+            "fitness": 0.00004851484853526619,
+            "generation": 4686,
+            "time": "0.18.29"
+        },
+        {
+            "fitness": 0.00004859533329734092,
+            "generation": 4722,
+            "time": "0.18.38"
+        },
+        {
+            "fitness": 0.000048677635471372025,
+            "generation": 4758,
+            "time": "0.18.46"
+        },
+        {
+            "fitness": 0.00004878827538278156,
+            "generation": 4794,
+            "time": "0.18.55"
+        },
+        {
+            "fitness": 0.00004885937812093217,
+            "generation": 4832,
+            "time": "0.19.4"
+        },
+        {
+            "fitness": 0.0000489098769541737,
+            "generation": 4870,
+            "time": "0.19.13"
+        },
+        {
+            "fitness": 0.000048993768897790296,
+            "generation": 4907,
+            "time": "0.19.21"
+        },
+        {
+            "fitness": 0.00004906936347899396,
+            "generation": 4942,
+            "time": "0.19.30"
+        },
+        {
+            "fitness": 0.00004912898176288964,
+            "generation": 4979,
+            "time": "0.19.38"
+        },
+        {
+            "fitness": 0.00004918553851172904,
+            "generation": 5015,
+            "time": "0.19.47"
+        },
+        {
+            "fitness": 0.00004894908850001465,
+            "generation": 5051,
+            "time": "0.19.56"
+        },
+        {
+            "fitness": 0.00004901918484673876,
+            "generation": 5086,
+            "time": "0.20.4"
+        },
+        {
+            "fitness": 0.000049077497354219255,
+            "generation": 5122,
+            "time": "0.20.13"
+        },
+        {
+            "fitness": 0.0000491778224933128,
+            "generation": 5160,
+            "time": "0.20.22"
+        },
+        {
+            "fitness": 0.000049259460669186815,
+            "generation": 5196,
+            "time": "0.20.31"
+        },
+        {
+            "fitness": 0.0000493034993528419,
+            "generation": 5232,
+            "time": "0.20.39"
+        },
+        {
+            "fitness": 0.00004940315963291582,
+            "generation": 5268,
+            "time": "0.20.48"
+        },
+        {
+            "fitness": 0.00004950684226869813,
+            "generation": 5306,
+            "time": "0.20.56"
+        },
+        {
+            "fitness": 0.00004955881873908978,
+            "generation": 5341,
+            "time": "0.21.5"
+        },
+        {
+            "fitness": 0.00004962968641824276,
+            "generation": 5378,
+            "time": "0.21.14"
+        },
+        {
+            "fitness": 0.00004972239474938296,
+            "generation": 5414,
+            "time": "0.21.22"
+        },
+        {
+            "fitness": 0.000049785052045323995,
+            "generation": 5452,
+            "time": "0.21.31"
+        },
+        {
+            "fitness": 0.0000487375203348056,
+            "generation": 5488,
+            "time": "0.21.40"
+        },
+        {
+            "fitness": 0.00004890675700318031,
+            "generation": 5523,
+            "time": "0.21.48"
+        },
+        {
+            "fitness": 0.00004899798135942807,
+            "generation": 5559,
+            "time": "0.21.57"
+        },
+        {
+            "fitness": 0.00004913008336534131,
+            "generation": 5594,
+            "time": "0.22.5"
+        },
+        {
+            "fitness": 0.00004924489038765248,
+            "generation": 5629,
+            "time": "0.22.14"
+        },
+        {
+            "fitness": 0.0000493476021735547,
+            "generation": 5665,
+            "time": "0.22.23"
+        },
+        {
+            "fitness": 0.00004948320160767981,
+            "generation": 5705,
+            "time": "0.22.31"
+        },
+        {
+            "fitness": 0.00004954283839954677,
+            "generation": 5742,
+            "time": "0.22.40"
+        },
+        {
+            "fitness": 0.00004960871712483193,
+            "generation": 5771,
+            "time": "0.22.49"
+        },
+        {
+            "fitness": 0.000049668392387890503,
+            "generation": 5815,
+            "time": "0.22.57"
+        },
+        {
+            "fitness": 0.00004973795038357678,
+            "generation": 5852,
+            "time": "0.23.7"
+        },
+        {
+            "fitness": 0.00004894482867416815,
+            "generation": 5892,
+            "time": "0.23.15"
+        },
+        {
+            "fitness": 0.00004909069214972679,
+            "generation": 5928,
+            "time": "0.23.24"
+        },
+        {
+            "fitness": 0.000049193032431036163,
+            "generation": 5967,
+            "time": "0.23.32"
+        },
+        {
+            "fitness": 0.00004932266223507138,
+            "generation": 6003,
+            "time": "0.23.41"
+        },
+        {
+            "fitness": 0.00004940744983367217,
+            "generation": 6028,
+            "time": "0.23.50"
+        },
+        {
+            "fitness": 0.000049315449877760876,
+            "generation": 6075,
+            "time": "0.23.59"
+        },
+        {
+            "fitness": 0.000049223744218197884,
+            "generation": 6109,
+            "time": "0.24.7"
+        },
+        {
+            "fitness": 0.00004936100366718704,
+            "generation": 6147,
+            "time": "0.24.16"
+        },
+        {
+            "fitness": 0.000049460357348353617,
+            "generation": 6182,
+            "time": "0.24.25"
+        },
+        {
+            "fitness": 0.000049562247899843195,
+            "generation": 6217,
+            "time": "0.24.33"
+        },
+        {
+            "fitness": 0.00004944825127123362,
+            "generation": 6251,
+            "time": "0.24.42"
+        },
+        {
+            "fitness": 0.000049572123218221426,
+            "generation": 6277,
+            "time": "0.24.51"
+        },
+        {
+            "fitness": 0.000049695889008606,
+            "generation": 6322,
+            "time": "0.24.59"
+        },
+        {
+            "fitness": 0.00004977666996877829,
+            "generation": 6358,
+            "time": "0.25.8"
+        },
+        {
+            "fitness": 0.00004988459152466919,
+            "generation": 6393,
+            "time": "0.25.17"
+        },
+        {
+            "fitness": 0.00004995260941770733,
+            "generation": 6428,
+            "time": "0.25.26"
+        },
+        {
+            "fitness": 0.00005002706948599594,
+            "generation": 6465,
+            "time": "0.25.34"
+        },
+        {
+            "fitness": 0.0000501251479677579,
+            "generation": 6501,
+            "time": "0.25.43"
+        },
+        {
+            "fitness": 0.00005020317856810095,
+            "generation": 6532,
+            "time": "0.25.51"
+        },
+        {
+            "fitness": 0.000050286692346468635,
+            "generation": 6578,
+            "time": "0.26.0"
+        },
+        {
+            "fitness": 0.000050356043865118315,
+            "generation": 6613,
+            "time": "0.26.9"
+        },
+        {
+            "fitness": 0.00005011207717955319,
+            "generation": 6648,
+            "time": "0.26.17"
+        },
+        {
+            "fitness": 0.0000499515362346674,
+            "generation": 6684,
+            "time": "0.26.26"
+        },
+        {
+            "fitness": 0.00005003499804494461,
+            "generation": 6720,
+            "time": "0.26.35"
+        },
+        {
+            "fitness": 0.00005012043333194144,
+            "generation": 6755,
+            "time": "0.26.43"
+        },
+        {
+            "fitness": 0.00005017745584205176,
+            "generation": 6792,
+            "time": "0.26.52"
+        },
+        {
+            "fitness": 0.000050256769559917894,
+            "generation": 6829,
+            "time": "0.27.1"
+        },
+        {
+            "fitness": 0.00005035614478205729,
+            "generation": 6871,
+            "time": "0.27.10"
+        },
+        {
+            "fitness": 0.0000504160388225246,
+            "generation": 6911,
+            "time": "0.27.18"
+        },
+        {
+            "fitness": 0.00005040648037576379,
+            "generation": 6949,
+            "time": "0.27.27"
+        },
+        {
+            "fitness": 0.00005044158899620442,
+            "generation": 6986,
+            "time": "0.27.36"
+        },
+        {
+            "fitness": 0.00005055244834284924,
+            "generation": 7023,
+            "time": "0.27.44"
+        },
+        {
+            "fitness": 0.00005061975186989488,
+            "generation": 7059,
+            "time": "0.27.53"
+        },
+        {
+            "fitness": 0.000050647559705218463,
+            "generation": 7095,
+            "time": "0.28.2"
+        },
+        {
+            "fitness": 0.000050737603263986385,
+            "generation": 7132,
+            "time": "0.28.10"
+        },
+        {
+            "fitness": 0.000050786910495123305,
+            "generation": 7169,
+            "time": "0.28.19"
+        },
+        {
+            "fitness": 0.00005081826549045269,
+            "generation": 7205,
+            "time": "0.28.27"
+        },
+        {
+            "fitness": 0.000050890524517770786,
+            "generation": 7240,
+            "time": "0.28.36"
+        },
+        {
+            "fitness": 0.00005092452168144557,
+            "generation": 7277,
+            "time": "0.28.45"
+        },
+        {
+            "fitness": 0.00005100234451606405,
+            "generation": 7313,
+            "time": "0.28.53"
+        },
+        {
+            "fitness": 0.00005105694452824595,
+            "generation": 7350,
+            "time": "0.29.2"
+        },
+        {
+            "fitness": 0.000051110510310333883,
+            "generation": 7386,
+            "time": "0.29.11"
+        },
+        {
+            "fitness": 0.000051150126614368936,
+            "generation": 7421,
+            "time": "0.29.19"
+        },
+        {
+            "fitness": 0.000050754927736942216,
+            "generation": 7459,
+            "time": "0.29.28"
+        },
+        {
+            "fitness": 0.000050816368526838165,
+            "generation": 7496,
+            "time": "0.29.37"
+        },
+        {
+            "fitness": 0.00005087109895588893,
+            "generation": 7532,
+            "time": "0.29.45"
+        },
+        {
+            "fitness": 0.000050920985812045386,
+            "generation": 7569,
+            "time": "0.29.54"
+        },
+        {
+            "fitness": 0.00005097124022106652,
+            "generation": 7604,
+            "time": "0.30.2"
+        },
+        {
+            "fitness": 0.000051068635907427206,
+            "generation": 7641,
+            "time": "0.30.11"
+        },
+        {
+            "fitness": 0.00005112620187195667,
+            "generation": 7678,
+            "time": "0.30.20"
+        },
+        {
+            "fitness": 0.00005122474278840673,
+            "generation": 7716,
+            "time": "0.30.29"
+        },
+        {
+            "fitness": 0.00005125597884727248,
+            "generation": 7751,
+            "time": "0.30.37"
+        },
+        {
+            "fitness": 0.00005129769213260693,
+            "generation": 7784,
+            "time": "0.30.46"
+        },
+        {
+            "fitness": 0.00005133584527180964,
+            "generation": 7820,
+            "time": "0.30.55"
+        },
+        {
+            "fitness": 0.000051349215691237114,
+            "generation": 7845,
+            "time": "0.31.3"
+        },
+        {
+            "fitness": 0.000051425299583221054,
+            "generation": 7892,
+            "time": "0.31.12"
+        },
+        {
+            "fitness": 0.000051510167404206043,
+            "generation": 7930,
+            "time": "0.31.20"
+        },
+        {
+            "fitness": 0.000051537029745228156,
+            "generation": 7967,
+            "time": "0.31.29"
+        },
+        {
+            "fitness": 0.000051604066360999896,
+            "generation": 8005,
+            "time": "0.31.38"
+        },
+        {
+            "fitness": 0.00005164539650957597,
+            "generation": 8043,
+            "time": "0.31.47"
+        },
+        {
+            "fitness": 0.00005126531869442224,
+            "generation": 8078,
+            "time": "0.31.55"
+        },
+        {
+            "fitness": 0.00005137506639772985,
+            "generation": 8106,
+            "time": "0.32.5"
+        },
+        {
+            "fitness": 0.00005145622088958589,
+            "generation": 8153,
+            "time": "0.32.13"
+        },
+        {
+            "fitness": 0.00005153052349442718,
+            "generation": 8187,
+            "time": "0.32.22"
+        },
+        {
+            "fitness": 0.000051598070431215706,
+            "generation": 8225,
+            "time": "0.32.31"
+        },
+        {
+            "fitness": 0.000051660600758964694,
+            "generation": 8260,
+            "time": "0.32.39"
+        },
+        {
+            "fitness": 0.00005123758081794971,
+            "generation": 8295,
+            "time": "0.32.48"
+        },
+        {
+            "fitness": 0.0000513471628734761,
+            "generation": 8333,
+            "time": "0.32.56"
+        },
+        {
+            "fitness": 0.00005139469787547478,
+            "generation": 8359,
+            "time": "0.33.5"
+        },
+        {
+            "fitness": 0.00005097998476464596,
+            "generation": 8405,
+            "time": "0.33.14"
+        },
+        {
+            "fitness": 0.000051067444438793626,
+            "generation": 8443,
+            "time": "0.33.23"
+        },
+        {
+            "fitness": 0.000051156237628535,
+            "generation": 8477,
+            "time": "0.33.31"
+        },
+        {
+            "fitness": 0.000051265781111368096,
+            "generation": 8514,
+            "time": "0.33.40"
+        },
+        {
+            "fitness": 0.00005130715793097072,
+            "generation": 8552,
+            "time": "0.33.49"
+        },
+        {
+            "fitness": 0.00005136952055916782,
+            "generation": 8587,
+            "time": "0.33.57"
+        },
+        {
+            "fitness": 0.00005139819954978489,
+            "generation": 8615,
+            "time": "0.34.6"
+        },
+        {
+            "fitness": 0.000051120707064309166,
+            "generation": 8659,
+            "time": "0.34.15"
+        },
+        {
+            "fitness": 0.00005120504574719825,
+            "generation": 8696,
+            "time": "0.34.23"
+        },
+        {
+            "fitness": 0.00005135682392122843,
+            "generation": 8733,
+            "time": "0.34.32"
+        },
+        {
+            "fitness": 0.000051101377489832474,
+            "generation": 8769,
+            "time": "0.34.41"
+        },
+        {
+            "fitness": 0.00005121775830368966,
+            "generation": 8807,
+            "time": "0.34.50"
+        },
+        {
+            "fitness": 0.0000513098715739145,
+            "generation": 8842,
+            "time": "0.34.58"
+        },
+        {
+            "fitness": 0.000051395578675406616,
+            "generation": 8876,
+            "time": "0.35.8"
+        },
+        {
+            "fitness": 0.000051057128587226244,
+            "generation": 8918,
+            "time": "0.35.16"
+        },
+        {
+            "fitness": 0.000051122685509575384,
+            "generation": 8955,
+            "time": "0.35.26"
+        },
+        {
+            "fitness": 0.000051188739063193435,
+            "generation": 8991,
+            "time": "0.35.34"
+        },
+        {
+            "fitness": 0.000051294170212901933,
+            "generation": 9028,
+            "time": "0.35.42"
+        },
+        {
+            "fitness": 0.00005136102918845078,
+            "generation": 9067,
+            "time": "0.35.51"
+        },
+        {
+            "fitness": 0.00005143971774856991,
+            "generation": 9103,
+            "time": "0.36.0"
+        },
+        {
+            "fitness": 0.000051510678074338296,
+            "generation": 9140,
+            "time": "0.36.8"
+        },
+        {
+            "fitness": 0.00005162371424733692,
+            "generation": 9176,
+            "time": "0.36.17"
+        },
+        {
+            "fitness": 0.000051665103384610606,
+            "generation": 9214,
+            "time": "0.36.26"
+        },
+        {
+            "fitness": 0.00005160686589245893,
+            "generation": 9251,
+            "time": "0.36.34"
+        },
+        {
+            "fitness": 0.00005168489118111478,
+            "generation": 9290,
+            "time": "0.36.43"
+        },
+        {
+            "fitness": 0.00005174466103494755,
+            "generation": 9325,
+            "time": "0.36.52"
+        },
+        {
+            "fitness": 0.00005182919429940784,
+            "generation": 9360,
+            "time": "0.36.59"
+        },
+        {
+            "fitness": 0.000051929454757170286,
+            "generation": 9400,
+            "time": "0.37.9"
+        },
+        {
+            "fitness": 0.000051993097499652146,
+            "generation": 9437,
+            "time": "0.37.18"
+        },
+        {
+            "fitness": 0.000052050183533802554,
+            "generation": 9474,
+            "time": "0.37.26"
+        },
+        {
+            "fitness": 0.00005145043965262133,
+            "generation": 9508,
+            "time": "0.37.35"
+        },
+        {
+            "fitness": 0.0000515143454548878,
+            "generation": 9546,
+            "time": "0.37.44"
+        },
+        {
+            "fitness": 0.00005161036533702212,
+            "generation": 9581,
+            "time": "0.37.52"
+        },
+        {
+            "fitness": 0.00005168854411709071,
+            "generation": 9620,
+            "time": "0.38.2"
+        },
+        {
+            "fitness": 0.00005115999319285247,
+            "generation": 9655,
+            "time": "0.38.10"
+        },
+        {
+            "fitness": 0.00005128185570582964,
+            "generation": 9690,
+            "time": "0.38.19"
+        },
+        {
+            "fitness": 0.00005137058332859122,
+            "generation": 9729,
+            "time": "0.38.27"
+        },
+        {
+            "fitness": 0.000051460114568358305,
+            "generation": 9764,
+            "time": "0.38.36"
+        },
+        {
+            "fitness": 0.00005140648170273928,
+            "generation": 9800,
+            "time": "0.38.44"
+        },
+        {
+            "fitness": 0.00005155252879215883,
+            "generation": 9836,
+            "time": "0.38.53"
+        },
+        {
+            "fitness": 0.00005166706230091209,
+            "generation": 9872,
+            "time": "0.39.2"
+        },
+        {
+            "fitness": 0.00005172237744988619,
+            "generation": 9908,
+            "time": "0.39.10"
+        },
+        {
+            "fitness": 0.00005184434814925913,
+            "generation": 9944,
+            "time": "0.39.19"
+        },
+        {
+            "fitness": 0.00005189854449042103,
+            "generation": 9979,
+            "time": "0.39.27"
+        },
+        {
+            "fitness": 0.000051973950300581185,
+            "generation": 10015,
+            "time": "0.39.36"
+        },
+        {
+            "fitness": 0.000052054694688711625,
+            "generation": 10052,
+            "time": "0.39.45"
+        },
+        {
+            "fitness": 0.00005210321661614342,
+            "generation": 10089,
+            "time": "0.39.54"
+        },
+        {
+            "fitness": 0.00005213927852708662,
+            "generation": 10125,
+            "time": "0.40.2"
+        },
+        {
+            "fitness": 0.000052216470633199265,
+            "generation": 10160,
+            "time": "0.40.11"
+        },
+        {
+            "fitness": 0.000052258271420198816,
+            "generation": 10196,
+            "time": "0.40.20"
+        },
+        {
+            "fitness": 0.00005207467762720563,
+            "generation": 10232,
+            "time": "0.40.28"
+        },
+        {
+            "fitness": 0.00005215908534728961,
+            "generation": 10269,
+            "time": "0.40.37"
+        },
+        {
+            "fitness": 0.00005225826047646159,
+            "generation": 10308,
+            "time": "0.40.46"
+        },
+        {
+            "fitness": 0.00005231586999934436,
+            "generation": 10345,
+            "time": "0.40.54"
+        },
+        {
+            "fitness": 0.000052388794806937246,
+            "generation": 10380,
+            "time": "0.41.3"
+        },
+        {
+            "fitness": 0.00005244406746780822,
+            "generation": 10417,
+            "time": "0.41.11"
+        },
+        {
+            "fitness": 0.00005238249167120578,
+            "generation": 10447,
+            "time": "0.41.21"
+        },
+        {
+            "fitness": 0.00005243482906487856,
+            "generation": 10492,
+            "time": "0.41.30"
+        },
+        {
+            "fitness": 0.00005233491927128562,
+            "generation": 10528,
+            "time": "0.41.38"
+        },
+        {
+            "fitness": 0.00005238646779573209,
+            "generation": 10563,
+            "time": "0.41.47"
+        },
+        {
+            "fitness": 0.00005244025532263131,
+            "generation": 10600,
+            "time": "0.41.56"
+        },
+        {
+            "fitness": 0.00005250769976212972,
+            "generation": 10637,
+            "time": "0.42.4"
+        },
+        {
+            "fitness": 0.00005181144059133355,
+            "generation": 10670,
+            "time": "0.42.14"
+        },
+        {
+            "fitness": 0.000051889366763803394,
+            "generation": 10700,
+            "time": "0.42.21"
+        },
+        {
+            "fitness": 0.00005200479282337493,
+            "generation": 10744,
+            "time": "0.42.30"
+        },
+        {
+            "fitness": 0.000052053693652821886,
+            "generation": 10780,
+            "time": "0.42.39"
+        },
+        {
+            "fitness": 0.00005213028778201572,
+            "generation": 10817,
+            "time": "0.42.47"
+        },
+        {
+            "fitness": 0.000052182363698410624,
+            "generation": 10854,
+            "time": "0.42.56"
+        },
+        {
+            "fitness": 0.0000522241953578841,
+            "generation": 10891,
+            "time": "0.43.5"
+        },
+        {
+            "fitness": 0.00005216088899951217,
+            "generation": 10927,
+            "time": "0.43.14"
+        },
+        {
+            "fitness": 0.000052215154717682514,
+            "generation": 10954,
+            "time": "0.43.23"
+        },
+        {
+            "fitness": 0.00005229666154145167,
+            "generation": 11000,
+            "time": "0.43.31"
+        },
+        {
+            "fitness": 0.000052357249656949404,
+            "generation": 11034,
+            "time": "0.43.40"
+        },
+        {
+            "fitness": 0.00005214503649331176,
+            "generation": 11070,
+            "time": "0.43.48"
+        },
+        {
+            "fitness": 0.000051132039051725745,
+            "generation": 11104,
+            "time": "0.43.57"
+        },
+        {
+            "fitness": 0.000051332582859925894,
+            "generation": 11142,
+            "time": "0.44.6"
+        },
+        {
+            "fitness": 0.000051412870367538826,
+            "generation": 11177,
+            "time": "0.44.14"
+        },
+        {
+            "fitness": 0.000051509426501047123,
+            "generation": 11205,
+            "time": "0.44.23"
+        },
+        {
+            "fitness": 0.00005159223122958341,
+            "generation": 11251,
+            "time": "0.44.32"
+        },
+        {
+            "fitness": 0.0000516740814038667,
+            "generation": 11287,
+            "time": "0.44.41"
+        },
+        {
+            "fitness": 0.00005173973045412859,
+            "generation": 11326,
+            "time": "0.44.49"
+        },
+        {
+            "fitness": 0.00005184625464182332,
+            "generation": 11361,
+            "time": "0.44.58"
+        },
+        {
+            "fitness": 0.000051912245250698405,
+            "generation": 11398,
+            "time": "0.45.7"
+        },
+        {
+            "fitness": 0.000051969386890764424,
+            "generation": 11435,
+            "time": "0.45.15"
+        },
+        {
+            "fitness": 0.00005204292053934774,
+            "generation": 11468,
+            "time": "0.45.24"
+        },
+        {
+            "fitness": 0.00005211349769182377,
+            "generation": 11510,
+            "time": "0.45.33"
+        },
+        {
+            "fitness": 0.00005219109053259467,
+            "generation": 11547,
+            "time": "0.45.42"
+        },
+        {
+            "fitness": 0.000052285936497642447,
+            "generation": 11583,
+            "time": "0.45.50"
+        },
+        {
+            "fitness": 0.00005235996184602937,
+            "generation": 11618,
+            "time": "0.45.59"
+        },
+        {
+            "fitness": 0.0000524160080314483,
+            "generation": 11656,
+            "time": "0.46.8"
+        },
+        {
+            "fitness": 0.0000524822419705919,
+            "generation": 11694,
+            "time": "0.46.17"
+        },
+        {
+            "fitness": 0.00005253367119647318,
+            "generation": 11730,
+            "time": "0.46.25"
+        },
+        {
+            "fitness": 0.00005260092051746024,
+            "generation": 11769,
+            "time": "0.46.34"
+        },
+        {
+            "fitness": 0.000052656365638242704,
+            "generation": 11805,
+            "time": "0.46.43"
+        },
+        {
+            "fitness": 0.000052727281945736904,
+            "generation": 11839,
+            "time": "0.46.51"
+        },
+        {
+            "fitness": 0.00005261398418086328,
+            "generation": 11877,
+            "time": "0.46.59"
+        },
+        {
+            "fitness": 0.00005268883641339537,
+            "generation": 11915,
+            "time": "0.47.9"
+        },
+        {
+            "fitness": 0.00005280167273965648,
+            "generation": 11952,
+            "time": "0.47.18"
+        },
+        {
+            "fitness": 0.00005286483232824719,
+            "generation": 11988,
+            "time": "0.47.26"
+        },
+        {
+            "fitness": 0.000052943367790932995,
+            "generation": 12024,
+            "time": "0.47.35"
+        },
+        {
+            "fitness": 0.00005302633937303583,
+            "generation": 12061,
+            "time": "0.47.44"
+        },
+        {
+            "fitness": 0.00005292898353868349,
+            "generation": 12096,
+            "time": "0.47.52"
+        },
+        {
+            "fitness": 0.000052990258753280425,
+            "generation": 12132,
+            "time": "0.48.1"
+        },
+        {
+            "fitness": 0.00005304880459224979,
+            "generation": 12167,
+            "time": "0.48.9"
+        },
+        {
+            "fitness": 0.00005307280803181706,
+            "generation": 12203,
+            "time": "0.48.18"
+        },
+        {
+            "fitness": 0.000052742666730653926,
+            "generation": 12237,
+            "time": "0.48.27"
+        },
+        {
+            "fitness": 0.0000528141302966425,
+            "generation": 12275,
+            "time": "0.48.36"
+        },
+        {
+            "fitness": 0.000052921237002295085,
+            "generation": 12313,
+            "time": "0.48.44"
+        },
+        {
+            "fitness": 0.00005295897115372373,
+            "generation": 12348,
+            "time": "0.48.53"
+        },
+        {
+            "fitness": 0.00005205923388871894,
+            "generation": 12385,
+            "time": "0.49.2"
+        },
+        {
+            "fitness": 0.00005216344725441606,
+            "generation": 12423,
+            "time": "0.49.11"
+        },
+        {
+            "fitness": 0.000052164792930814444,
+            "generation": 12459,
+            "time": "0.49.20"
+        },
+        {
+            "fitness": 0.00005226456722582079,
+            "generation": 12496,
+            "time": "0.49.28"
+        },
+        {
+            "fitness": 0.000052251664327173064,
+            "generation": 12530,
+            "time": "0.49.37"
+        },
+        {
+            "fitness": 0.00005232783555187448,
+            "generation": 12566,
+            "time": "0.49.46"
+        },
+        {
+            "fitness": 0.000052399251683072425,
+            "generation": 12604,
+            "time": "0.49.54"
+        },
+        {
+            "fitness": 0.00005223107038034817,
+            "generation": 12638,
+            "time": "0.50.3"
+        },
+        {
+            "fitness": 0.0000521535033091704,
+            "generation": 12673,
+            "time": "0.50.12"
+        },
+        {
+            "fitness": 0.000052233852679723344,
+            "generation": 12710,
+            "time": "0.50.20"
+        },
+        {
+            "fitness": 0.00005232775166890912,
+            "generation": 12745,
+            "time": "0.50.29"
+        },
+        {
+            "fitness": 0.000052379812463543255,
+            "generation": 12780,
+            "time": "0.50.38"
+        },
+        {
+            "fitness": 0.00005249453714883724,
+            "generation": 12816,
+            "time": "0.50.46"
+        },
+        {
+            "fitness": 0.00005258657853768937,
+            "generation": 12851,
+            "time": "0.50.55"
+        },
+        {
+            "fitness": 0.00005268069593183177,
+            "generation": 12887,
+            "time": "0.51.3"
+        },
+        {
+            "fitness": 0.000052760216174185726,
+            "generation": 12924,
+            "time": "0.51.12"
+        },
+        {
+            "fitness": 0.00005285443418368702,
+            "generation": 12958,
+            "time": "0.51.21"
+        },
+        {
+            "fitness": 0.00005293407177198635,
+            "generation": 12994,
+            "time": "0.51.30"
+        },
+        {
+            "fitness": 0.00005301554630160132,
+            "generation": 13029,
+            "time": "0.51.38"
+        },
+        {
+            "fitness": 0.00005308741162203086,
+            "generation": 13066,
+            "time": "0.51.47"
+        },
+        {
+            "fitness": 0.00005314353750533412,
+            "generation": 13106,
+            "time": "0.51.56"
+        },
+        {
+            "fitness": 0.00005321389064157703,
+            "generation": 13142,
+            "time": "0.52.4"
+        },
+        {
+            "fitness": 0.000053257248074486194,
+            "generation": 13178,
+            "time": "0.52.13"
+        },
+        {
+            "fitness": 0.00005330074150620038,
+            "generation": 13212,
+            "time": "0.52.22"
+        },
+        {
+            "fitness": 0.000053375215847414706,
+            "generation": 13248,
+            "time": "0.52.31"
+        },
+        {
+            "fitness": 0.00005338754685597989,
+            "generation": 13278,
+            "time": "0.52.40"
+        },
+        {
+            "fitness": 0.00005345484790944056,
+            "generation": 13319,
+            "time": "0.52.49"
+        },
+        {
+            "fitness": 0.00005350047705546293,
+            "generation": 13354,
+            "time": "0.52.57"
+        },
+        {
+            "fitness": 0.00005353620258012571,
+            "generation": 13390,
+            "time": "0.53.5"
+        },
+        {
+            "fitness": 0.00005358358274682963,
+            "generation": 13427,
+            "time": "0.53.14"
+        },
+        {
+            "fitness": 0.00005364555730399167,
+            "generation": 13465,
+            "time": "0.53.23"
+        },
+        {
+            "fitness": 0.000053711136711354275,
+            "generation": 13502,
+            "time": "0.53.31"
+        },
+        {
+            "fitness": 0.00005373880940176735,
+            "generation": 13529,
+            "time": "0.53.40"
+        },
+        {
+            "fitness": 0.000053782846676189,
+            "generation": 13576,
+            "time": "0.53.49"
+        },
+        {
+            "fitness": 0.00005383407751094652,
+            "generation": 13610,
+            "time": "0.53.57"
+        },
+        {
+            "fitness": 0.00005385628367033242,
+            "generation": 13647,
+            "time": "0.54.6"
+        },
+        {
+            "fitness": 0.000053909096030571565,
+            "generation": 13682,
+            "time": "0.54.14"
+        },
+        {
+            "fitness": 0.00005393575476243135,
+            "generation": 13718,
+            "time": "0.54.23"
+        },
+        {
+            "fitness": 0.000053795000891519154,
+            "generation": 13754,
+            "time": "0.54.32"
+        },
+        {
+            "fitness": 0.000053840056583633164,
+            "generation": 13781,
+            "time": "0.54.41"
+        },
+        {
+            "fitness": 0.000053901948752190754,
+            "generation": 13828,
+            "time": "0.54.49"
+        },
+        {
+            "fitness": 0.000053938745220048,
+            "generation": 13865,
+            "time": "0.54.58"
+        },
+        {
+            "fitness": 0.00005398055220814559,
+            "generation": 13901,
+            "time": "0.55.7"
+        },
+        {
+            "fitness": 0.00005403873723660159,
+            "generation": 13937,
+            "time": "0.55.15"
+        },
+        {
+            "fitness": 0.00005406992417921207,
+            "generation": 13972,
+            "time": "0.55.24"
+        },
+        {
+            "fitness": 0.00005410460640203766,
+            "generation": 14008,
+            "time": "0.55.33"
+        },
+        {
+            "fitness": 0.00005414995999391369,
+            "generation": 14037,
+            "time": "0.55.42"
+        },
+        {
+            "fitness": 0.00005419410539807902,
+            "generation": 14084,
+            "time": "0.55.51"
+        },
+        {
+            "fitness": 0.00005422843157086496,
+            "generation": 14119,
+            "time": "0.55.59"
+        },
+        {
+            "fitness": 0.00005427598245796567,
+            "generation": 14157,
+            "time": "0.56.8"
+        },
+        {
+            "fitness": 0.00005430095760854173,
+            "generation": 14193,
+            "time": "0.56.17"
+        },
+        {
+            "fitness": 0.00005433226375959069,
+            "generation": 14230,
+            "time": "0.56.25"
+        },
+        {
+            "fitness": 0.00005437362064243309,
+            "generation": 14266,
+            "time": "0.56.35"
+        },
+        {
+            "fitness": 0.000053550205501082535,
+            "generation": 14300,
+            "time": "0.56.43"
+        },
+        {
+            "fitness": 0.000053673093256998816,
+            "generation": 14341,
+            "time": "0.56.52"
+        },
+        {
+            "fitness": 0.000053725487081370624,
+            "generation": 14378,
+            "time": "0.57.0"
+        },
+        {
+            "fitness": 0.000053819261168782226,
+            "generation": 14416,
+            "time": "0.57.9"
+        },
+        {
+            "fitness": 0.00005386259472598741,
+            "generation": 14452,
+            "time": "0.57.18"
+        },
+        {
+            "fitness": 0.000053920197836820363,
+            "generation": 14487,
+            "time": "0.57.26"
+        },
+        {
+            "fitness": 0.0000539840809140494,
+            "generation": 14524,
+            "time": "0.57.35"
+        },
+        {
+            "fitness": 0.0000540415831816795,
+            "generation": 14561,
+            "time": "0.57.44"
+        },
+        {
+            "fitness": 0.00005408154491956603,
+            "generation": 14596,
+            "time": "0.57.53"
+        }
+    ]
+}

@@ -23,6 +23,18 @@ def read_summary(path):
 def read_stats(path):
     return load_data(path, 'stats.json')
 
+def get_avg_attempts(tasks):
+    count = 0
+    total = 0
+    for task in tasks:
+        if task['attempt'] > 0:
+            count += 1
+            total += task['attempt']
+    if count == 0:
+        return 0
+    return total / count
+
+
 def get_duration(seconds):
     hours = int(seconds / 3600)
     seconds -= hours * 3600
@@ -53,6 +65,7 @@ def compute_averages():
     for scale in scales:
         total = 0
         sums = { 
+            'attempts': 0,
             'duration': 0, 
             'fitness': 0, 
             'generationsPerSecond': 0,
@@ -71,6 +84,7 @@ def compute_averages():
             total += 1
 
             if summary:
+                sums['attempts'] += get_avg_attempts(summary['tasks'])
                 [hours, minutes, seconds] = summary['duration'].split('.')
                 seconds = int(seconds) + int(minutes) * 60 + int(hours) * 3600
                 sums['duration'] += seconds
@@ -83,6 +97,7 @@ def compute_averages():
             continue
 
         averages[scale] = {}
+        averages[scale]['attempts'] = round(sums['attempts'] / total)
         averages[scale]['duration'] = get_duration(round(sums['duration'] / total))
         averages[scale]['generationsPerSecond'] = round(sums['generationsPerSecond'] / total, 2)
         averages[scale]['fitness'] = sums['fitness'] / total

@@ -3,6 +3,12 @@ import matplotlib.pyplot as plt
 import json
 import re
 
+labels = {
+    'scale1': 'single system',
+    'scale2': 'simulated',
+    'scale3': 'distributed',
+}
+
 def regroup(averages):
     data = {}
     for scale in averages:
@@ -14,12 +20,15 @@ def regroup(averages):
                 data[metric] = { scale: val }
     return data
 
+def get_labels(scales):
+    return [labels[scale] for scale in scales]
+
 def get_duration_minutes(duration):
     [hours, minutes, seconds] = duration.split('.')
     return int(minutes) + int(hours) * 60 + (int(seconds) / 60)
 
 def plot_duration(durations):
-    scales = durations.keys()
+    scales = get_labels(durations.keys())
     durations = [get_duration_minutes(dur) for dur in durations.values()]
 
     fig = plt.figure()
@@ -30,7 +39,7 @@ def plot_duration(durations):
     plt.savefig('plots/duration.png')
 
 def plot_generations_per_second(gensPerSeconds):
-    scales = gensPerSeconds.keys()
+    scales = get_labels(gensPerSeconds.keys())
     values = gensPerSeconds.values()
 
     fig = plt.figure()
@@ -41,7 +50,7 @@ def plot_generations_per_second(gensPerSeconds):
     plt.savefig('plots/generations_per_second.png')
 
 def plot_fitness(fitness):
-    scales = fitness.keys()
+    scales = get_labels(fitness.keys())
     values = fitness.values()
 
     fig = plt.figure()
@@ -55,7 +64,7 @@ def get_memory_value(memory):
     return float(re.search(r'(\d*\.?\d*)', memory).groups()[0])
 
 def plot_memory(memory):
-    scales = memory.keys()
+    scales = get_labels(memory.keys())
     values = [get_memory_value(mem) for mem in memory.values()]
 
     fig = plt.figure()
