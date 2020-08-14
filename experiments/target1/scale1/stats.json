@@ -1,0 +1,12 @@
+{
+    "single-system": {
+        "memory": "94.44MiB",
+        "netInput": "9e-05MB",
+        "netOutput": "99.8MB"
+    },
+    "ui": {
+        "memory": "87.17MiB",
+        "netInput": "99.9MB",
+        "netOutput": "9.6e-05MB"
+    }
+}

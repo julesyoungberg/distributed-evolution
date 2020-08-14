@@ -29,10 +29,10 @@ export function getDurationInSeconds(startedAt: string, completedAt?: string): n
 export function getDuration(startedAt: string, completedAt?: string): number[] {
     let delta = getDurationInSeconds(startedAt, completedAt)
 
-    const hours = Math.floor(delta / 3600) % 24
+    const hours = Math.floor(delta / 3600)
     delta -= hours * 3600
 
-    const minutes = Math.floor(delta / 60) % 60
+    const minutes = Math.floor(delta / 60)
     delta -= minutes * 60
 
     const seconds = Math.floor(delta)

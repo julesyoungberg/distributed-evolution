@@ -29,14 +29,14 @@ spec:
         - name: SENTINELS
           value: sentinel-master:26379
         - name: THREADS
-          value: "6"
+          value: "9"
         resources:
           requests:
             cpu: 2.5
-            memory: 400Mi
+            memory: 500Mi
           limits:
             cpu: 3
-            memory: 800Mi
+            memory: 1000Mi
       restartPolicy: Always
       serviceAccountName: ""
       volumes: null

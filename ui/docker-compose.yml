@@ -3,9 +3,7 @@ version: '3'
 
 services:
     ui:
-        build:
-            context: .
-            dockerfile: dev.dockerfile
+        build: .
         environment: 
             API_URL: http://34.107.198.190/api
             CHANNEL_URL: ws://34.107.198.190/api/subscribe

@@ -96,20 +96,15 @@ func (s *SingleSystem) generateTask() {
 func (s *SingleSystem) createCallback() func(ga *eaopt.GA) {
 	return func(ga *eaopt.GA) {
 		s.Master.mu.Lock()
-		state := s.WorkerTask
-		s.Master.mu.Unlock()
+		defer s.Master.mu.Unlock()
 
-		state.Mu.Lock()
+		state := s.WorkerTask
 		output := state.BestFit.Output
 		fitness := state.BestFit.Fitness
-		state.Mu.Unlock()
 
 		if fitness != 0 {
 			fitness = 1 / fitness
 		}
-
-		s.Master.mu.Lock()
-		defer s.Master.mu.Unlock()
 
 		s.Master.Fitness = fitness
 		s.Master.Generation = ga.Generations
@@ -195,6 +190,7 @@ func (s *SingleSystem) updateUI() {
 		s.Master.mu.Unlock()
 
 		if output == nil || generation < 1 {
+			log.Printf("output nil or generation < 1")
 			continue
 		}
 

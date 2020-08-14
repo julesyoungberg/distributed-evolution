@@ -1,0 +1,14 @@
+{
+    "master": {
+        "cpu":  "0.665",
+        "memory": "28MiB"
+    },
+    "worker": {
+        "cpu":  "7.8",
+        "memory": "35MiB"
+    },
+    "sentinel": {
+        "cpu":  "0.2",
+        "memory": "600MiB"
+    }
+}

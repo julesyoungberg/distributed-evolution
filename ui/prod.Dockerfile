@@ -1,7 +1,7 @@
 FROM mhart/alpine-node:10 AS builder
 WORKDIR /app
-COPY package.json .
-RUN yarn install
+COPY ./package*.json ./
+RUN npm ci
 COPY . .
 RUN npm run build:production
 

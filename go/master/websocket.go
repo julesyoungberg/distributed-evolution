@@ -108,6 +108,8 @@ func (m *Master) sendOutput(output image.Image) {
 
 	if img, err := util.EncodeImage(output); err == nil {
 		state.Output = img
+	} else {
+		log.Printf("[combiner] error encoding output image: %v", err)
 	}
 
 	if err := m.sendData(state); err != nil {

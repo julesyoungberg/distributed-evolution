@@ -34,7 +34,7 @@ spec:
         - name: SENTINELS
           value: sentinel-master:26379
         - name: START_RANDOM_JOB
-          value: "true"
+          value: "false"
         - name: WORKERS
           value: "6"
         - name: WORKER_THREADS

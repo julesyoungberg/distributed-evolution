@@ -1,0 +1,18 @@
+{
+    "sentinel": {
+        "memory": "87.44MiB"
+    },
+    "master": {
+        "memory": "232MiB",
+        "netInput": "32700.000000000004MB",
+        "netOutput": "1580.0MB"
+    },
+    "ui": {
+        "memory": "594MiB",
+        "netInput": "211.0MB",
+        "netOutput": "3.81MB"
+    },
+    "worker": {
+        "memory": "143.8MiB"
+    }
+}

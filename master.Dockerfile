@@ -14,7 +14,7 @@ FROM julesyoungberg/gocv
 
 COPY --from=builder ./app/master .
 
-EXPOSE 9000 
+EXPOSE 9001
 EXPOSE 8080
 
 CMD ["./master"]

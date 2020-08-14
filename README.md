@@ -18,11 +18,17 @@ minikube addons enable ingress
 make build-apply
 ```
 
+Be sure to update your `/etc/hosts` file with `IP distributed.ga` 
+where `IP` is the ingress-controller IP from
+```shell
+kubectl get ingresses
+```
+
 redis testing: https://itsmetommy.com/2018/04/13/docker-compose-redis/
 
 
 ## Deployment
-The system can be deployed to any cloud provider that supports Kubernetes, such as GCP.
+The system can be deployed to any cloud provider that supports Kubernetes, such as GCP. The UI is best run locally or on [Vercel](vercel.com). 
 
 ### Build Images
 ```shell

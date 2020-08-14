@@ -7,17 +7,17 @@
                 context: .
                 dockerfile: single-system.Dockerfile
             environment: 
-                HTTP_PORT: 9000
+                HTTP_PORT: 9001
                 START_RANDOM_JOB: "false"
             ports:
-                - 9000:9000
+                - 9001:9001
         ui:
             build:
                 context: ui
                 dockerfile: dev.Dockerfile
             environment: 
-                API_URL: http://localhost:9000/api
-                CHANNEL_URL: ws://localhost:9000/api/subscribe
+                API_URL: http://localhost:9001/api
+                CHANNEL_URL: ws://localhost:9001/api/subscribe
                 NODE_ENV: development
                 PORT: 3000
             ports:

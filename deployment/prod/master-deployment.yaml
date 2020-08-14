@@ -36,9 +36,9 @@ spec:
         - name: START_RANDOM_JOB
           value: "false"
         - name: WORKERS
-          value: "6"
+          value: "7"
         - name: WORKER_THREADS
-          value: "6"
+          value: "7"
         readinessProbe:
           httpGet:
             path: /api/healthz

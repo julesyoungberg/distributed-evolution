@@ -21,7 +21,7 @@ sentinel-replica:
 	docker push julesyoungberg/distributed-evolution-sentinel-replica
 
 ui:
-	docker build -f prod.Dockerfile -t julesyoungberg/distributed-evolution-ui ./ui && \
+	docker build -t julesyoungberg/distributed-evolution-ui ./ui && \
 	docker push julesyoungberg/distributed-evolution-ui
 
 build: master worker sentinel-master sentinel-replica ui

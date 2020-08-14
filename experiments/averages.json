@@ -1,0 +1,20 @@
+{
+    "scale1": {
+        "duration": "1.27.10",
+        "generationsPerSecond": 1.91,
+        "fitness": 5.947002510339347e-06,
+        "memory": "149.17MiB"
+    },
+    "scale2": {
+        "duration": "0.49.11",
+        "generationsPerSecond": 3.39,
+        "fitness": 3.936297008264015e-05,
+        "memory": "256.94MiB"
+    },
+    "scale3": {
+        "duration": "0.41.8",
+        "generationsPerSecond": 4.14,
+        "fitness": 4.670780021940655e-05,
+        "memory": "335.68MiB"
+    }
+}

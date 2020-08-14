@@ -80,6 +80,9 @@ export default function Control() {
 
         if (!fileInputRef.current) throw new Error('File input ref has no current value')
 
+        const file = fileInputRef.current.files[0]
+        if (!file) return
+
         const img = new Image()
         img.crossOrigin = 'anonymous'
 
@@ -88,7 +91,6 @@ export default function Control() {
             setLoading(false)
         }
 
-        const file = fileInputRef.current.files[0]
         const reader = new FileReader()
         reader.addEventListener(
             'load',
@@ -193,6 +195,10 @@ export default function Control() {
                 } else {
                     value = parseFloat(value)
                 }
+
+                if (isNaN(value)) {
+                    value = target.value
+                }
             }
 
             setConfig({ ...config, [key]: value })
@@ -209,7 +215,7 @@ export default function Control() {
     return (
         <form css={{ marginBottom: 20 }}>
             <Flex css={{ textAlign: 'center' }} justifyContent='space-around'>
-                <Box width={1 / 2}>
+                <Box css={{ marginTop: '18px' }} width={1 / 2}>
                     <Input css={{ display: 'none ' }} onChange={onFileInputChange} ref={fileInputRef} type='file' />
                     <Button css={{ marginRight: 10 }} disabled={disableButtons} onClick={uploadTargetImage}>
                         Upload Target
@@ -279,7 +285,7 @@ export default function Control() {
                 </Field>
                 <Field>
                     <Label htmlFor='mutationRate'>Mutation Rate</Label>
-                    <Input step='0.001' min='0.0' max='1.0' {...fieldProps('mutationRate')} />
+                    <Input type='number' step='0.001' min='0.0' max='1.0' {...fieldProps('mutationRate')} />
                 </Field>
                 <Field>
                     <Label htmlFor='crossRate'>Cross Rate</Label>
