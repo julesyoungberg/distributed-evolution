@@ -1,6 +1,7 @@
 package api
 
 import (
+	"image"
 	"image/color"
 	"math/rand"
 
@@ -15,8 +16,20 @@ type Shape interface {
 type ShapeOptions struct {
 	Bounds       util.Vector
 	Palette      []color.RGBA
+	PaletteType  string
 	Quantization int
 	Size         float64
+	TargetImage  image.Image
+}
+
+func getShapeColor(rng *rand.Rand, opt ShapeOptions, position util.Vector) color.RGBA {
+	if opt.PaletteType == "targetImage" {
+		c := opt.TargetImage.At(int(position.X), int(position.Y))
+		r, g, b, a := c.RGBA()
+		return color.RGBA{uint8(r), uint8(g), uint8(b), uint8(a)}
+	}
+
+	return util.RandomColorFromPalette(rng, opt.Palette)
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -29,9 +42,11 @@ type Circle struct {
 }
 
 func CreateCircle(opt ShapeOptions, rng *rand.Rand) Shape {
+	position := util.RandomVector(rng, opt.Bounds, opt.Quantization)
+
 	return Circle{
-		Color:    util.RandomColorFromPalette(rng, opt.Palette),
-		Position: util.RandomVector(rng, opt.Bounds, opt.Quantization),
+		Color:    getShapeColor(rng, opt, position),
+		Position: position,
 		Radius:   util.RandomRadius(rng, opt.Size),
 	}
 }
@@ -57,9 +72,13 @@ func CreateLine(opt ShapeOptions, rng *rand.Rand) Shape {
 		X: p1.X + rng.Float64()*opt.Size*2,
 		Y: p1.Y + rng.Float64()*opt.Size*2,
 	}
+	position := util.Vector{
+		X: (p1.X + p2.X) / 2.0,
+		Y: (p1.Y + p2.Y) / 2.0,
+	}
 
 	return Line{
-		Color:    util.RandomColorFromPalette(rng, opt.Palette),
+		Color:    getShapeColor(rng, opt, position),
 		Position: []util.Vector{p1, p2},
 		Width:    float64(rng.Intn(16)),
 	}
@@ -84,9 +103,11 @@ type Polygon struct {
 }
 
 func CreatePolygon(opt ShapeOptions, rng *rand.Rand) Shape {
+	position := util.RandomVector(rng, opt.Bounds, opt.Quantization)
+
 	return Polygon{
-		Color:    util.RandomColorFromPalette(rng, opt.Palette),
-		Position: util.RandomVector(rng, opt.Bounds, opt.Quantization),
+		Color:    getShapeColor(rng, opt, position),
+		Position: position,
 		Radius:   util.RandomRadius(rng, opt.Size),
 		Rotation: util.RandomRotation(rng),
 		Sides:    rng.Intn(5) + 3,
@@ -115,9 +136,13 @@ func CreateTriangle(opt ShapeOptions, rng *rand.Rand) Shape {
 	p1 := util.RandomVector(rng, opt.Bounds, opt.Quantization)
 	p2 := util.Vector{X: p1.X + offset(), Y: p1.Y + offset()}
 	p3 := util.Vector{X: p1.X + offset(), Y: p1.Y + offset()}
+	position := util.Vector{
+		X: (p1.X + p2.X + p3.X) / 3.0,
+		Y: (p1.Y + p2.Y + p3.Y) / 3.0,
+	}
 
 	return Triangle{
-		Color:    util.RandomColorFromPalette(rng, opt.Palette),
+		Color:    getShapeColor(rng, opt, position),
 		Vertices: []util.Vector{p1, p2, p3},
 	}
 }

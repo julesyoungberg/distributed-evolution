@@ -64,10 +64,12 @@ func (m *Master) getPalette() []color.RGBA {
 	m.mu.Unlock()
 
 	switch paletteType {
-	case "targetImage":
+	case "kmeans":
 		return m.getPaletteFromTargetImage(false)
-	case "targetImageRandomCenters":
+	case "kmeansRandomCenters":
 		return m.getPaletteFromTargetImage(true)
+	case "targetImage":
+		return []color.RGBA{{0, 0, 0, 0}} // dummy
 	default:
 		return m.getRandomPalette()
 	}

@@ -39,8 +39,10 @@ func CreateShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
 	opt := ShapeOptions{
 		Bounds:       bounds,
 		Palette:      ctx.Palette,
+		PaletteType:  ctx.Task.Job.PaletteType,
 		Quantization: ctx.Task.ScaledQuantization,
 		Size:         float64(ctx.Task.Job.ShapeSize),
+		TargetImage:  ctx.TargetImage.Image,
 	}
 
 	return func(rng *rand.Rand) eaopt.Genome {

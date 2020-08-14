@@ -7,6 +7,9 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
+const Timeout = 5 * time.Second
+const QueueTimeout = 60 * time.Second
+
 // recovers a failed task by fetching the
 func (m *Master) recover(id int) {
 	m.mu.Lock()
@@ -59,17 +62,14 @@ func (m *Master) recover(id int) {
 // check that each inprogress task is active by checking its last update
 // if a task times out, mark it as failed and begin recovery process
 func (m *Master) detectFailures() {
-	timeout := 10 * time.Second
-	queueTimeout := 60 * time.Second
-
 	for {
-		time.Sleep(timeout / 4)
+		time.Sleep(Timeout / 4)
 
 		m.mu.Lock()
 
 		for id, task := range m.Tasks {
-			workerTimeout := task.Status == "inprogress" && time.Since(task.LastUpdate) > timeout
-			queueTimeout := task.Status == "queued" && time.Since(task.LastUpdate) > queueTimeout
+			workerTimeout := task.Status == "inprogress" && time.Since(task.LastUpdate) > Timeout
+			queueTimeout := task.Status == "queued" && time.Since(task.LastUpdate) > QueueTimeout
 
 			if workerTimeout || queueTimeout {
 				util.DPrintf("[failure detector] %v task %v timed out, recovering", task.Status, id)
