@@ -7,7 +7,7 @@ services:
             context: .
             dockerfile: master.Dockerfile
         environment: 
-            HTTP_PORT: 9000
+            HTTP_PORT: 9001
             REDIS_MASTER_NAME: mymaster
             RPC_PORT: 8080
             SENTINELS: distributed-evolution_sentinel_1:26379,distributed-evolution_sentinel_2:26379,distributed-evolution_sentinel_3:26379
@@ -15,7 +15,7 @@ services:
             WORKERS: 5
             WORKER_THREADS: 5
         ports:
-            - 9000:9000
+            - 9001:9001
             - 8080
     worker:
         build:
@@ -25,14 +25,12 @@ services:
             MASTER_URL: master:8080
             REDIS_MASTER_NAME: mymaster
             SENTINELS: distributed-evolution_sentinel_1:26379,distributed-evolution_sentinel_2:26379,distributed-evolution_sentinel_3:26379
-            THREADS: 5
+            THREADS: 6
     ui:
-        build:
-            context: ui
-            dockerfile: dev.Dockerfile
+        build: ui
         environment: 
-            API_URL: http://localhost:9000/api
-            CHANNEL_URL: ws://localhost:9000/api/subscribe
+            API_URL: http://localhost:9001/api
+            CHANNEL_URL: ws://localhost:9001/api/subscribe
             NODE_ENV: development
             PORT: 3000
         ports:

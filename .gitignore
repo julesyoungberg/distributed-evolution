@@ -1,5 +1,3 @@
 .DS_Store
 log
-input.png
-palette.png
-edges.png
+go/**/*.png

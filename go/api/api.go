@@ -17,7 +17,7 @@ type Output struct {
 	Output  image.Image
 }
 
-type WorkerTask struct {
+type TaskContext struct {
 	BestFit     Output
 	Edges       image.Image
 	GenOffset   uint
@@ -114,4 +114,27 @@ func (t Task) UpdateMaster(worker uint32, thread int, status string) error {
 		Thread:     thread,
 		WorkerID:   worker,
 	})
+}
+
+func (ctx *TaskContext) EnrichTask(ga *eaopt.GA) (Task, error) {
+	output := ctx.BestFit.Output
+	if output == nil {
+		return Task{}, fmt.Errorf("best fit output is nil")
+	}
+
+	encoded, err := util.EncodeImage(output)
+	if err != nil {
+		return Task{}, fmt.Errorf("encoding output: %v", err)
+	}
+
+	bestFit := ga.HallOfFame[0]
+	bestFit.Genome = Shapes{}
+
+	task := ctx.Task
+	task.Output = encoded
+	task.BestFit = bestFit
+
+	task.Population = ga.Populations[0].Individuals
+
+	return task, nil
 }

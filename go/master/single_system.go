@@ -24,7 +24,7 @@ type SingleSystem struct {
 	Palette          []color.RGBA
 	TargetImageEdges image.Image
 	Task             api.Task
-	WorkerTask       *api.WorkerTask
+	TaskContext      *api.TaskContext
 
 	ga *eaopt.GA
 }
@@ -98,7 +98,7 @@ func (s *SingleSystem) createCallback() func(ga *eaopt.GA) {
 		s.Master.mu.Lock()
 		defer s.Master.mu.Unlock()
 
-		state := s.WorkerTask
+		state := s.TaskContext
 		output := state.BestFit.Output
 		fitness := state.BestFit.Fitness
 
@@ -123,7 +123,7 @@ func (s *SingleSystem) createCallback() func(ga *eaopt.GA) {
 func (s *SingleSystem) createEarlyStop() func(ga *eaopt.GA) bool {
 	return func(ga *eaopt.GA) bool {
 		s.Master.mu.Lock()
-		state := s.WorkerTask
+		state := s.TaskContext
 		s.Master.mu.Unlock()
 
 		state.Mu.Lock()
@@ -142,7 +142,7 @@ func (s *SingleSystem) runTask() {
 	s.Master.mu.Lock()
 	job := s.Master.Job
 	task := s.Task
-	t := api.WorkerTask{
+	t := api.TaskContext{
 		GenOffset:   0,
 		Palette:     s.Palette,
 		TargetImage: s.Master.TargetImage,
@@ -160,7 +160,7 @@ func (s *SingleSystem) runTask() {
 	factory := api.GetShapesFactory(&t, task.Population)
 
 	s.Master.mu.Lock()
-	s.WorkerTask = &t
+	s.TaskContext = &t
 	s.Master.mu.Unlock()
 
 	// evolve

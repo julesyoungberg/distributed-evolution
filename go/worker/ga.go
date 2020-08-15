@@ -37,11 +37,11 @@ func CreateGA(config api.Job) *eaopt.GA {
 	return ga
 }
 
-func (w *Worker) setTaskState(state *api.WorkerTask) {
-	w.mu.Lock()
-	w.Tasks[state.Task.ID] = state
-	w.mu.Unlock()
-}
+// func (w *Worker) setTaskState(state *api.TaskContext) {
+// 	w.mu.Lock()
+// 	w.Tasks[state.Task.ID] = state
+// 	w.mu.Unlock()
+// }
 
 // returns a closure to be called after each generation
 func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
@@ -62,14 +62,11 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 
 		success := w.updateMaster(state, thread, status)
 		if !success {
-			w.setTaskState(state)
+			// w.setTaskState(state)
 			return
 		}
 
-		go func() {
-			w.updateTask(state, ga, thread)
-			w.setTaskState(state)
-		}()
+		w.updateTask(state, ga, thread)
 	}
 }
 

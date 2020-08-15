@@ -8,12 +8,14 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
+/**
+ * REMEMBER to update JSONShapes in json.go
+ */
 type Shapes struct {
-	Bounds       util.Vector
-	Context      *WorkerTask
-	Members      []Shape
-	Quantization int
-	Type         string
+	Bounds  util.Vector
+	Context *TaskContext
+	Members []Shape
+	Type    string
 }
 
 // get the correct creation function based on the given shape type
@@ -30,28 +32,28 @@ func GetCreateShapeFunc(shapeType string) func(opt ShapeOptions, rng *rand.Rand)
 	}
 }
 
-// returns a closure with a reference to the context that can be used to generate a random shapes object
-func CreateShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
-	bounds := ctx.Task.Dimensions
-
-	createShape := GetCreateShapeFunc(ctx.Task.ShapeType)
-
-	opt := ShapeOptions{
-		Bounds:       bounds,
+func getShapeOptions(ctx *TaskContext) ShapeOptions {
+	return ShapeOptions{
+		Bounds:       ctx.Task.Dimensions,
 		Palette:      ctx.Palette,
 		PaletteType:  ctx.Task.Job.PaletteType,
 		Quantization: ctx.Task.ScaledQuantization,
 		Size:         float64(ctx.Task.Job.ShapeSize),
 		TargetImage:  ctx.TargetImage.Image,
 	}
+}
+
+// returns a closure with a reference to the context that can be used to generate a random shapes object
+func CreateShapesFactory(ctx *TaskContext) func(rng *rand.Rand) eaopt.Genome {
+	createShape := GetCreateShapeFunc(ctx.Task.ShapeType)
+	opt := getShapeOptions(ctx)
 
 	return func(rng *rand.Rand) eaopt.Genome {
 		shapes := Shapes{
-			Bounds:       bounds,
-			Context:      ctx,
-			Members:      make([]Shape, ctx.Task.Job.ShapesPerSlice),
-			Quantization: ctx.Task.ScaledQuantization,
-			Type:         ctx.Task.ShapeType,
+			Bounds:  opt.Bounds,
+			Context: ctx,
+			Members: make([]Shape, ctx.Task.Job.ShapesPerSlice),
+			Type:    ctx.Task.ShapeType,
 		}
 
 		for i := 0; i < int(ctx.Task.Job.ShapesPerSlice); i++ {
@@ -63,28 +65,23 @@ func CreateShapesFactory(ctx *WorkerTask) func(rng *rand.Rand) eaopt.Genome {
 }
 
 func CreateShapesFactoryFromPopulation(
-	ctx *WorkerTask,
+	ctx *TaskContext,
 	initialPopulation eaopt.Individuals,
 ) func(rng *rand.Rand) eaopt.Genome {
 	population := initialPopulation
 
 	return func(rng *rand.Rand) eaopt.Genome {
 		index := len(population) - 1
-
 		member := population[index]
-
 		population = population[:index]
-
 		s := member.Genome.(Shapes)
-
 		s.Context = ctx
-
 		return s
 	}
 }
 
 func GetShapesFactory(
-	ctx *WorkerTask,
+	ctx *TaskContext,
 	initialPopulation eaopt.Individuals,
 ) func(rng *rand.Rand) eaopt.Genome {
 	if len(initialPopulation) > 0 {
@@ -137,13 +134,7 @@ func (s Shapes) Evaluate() (float64, error) {
 // randomly replace members of the population with a new random shape
 func (s Shapes) Mutate(rng *rand.Rand) {
 	createShape := GetCreateShapeFunc(s.Type)
-
-	opt := ShapeOptions{
-		Bounds:       s.Bounds,
-		Palette:      s.Context.Palette,
-		Quantization: s.Quantization,
-		Size:         float64(s.Context.Task.Job.ShapeSize),
-	}
+	opt := getShapeOptions(s.Context)
 
 	for i := range s.Members {
 		if rng.Float64() < s.Context.Task.Job.MutationRate {

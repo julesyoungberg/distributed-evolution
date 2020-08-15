@@ -7,12 +7,18 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
+/**
+ * Since Shapes contains pointers, custom json marshalling is needed.
+ * This file contains the JSON-encodable versions of Shapes and eaopt.Individual,
+ * and handles the logic associated with them.
+ */
 type JSONShapes struct {
-	Circles   []Circle    `json:"circles"`
-	Bounds    util.Vector `json:"bounds"`
-	Polygons  []Polygon   `json:"polygon"`
-	Triangles []Triangle  `json:"triangle"`
-	Type      string      `json:"type"`
+	Bounds util.Vector `json:"bounds"`
+	Type   string      `json:"type"`
+
+	Circles   []Circle   `json:"circles"`
+	Polygons  []Polygon  `json:"polygon"`
+	Triangles []Triangle `json:"triangle"`
 }
 
 type JSONIndividual struct {
@@ -21,6 +27,7 @@ type JSONIndividual struct {
 	ID      string     `json:"ID"`
 }
 
+// convert a Shapes instance to a json encodable version
 func (s Shapes) ToJSON() JSONShapes {
 	j := JSONShapes{
 		Bounds: s.Bounds,
@@ -50,6 +57,7 @@ func (s Shapes) ToJSON() JSONShapes {
 	return j
 }
 
+// convert a decoded json shapes intance to a Shapes instance
 func (j JSONShapes) ToShapes() Shapes {
 	s := Shapes{
 		Bounds: j.Bounds,

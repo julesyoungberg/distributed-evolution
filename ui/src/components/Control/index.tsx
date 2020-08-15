@@ -29,7 +29,7 @@ interface Config {
     numGenerations: number
     numShapes: number
     overDraw: number
-    paletteType: 'random' | 'kmeans' | 'kmeansRandomCenters' | 'targetImage'
+    paletteType: 'kmeans' | 'kmeansRandomCenters' | 'random' | 'targetImage'
     poolSize: number
     popSize: number
     quantization: number
@@ -298,7 +298,7 @@ export default function Control() {
                 <Field>
                     <Label htmlFor='paletteType'>Palette Type</Label>
                     <Select {...fieldProps('paletteType')}>
-                        {['random', 'kmeans', 'kmeansRandomCenters', 'targetImage'].map((type) => (
+                        {['kmeans', 'kmeansRandomCenters', 'random', 'targetImage'].map((type) => (
                             <option key={type}>{type}</option>
                         ))}
                     </Select>

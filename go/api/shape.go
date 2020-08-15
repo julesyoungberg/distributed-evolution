@@ -15,6 +15,7 @@ type Shape interface {
 
 type ShapeOptions struct {
 	Bounds       util.Vector
+	MutationRate float64
 	Palette      []color.RGBA
 	PaletteType  string
 	Quantization int
@@ -24,9 +25,13 @@ type ShapeOptions struct {
 
 func getShapeColor(rng *rand.Rand, opt ShapeOptions, position util.Vector) color.RGBA {
 	if opt.PaletteType == "targetImage" {
+		if rng.Float64() < opt.MutationRate {
+			return util.RandomColor(rng)
+		}
+
 		c := opt.TargetImage.At(int(position.X), int(position.Y))
-		r, g, b, a := c.RGBA()
-		return color.RGBA{uint8(r), uint8(g), uint8(b), uint8(a)}
+		r, g, b, _ := c.RGBA()
+		return color.RGBA{uint8(r), uint8(g), uint8(b), uint8((rng.Intn(3) + 1) * 64)}
 	}
 
 	return util.RandomColorFromPalette(rng, opt.Palette)

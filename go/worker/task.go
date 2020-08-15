@@ -1,6 +1,8 @@
 package worker
 
 import (
+	"fmt"
+	"image/color"
 	"log"
 
 	"github.com/MaxHalford/eaopt"
@@ -8,21 +10,17 @@ import (
 	"github.com/rickyfitts/distributed-evolution/go/util"
 )
 
-// RunTask executes the genetic algorithm for a given task
-func (w *Worker) RunTask(task api.Task, thread int) {
-	log.Printf("[thread %v] assigned task %v of job %v with population len: %v", thread, task.ID, task.Job.ID, len(task.Population))
-
-	t := api.WorkerTask{
+func getTaskContext(task api.Task, palette []color.RGBA) (*api.TaskContext, error) {
+	t := api.TaskContext{
 		GenOffset: task.Generation,
-		Palette:   w.Palette,
+		Palette:   palette,
 		Task:      task,
 	}
 
 	// decode and save target image
 	img, err := util.DecodeImage(task.TargetImage)
 	if err != nil {
-		log.Printf("[thread %v] error decoding task target image: %v", thread, err)
-		return
+		return nil, fmt.Errorf("error decoding task target image: %v", err)
 	}
 
 	width, height := util.GetImageDimensions(img)
@@ -35,24 +33,32 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	if len(task.Edges) > 0 {
 		edges, err := util.DecodeImage(task.Edges)
 		if err != nil {
-			log.Printf("[thread %v] error decoding task target image edges: %v", thread, err)
-			return
+			return nil, fmt.Errorf("error decoding task target image edges: %v", err)
 		}
 
 		t.Edges = edges
 	}
+
+	return &t, nil
+}
+
+// RunTask executes the genetic algorithm for a given task
+func (w *Worker) RunTask(task api.Task, thread int) {
+	log.Printf("[thread %v] assigned task %v of job %v with population len: %v", thread, task.ID, task.Job.ID, len(task.Population))
+
+	t, err := getTaskContext(task, w.Palette)
 
 	w.ga = CreateGA(task.Job)
 
 	// create closure functions with context
 	w.ga.Callback = w.createCallback(task.ID, thread)
 	w.ga.EarlyStop = w.createEarlyStop(task.ID)
-	factory := api.GetShapesFactory(&t, task.Population)
+	factory := api.GetShapesFactory(t, task.Population)
 
-	t.Task.Population = eaopt.Individuals{}
+	// t.Task.Population = eaopt.Individuals{}
 
 	w.mu.Lock()
-	w.Tasks[task.ID] = &t
+	w.Tasks[task.ID] = t
 	w.mu.Unlock()
 
 	// evolve
@@ -62,7 +68,7 @@ func (w *Worker) RunTask(task api.Task, thread int) {
 	}
 }
 
-func (w *Worker) updateMaster(state *api.WorkerTask, thread int, status string) bool {
+func (w *Worker) updateMaster(state *api.TaskContext, thread int, status string) bool {
 	err := state.Task.UpdateMaster(w.ID, thread, status)
 	if err != nil {
 		log.Printf("[thread %v] failed to update master: %v", thread, err)
@@ -74,40 +80,23 @@ func (w *Worker) updateMaster(state *api.WorkerTask, thread int, status string) 
 }
 
 // saves a task snapshot as a serialized JSON string to the cache
-func (w *Worker) saveTaskSnapshot(state *api.WorkerTask, thread int) {
-	task := state.Task
-	task.Population = w.ga.Populations[0].Individuals
+func (w *Worker) saveTaskSnapshot(task api.Task, thread int) {
 	err := w.db.SaveTask(task)
 	if err != nil {
 		log.Printf("[thread %v] error saving task %v snapshot: %v", thread, task.ID, err)
 	}
 }
 
-func (w *Worker) updateTask(state *api.WorkerTask, ga *eaopt.GA, thread int) {
-	// get best fit
-	bestFit := ga.HallOfFame[0]
-
-	output := state.BestFit.Output
-	if output == nil {
-		// this happens A LOT - idk why
-		// log.Printf("[thread %v] error! best fit image is nil at generation %v - bestFit: %v", thread, ga.Generations, state.BestFit)
-		return
-	}
-
-	encoded, err := util.EncodeImage(output)
+func (w *Worker) updateTask(state *api.TaskContext, ga *eaopt.GA, thread int) {
+	// enrich task with data to save in the db
+	task, err := state.EnrichTask(ga)
 	if err != nil {
-		log.Printf("[thread %v] error saving task: %v", thread, err)
+		log.Printf("[thread %v] error updateing task: %v", thread, err)
 		return
 	}
 
-	state.Task.Output = encoded
-	bestFit.Genome = api.Shapes{}
-
-	// clear state
+	// clear best fit
 	state.BestFit = api.Output{}
 
-	// add data to the task
-	state.Task.BestFit = bestFit
-
-	w.saveTaskSnapshot(state, thread)
+	go w.saveTaskSnapshot(task, thread)
 }

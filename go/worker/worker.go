@@ -17,7 +17,7 @@ import (
 type Worker struct {
 	ID      uint32
 	Palette []color.RGBA
-	Tasks   map[int]*api.WorkerTask
+	Tasks   map[int]*api.TaskContext
 
 	db db.DB
 	ga *eaopt.GA
@@ -69,7 +69,7 @@ func Run() {
 	w := Worker{
 		ID:    uuid.New().ID(),
 		db:    db.NewConnection(),
-		Tasks: map[int]*api.WorkerTask{},
+		Tasks: map[int]*api.TaskContext{},
 	}
 
 	nThreads, err := strconv.Atoi(os.Getenv("THREADS"))

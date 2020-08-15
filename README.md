@@ -7,7 +7,6 @@ Genetic algorithms are a problem solving technique based on Darwin’s theory of
 With `docker-compose`
 ```shell
 docker network create distributed-ga
-make gocv # base image for running gocv in docker
 make start
 ```
 
