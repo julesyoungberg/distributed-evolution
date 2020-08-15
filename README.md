@@ -79,11 +79,11 @@ Fun:
 
 # Design
 
-The design of the system is illustrated in **Figure 1**. Data flows from the UI, to the master, through Redis to worker threads, then back through Redis to the master, and finally back to the UI. Each component is covered in detail in the following sections.
+The system is built as a collection of Docker containers. There is a master and many workers all running the main Golang project. There’s a set of containers dedicated to running a highly available Redis Sentinel cluster. Lastly, there is a container that runs the UI for managing jobs, and collecting results. Data flows from the UI, to the master, through Redis to worker threads and back again.
 
 ![](images/design.png)
 
-**Figure 1.** A diagram of the components and data flow of the system.
+![](images/process_flow.png)
 
 
 ## Master
@@ -97,36 +97,28 @@ The master communicates with the UI and oversees a job’s execution. The main c
 The [Gorilla web toolkit](https://www.gorillatoolkit.org/) is used to support the HTTP and WebSocket server.
 
 
-### Task Generator
+The task generator uses the job configuration from the UI to generate subtasks which can be worked on in parallel. Each task is added to the master’s local state and saved in Redis. The ID is then added to the task queue in Redis. 
 
-The task generator uses the job specification to generate sub problems which can be worked on in parallel. It divides the target image based on the total number of worker threads available, maximizing utilization. Each task is added to the master’s local state and saved in Redis. The ID is then added to the task queue in Redis. 
+After the task generator finishes, the failure detector and combiner are the primary function of the master. The failure detector periodically scans the master’s local state for timed out tasks. The master receives RPC updates from the workers, the time of each update is recorded, and later checked by the failure detector. If a task times out, the ID is again added to the task queue. If a false positive occurs, whichever worker thread sends the next update claims the task, and an update from any other worker is received, the master responds with an error. If a worker can’t update the master, it does not save anything to the database, stops, and checks the queue for new tasks. This behaviour guarantees only one thread will ever be working on a task at a time. The combiner periodically reads each task from Redis, combines the results into a single output image, then sends it to the UI with the master’s local state for tracking.
 
-
-### Failure Detector
-
-The failure detector periodically scans the master’s local state for timed out tasks. If a task times out,  the ID is again added to the task queue.
-
-
-### Combiner
-
-The combiner periodically reads each task from Redis, combining the results into a single output image. The output is then encoded with the master’s local state, and sent to the UI over the WebSocket connection. 
+The master also saves its local state to Redis periodically. If the master crashes, this makes it possible to continue work on the current job when a new master starts up. On startup, it checks the database for a state snapshot. If one exists, the master restores its state, requeues the tasks, and continues job progress. 
 
 
 ## Worker Threads
 
-Worker threads run the genetic algorithm. Each worker spawns a number of threads to each work on a separate task. Each thread starts by requesting a task ID from the task queue. If there is one available, the worker thread initializes the genetic algorithm engine and begins processing the task. If there is no work available, the thread sleeps and tries again. If a thread receives a task that has been previously worked on, the initial population for the genetic algorithm needs to be taken from the task data rather than generated randomly. After each generation during the genetic algorithm, the task output is saved to Redis and the task status is sent to the master, via the UpdateTask RPC. If UpdateTask throws an error, the worker thread stops progress on the task, and begins to poll the queue for new tasks. Two packages at the core of the worker threads are [EAOPT](https://github.com/MaxHalford/eaopt), the genetic algorithm engine, and [Go Graphics](https://github.com/fogleman/gg), the drawing library.
+Worker threads run the genetic algorithm. Each worker spawns a number of threads to work on a separate task. Each thread starts by requesting a task ID from the task queue. If there is one available, the worker thread initializes the GA engine and begins processing the task. If there is no work available, the thread sleeps and tries again. If a thread receives a task that has been previously worked on, the initial population for the GA is taken from the task data rather than generated randomly. After each generation, the task status is sent to the master with the UpdateTask RPC and the task output is saved to Redis. If UpdateTask throws an error, the worker thread stops working on the task, and begins to poll the queue for new tasks. Two packages at the core of the worker threads are [EAOPT](https://github.com/MaxHalford/eaopt), the genetic algorithm engine, and [Go Graphics](https://github.com/fogleman/gg), the drawing library.
 
 
 ## Redis
 
-Redis is used to share task data and queue tasks. Each task is saved in Redis as a JSON string with key `task:ID`. The task queue is a list of task IDs to be started by worker threads. The task queue decouples task generation and management from task assignment, removing the need for worker threads to send RPCs to the master to request work. As a task is worked on, the latest population and current best fitting output are saved to Redis. Doing this allows the UpdateTask RPC arguments to be minimal, reducing unnecessary data transfer. The master does not need the latest population or the best fitting output image when UpdateTask is called. The output is read from Redis at a reduced rate by the combiner. 
+Redis is used to share task data between the master and workers, queue tasks, and save master state snapshots for recovery. Each task is saved in Redis as a JSON string with key task:ID. The task queue is a list of unassigned task IDs. This decouples task generation and management from task assignment, removing the need for worker threads to request work from the master directly. As a task is worked on, the latest population and current best fitting output are saved to Redis. Doing this allows the UpdateTask RPC arguments to be minimal, reducing unnecessary blocking data transfer between the workers and master. The output is read from Redis at a reduced rate by the combiner. Lastly, Redis is used to periodically save the master’s state as a snapshot. This snapshot can later be used to restore the state after a crash. 
 
 [Redis](https://redis.io/) was chosen as the database because it is fast, single threaded, and can be configured for high availability. The entire database is stored in memory, making read and writes very fast. Since Redis is single threaded, all commands are run in serial, eliminating the need for synchronization techniques like a distributed lock. [Redis Sentinel](https://redis.io/topics/sentinel) provides easy master-slave replication and automatic failover (leader election). 
 
 
 ## UI
 
-The UI allows a user to start a job and monitor its progress. The output is displayed next to the target image, and each worker thread is displayed in a table. The UI is built with TypeScript; [NextJS](https://nextjs.org/) a web framework built on [ReactJS](https://reactjs.org/); and [RebassJS](https://rebassjs.org/), a minimal UI component library. 
+The UI allows a user to start a job and monitor its progress. The output is displayed next to the target image, and each worker thread is displayed in a table. The UI is built with TypeScript; [NextJS](https://nextjs.org/) a [ReactJS](https://reactjs.org/)framework; and [RebassJS](https://rebassjs.org/), a minimal UI component library. 
 
 
 # Containerization & Deployment
@@ -164,3 +156,8 @@ The system is stable and mostly fault-tolerant. It has run on a job for 8 hours,
 
 The system has potential, but needs to be deployed to a cloud cluster to take advantage of the distributed design. One thing that could be done to greatly improve the output is reducing the solution space. Essentially, this means to reduce the number of possibilities within the randomness. This could be done by reducing the number of colors available, using a subset of colors from the target image, or using precomputed slices of an entirely different image. Another thing that could be done is running line detection on the target image, and then treating pixels on an edge differently than others. These concepts are covered in more detail by John Muellerleile in his talk [**An Adventure in Distributed Systems, Genetic Algorithms & Art**](https://www.youtube.com/watch?v=JNP8NyiklAU). However, these optimizations are beyond the scope of Phase I of this project, and focus has been on making the system fault tolerant and scalable. 
 
+# Screenshots
+
+![](images/screenshot1.png)
+
+![](images/screenshot2.png)
