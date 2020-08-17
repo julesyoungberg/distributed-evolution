@@ -2,34 +2,38 @@
 import json
 import re
 
-experiments = ['target1', 'target2', 'target3']
-scales = ['scale1', 'scale2', 'scale3']
+experiments = ["target1", "target2", "target3"]
+scales = ["scale1", "scale2", "scale3"]
+
 
 def load_data(path, filename):
     name = path + filename
     try:
-        with open(name, 'r') as f:
+        with open(name, "r") as f:
             data = json.load(f)
     except FileNotFoundError:
         return None
     return data
 
+
 def read_summary(path):
-    data = load_data(path, 'summary.json')
+    data = load_data(path, "summary.json")
     if data == None:
         return data
-    return data['metadata']
+    return data["metadata"]
+
 
 def read_stats(path):
-    return load_data(path, 'stats.json')
+    return load_data(path, "stats.json")
+
 
 def get_avg_attempts(tasks):
     count = 0
     total = 0
     for task in tasks:
-        if task['attempt'] > 0:
+        if task["attempt"] > 0:
             count += 1
-            total += task['attempt']
+            total += task["attempt"]
     if count == 0:
         return 0
     return total / count
@@ -40,15 +44,16 @@ def get_duration(seconds):
     seconds -= hours * 3600
     minutes = int(seconds / 60)
     seconds -= minutes * 60
-    s = '.'.join(map(str, [hours, minutes, int(seconds)]))
+    s = ".".join(map(str, [hours, minutes, int(seconds)]))
     return s
+
 
 def get_total_memory(stats):
     count = 0
     total = 0
 
     for key in stats:
-        m = re.search(r'(\d*\.?\d*)', stats[key]['memory'])
+        m = re.search(r"(\d*\.?\d*)", stats[key]["memory"])
         if m == None:
             continue
         count += 1
@@ -59,21 +64,22 @@ def get_total_memory(stats):
 
     return round(total / count, 2)
 
+
 def compute_averages():
     averages = {}
 
     for scale in scales:
         total = 0
-        sums = { 
-            'attempts': 0,
-            'duration': 0, 
-            'fitness': 0, 
-            'generationsPerSecond': 0,
-            'memory': 0,
+        sums = {
+            "attempts": 0,
+            "duration": 0,
+            "fitness": 0,
+            "generationsPerSecond": 0,
+            "memory": 0,
         }
 
         for experiment in experiments:
-            path = experiment + '/' + scale + '/'
+            path = experiment + "/" + scale + "/"
 
             summary = read_summary(path)
             stats = read_stats(path)
@@ -84,28 +90,31 @@ def compute_averages():
             total += 1
 
             if summary:
-                sums['attempts'] += get_avg_attempts(summary['tasks'])
-                [hours, minutes, seconds] = summary['duration'].split('.')
+                sums["attempts"] += get_avg_attempts(summary["tasks"])
+                [hours, minutes, seconds] = summary["duration"].split(".")
                 seconds = int(seconds) + int(minutes) * 60 + int(hours) * 3600
-                sums['duration'] += seconds
-                sums['generationsPerSecond'] += float(summary['generation'] / seconds)
-                sums['fitness'] += float(summary['fitness'])
+                sums["duration"] += seconds
+                sums["generationsPerSecond"] += float(summary["generation"] / seconds)
+                sums["fitness"] += float(summary["fitness"])
             if stats:
-                sums['memory'] += get_total_memory(stats)
+                sums["memory"] += get_total_memory(stats)
 
         if total == 0:
             continue
 
         averages[scale] = {}
-        averages[scale]['attempts'] = round(sums['attempts'] / total)
-        averages[scale]['duration'] = get_duration(round(sums['duration'] / total))
-        averages[scale]['generationsPerSecond'] = round(sums['generationsPerSecond'] / total, 2)
-        averages[scale]['fitness'] = sums['fitness'] / total
-        averages[scale]['memory'] = str(round(sums['memory'] / total, 2)) + 'MiB'
+        averages[scale]["attempts"] = round(sums["attempts"] / total)
+        averages[scale]["duration"] = get_duration(round(sums["duration"] / total))
+        averages[scale]["generationsPerSecond"] = round(
+            sums["generationsPerSecond"] / total, 2
+        )
+        averages[scale]["fitness"] = sums["fitness"] / total
+        averages[scale]["memory"] = str(round(sums["memory"] / total, 2)) + "MiB"
 
     return averages
 
+
 averages = compute_averages()
 
-with open('averages.json', 'w') as file:
+with open("averages.json", "w") as file:
     json.dump(averages, file, indent=4)
