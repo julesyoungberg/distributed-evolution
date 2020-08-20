@@ -26,6 +26,10 @@ func NewConnection() DB {
 	return DB{Client: client}
 }
 
+func NewTestConnection() DB {
+	return DB{Client: redis.NewClient(&redis.Options{Addr: "localhost:6379"})}
+}
+
 func (db *DB) Flush() error {
 	return db.Client.FlushAll(ctx).Err()
 }
