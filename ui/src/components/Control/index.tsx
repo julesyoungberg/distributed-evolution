@@ -46,7 +46,7 @@ const initialConfig: Config = Object.freeze({
     numGenerations: 0,
     numShapes: 7000,
     overDraw: 20,
-    paletteType: 'random',
+    paletteType: 'targetImage',
     poolSize: 10,
     popSize: 50,
     quantization: 50,

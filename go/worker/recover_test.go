@@ -236,7 +236,7 @@ func TestRedis(t *testing.T) {
 
 	dc := db.NewTestConnection()
 	dc.Flush()
-	runWithRedis(t, task, &dc, 1000)
+	runWithRedis(t, task, &dc, 2000)
 
 	task2, err := dc.GetTask(task.ID)
 	if err != nil {

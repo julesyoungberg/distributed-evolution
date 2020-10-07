@@ -37,12 +37,6 @@ func CreateGA(config api.Job) *eaopt.GA {
 	return ga
 }
 
-// func (w *Worker) setTaskState(state *api.TaskContext) {
-// 	w.mu.Lock()
-// 	w.Tasks[state.Task.ID] = state
-// 	w.mu.Unlock()
-// }
-
 // returns a closure to be called after each generation
 func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 	// send the currrent best fit and other data to the master
@@ -62,7 +56,6 @@ func (w *Worker) createCallback(id int, thread int) func(ga *eaopt.GA) {
 
 		success := w.updateMaster(state, thread, status)
 		if !success {
-			// w.setTaskState(state)
 			return
 		}
 
